@@ -1,0 +1,365 @@
+/**
+ * REST API Manager Admin Styles
+ *
+ * @package RestApiManager
+ */
+
+.rest-api-namespace {
+	margin-bottom: 15px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Namespace Header (Accordion Header) */
+.namespace-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 5px 10px;
+	background: #f6f7f7;
+	border-bottom: 1px solid #c3c4c7;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.namespace-header:hover {
+	background: #f0f0f1;
+}
+
+.namespace-header.expanded {
+	background: #f6f7f7;
+	border-bottom-color: #c3c4c7;
+}
+
+.namespace-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 1;
+}
+
+.rest-api-namespace h3 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.disabled-count {
+	background: #d63638;
+	color: white;
+	font-size: 11px;
+	font-weight: 500;
+	padding: 2px 6px;
+	border-radius: 10px;
+	white-space: nowrap;
+}
+
+/* Toggle Button */
+.namespace-toggle {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 5px;
+	border-radius: 3px;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 30px;
+	height: 30px;
+}
+
+.namespace-toggle:hover {
+	background: rgba(0, 0, 0, 0.05);
+}
+
+.namespace-toggle:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.toggle-icon {
+	width: 24px;
+	height: 24px;
+	background: url('../images/arrow-drop-down.svg') no-repeat center;
+	background-size: 24px 24px;
+	transition: all 0.3s ease;
+	display: inline-block;
+	opacity: 0.7;
+}
+
+.namespace-header.expanded .toggle-icon {
+	background-image: url('../images/arrow-drop-up.svg');
+}
+
+/* Screen reader only text */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.rest-api-routes {
+	padding: 0 10px;
+	overflow: hidden;
+	transition: all 0.3s ease;
+}
+
+.rest-api-routes.expanded {
+	padding: 5px 10px;
+}
+
+.rest-api-route {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 0;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.rest-api-route:last-child {
+	border-bottom: none;
+}
+
+.rest-api-route label {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	cursor: pointer;
+	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Hide the actual checkbox */
+.rest-api-route input[type="checkbox"] {
+	display: none;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+	position: relative;
+	display: inline-block;
+	width: 51px;
+	height: 25.5px;
+	margin-right: 15px;
+	background: #00a32a; /* WordPress success green = Enabled */
+	border-radius: 25.5px;
+	transition: background-color 0.3s ease;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+/* When checkbox is checked (endpoint disabled), switch turns red */
+.rest-api-route input[type="checkbox"]:checked + .toggle-switch {
+	background: #d63638; /* WordPress notification red = Disabled */
+}
+
+.toggle-switch::before {
+	content: '';
+	position: absolute;
+	top: 2.55px;
+	left: 2.55px;
+	width: 20.4px;
+	height: 20.4px;
+	background: white;
+	border-radius: 50%;
+	transition: transform 0.3s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* When checked (disabled), move toggle to right */
+.rest-api-route input[type="checkbox"]:checked + .toggle-switch::before {
+	transform: translateX(25.5px);
+}
+
+/* Toggle Labels - Always visible in the available space */
+.toggle-switch::after {
+	content: 'ON';
+	position: absolute;
+	top: 50%;
+	right: 6px;
+	transform: translateY(-50%);
+	color: white;
+	font-size: 8.5px;
+	font-weight: bold;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	opacity: 1;
+	transition: all 0.3s ease;
+	z-index: 1;
+}
+
+.rest-api-route input[type="checkbox"]:checked + .toggle-switch::after {
+	content: 'OFF';
+	left: 6px;
+	right: auto;
+}
+
+.route-path {
+	font-size: 13px;
+	color: #50575e;
+	font-weight: 500;
+	margin-right: 10px;
+}
+
+.route-status {
+	margin-left: auto;
+	margin-right: 15px;
+	font-size: 12px;
+	font-weight: 500;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.route-status.enabled {
+	color: #00a32a;
+}
+
+.route-status.disabled {
+	color: #d63638;
+}
+
+.rest-api-route:hover {
+	background: #f6f7f7;
+}
+
+/* Responsive design */
+@media (max-width: 782px) {
+	.rest-api-route {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+		padding: 15px 0;
+	}
+
+	.rest-api-route label {
+		width: 100%;
+	}
+
+	.toggle-switch {
+		margin-bottom: 10px;
+	}
+}
+
+/* Settings page specific styles */
+
+/* Confirmation checkbox */
+.rest-api-manager-footer {
+	padding: 16px 0;
+}
+.rest-api-manager-footer .rest-api-manager-save-confirmation {
+	align-items:center;
+	cursor: pointer;
+	display:flex;
+	margin-bottom: 24px;
+}
+.rest-api-manager-footer .rest-api-manager-save-confirmation input[type="checkbox"] {
+	margin: 0;
+	margin-right: 8px;
+}
+.rest-api-manager-footer .submit {
+	margin: 0;
+	padding: 0;
+}
+
+/* Disabled submit button */
+#rest-api-manager-form input[type="submit"]:disabled,
+#rest-api-manager-form input[type="submit"].disabled {
+	cursor: not-allowed !important;
+	opacity: 0.5;
+}
+
+/* Route info container */
+.route-info {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+
+.button {
+	text-align: center;
+}
+
+/**
+ * Content and Sidebar Layout
+ */
+.rest-api-manager-container {
+	display: flex;
+	gap: 20px;
+}
+.rest-api-manager-content {
+	flex: 1;
+	min-width: 0;
+}
+.rest-api-manager-sidebar {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	gap: 16px;
+	width: 280px;
+}
+
+/**
+ * Sidebar Widgets
+ */
+.rest-api-manager-sidebar-widget {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 20px;
+}
+.rest-api-manager-sidebar-widget > * {
+	margin: 0;
+	padding: 0;
+}
+.rest-api-manager-sidebar-widget li:last-child {
+	margin-bottom: 0;
+}
+
+/**
+ * Upgrade Widget
+ */
+.rest-api-manager-pro-feature {
+	align-items: center;
+	background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%2300a32a"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>');
+	background-repeat: no-repeat;
+	background-size: 24px 24px;
+	background-position: left top;
+	display: flex;
+	min-height: 24px;
+	padding-left: 32px;
+}
+
+
+/* Responsive sidebar */
+@media (max-width: 1200px) {
+	.rest-api-manager-container {
+		flex-direction: column;
+	}
+
+	.rest-api-manager-sidebar {
+		width: 100%;
+		order: -1;
+	}
+}
+
+@media (max-width: 768px) {
+	.rest-api-manager-container {
+		gap: 15px;
+	}
+
+	.sidebar-widget {
+		padding: 15px;
+	}
+}
