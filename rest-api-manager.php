@@ -75,6 +75,9 @@ class REST_API_Manager {
 	 * Load plugin dependencies.
 	 */
 	private function load_dependencies() {
+		// Load template helpers
+		require_once REST_API_MANAGER_PATH . 'includes/helpers.php';
+
 		// Load feature manager
 		require_once REST_API_MANAGER_PATH . 'includes/class-feature-manager.php';
 	}
@@ -230,7 +233,6 @@ class REST_API_Manager {
 			return;
 		}
 
-		// Check if settings were updated
 		if ( isset( $_GET['settings-updated'] ) ) {
 			add_settings_error(
 				'rest_api_manager_messages',
@@ -241,78 +243,26 @@ class REST_API_Manager {
 		}
 
 		settings_errors( 'rest_api_manager_messages' );
-		?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
-			<div class="rest-api-manager-container">
-				<div class="rest-api-manager-content">
-					<form action="options.php" method="post" id="rest-api-manager-form">
-						<?php
-						settings_fields( 'rest_api_manager' );
-						do_settings_sections( 'rest-api-manager' );
-						?>
-
-						<hr>
-
-						<div class="rest-api-manager-footer">
-							<label class="rest-api-manager-save-confirmation">
-								<input type="checkbox" id="rest-api-manager-confirm" name="rest_api_manager_confirm" value="1">
-								<span><?php esc_html_e( 'I acknowledge the risks and accept full responsibility for any impact these changes may cause.', 'rest-api-manager' ); ?></span>
-							</label>
-							<?php submit_button( __( 'Save Changes', 'rest-api-manager' ), 'primary', 'submit', true, array( 'disabled' => 'disabled' ) ); ?>
-						</div>
-					</form>
-				</div>
-
-				<div class="rest-api-manager-sidebar">
-					<?php $this->render_sidebar(); ?>
-				</div>
-			</div>
-		</div>
-		<?php
+		$sidebar_html = $this->render_sidebar();
+		ramp_get_plugin_part( 'admin/page', 'main', compact( 'sidebar_html' ) );
 	}
 
 	/**
-	 * Render the admin sidebar.
+	 * Render the admin sidebar and return it as a string.
+	 *
+	 * @return string Rendered sidebar HTML.
 	 */
-	private function render_sidebar() { ?>
-
-		<div class="rest-api-manager-sidebar-widget upgrade-widget">
-			<h3><?php esc_html_e( 'Upgrade to Pro', 'rest-api-manager' ); ?></h3>
-			<p><?php esc_html_e( 'Upgrade to REST API Manager Pro for advanced features:', 'rest-api-manager' ); ?></p>
-			<ul class="rest-api-manager-pro-features">
-				<li class="rest-api-manager-pro-feature"><?php esc_html_e( 'Advanced Filters', 'rest-api-manager' ); ?></li>
-				<li class="rest-api-manager-pro-feature"><?php esc_html_e( 'All Namespaces', 'rest-api-manager' ); ?></li>
-				<li class="rest-api-manager-pro-feature"><?php esc_html_e( 'Dynamic Endpoint Support', 'rest-api-manager' ); ?></li>
-				<li class="rest-api-manager-pro-feature"><?php esc_html_e( 'Endpoint Preview', 'rest-api-manager' ); ?></li>
-				<li class="rest-api-manager-pro-feature"><?php esc_html_e( 'Security Logs', 'rest-api-manager' ); ?></li>
-				<li class="rest-api-manager-pro-feature"><?php esc_html_e( 'Export Logs', 'rest-api-manager' ); ?></li>
-			</ul>
-			<a href="https://wpbuoy.com/product/rest-api-manager/#pricing" target="_blank" class="button button-primary"><?php esc_html_e( 'Upgrade to Pro', 'rest-api-manager' ); ?></a>
-			<a href="https://wpbuoy.com/product/rest-api-manager-pro/#features/" target="_blank" class="button button-secondary"><?php esc_html_e( 'View All Features', 'rest-api-manager' ); ?></a>
-		</div>
-
-		<div class="rest-api-manager-sidebar-widget support-widget">
-			<h3><?php esc_html_e( 'Need Help?', 'rest-api-manager' ); ?></h3>
-			<p><?php esc_html_e( 'Get support and documentation for REST API Manager Pro.', 'rest-api-manager' ); ?></p>
-			<ul class="support-links">
-				<li><a href="https://wpbuoy.com/product/rest-api-manager/#faqs" target="_blank"><?php esc_html_e( 'FAQ', 'rest-api-manager' ); ?></a></li>
-				<li><a href="https://wpbuoy.com/docs/rest-api-manager" target="_blank"><?php esc_html_e( 'Documentation', 'rest-api-manager' ); ?></a></li>
-				<li><a href="https://wpbuoy.com/support" target="_blank"><?php esc_html_e( 'Helpdesk', 'rest-api-manager' ); ?></a></li>
-			</ul>
-		</div>
-		<?php
+	private function render_sidebar() {
+		return ramp_return_plugin_part( 'admin/sidebar' );
 	}
 
 	/**
 	 * Render section description.
 	 */
-	public function render_section_description() { ?>
-		<div class="notice notice-warning">
-			<p><strong>Warning:</strong> Disabling certain endpoints may affect WordPress functionality, plugins, or themes that depend on the REST API. Test thoroughly after making changes.</p>
-		</div>
-	<?php }
+	public function render_section_description() {
+		ramp_get_plugin_part( 'admin/section', 'description' );
+	}
 
 	/**
 	 * Render endpoints field.
@@ -321,69 +271,32 @@ class REST_API_Manager {
 		$blocked_endpoints = get_option( 'rest_api_manager_blocked_endpoints', array() );
 		$all_routes        = $this->get_rest_routes();
 
-		// For checkbox state, check if the current route matches any stored pattern
-		$patterns_to_check = array();
-		foreach ( $blocked_endpoints as $stored_pattern ) {
-			$patterns_to_check[] = $stored_pattern;
-		}
-
+		$routes_data = array();
 		foreach ( $all_routes as $namespace => $routes ) {
-			// Count disabled endpoints in this namespace
-			$disabled_count = 0;
+			$disabled_count   = 0;
+			$namespace_routes = array();
+
 			foreach ( $routes as $route => $route_data ) {
-				if ( $this->is_route_blocked( $route, $patterns_to_check ) ) {
+				$is_blocked = $this->is_route_blocked( $route, $blocked_endpoints );
+
+				if ( $is_blocked ) {
 					$disabled_count++;
 				}
+
+				$namespace_routes[ $route ] = array(
+					'field_id'      => 'endpoint_' . md5( $route ),
+					'route_encoded' => base64_encode( $route ),
+					'is_blocked'    => $is_blocked,
+				);
 			}
-			?>
-			<div class="rest-api-namespace">
-				<div class="namespace-header" data-namespace="<?php echo esc_attr( $namespace ); ?>">
-					<div class="namespace-title">
-						<h3><?php echo esc_html( $namespace ); ?></h3>
-						<?php if ( $disabled_count > 0 ) : ?>
-							<span class="disabled-count"><?php echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $disabled_count, 'rest-api-manager' ), $disabled_count ) ); ?></span>
-						<?php endif; ?>
-					</div>
-					<button type="button" class="namespace-toggle" aria-expanded="false">
-						<span class="toggle-icon"></span>
-						<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'rest-api-manager' ); ?></span>
-					</button>
-				</div>
-				<div class="rest-api-routes" style="display: none;">
-					<?php
-					foreach ( $routes as $route => $route_data ) {
-						$field_id = 'endpoint_' . md5( $route );
 
-						// Use base64 encoding to preserve exact route patterns
-						$route_encoded = base64_encode( $route );
-
-						// Check if this route should be considered blocked
-						$is_checked = $this->is_route_blocked( $route, $patterns_to_check );
-						$checked = $is_checked ? 'checked' : '';
-						?>
-						<div class="rest-api-route">
-							<label for="<?php echo esc_attr( $field_id ); ?>">
-								<input type="checkbox"
-									   id="<?php echo esc_attr( $field_id ); ?>"
-									   name="rest_api_manager_blocked_endpoints_encoded[]"
-									   value="<?php echo esc_attr( $route_encoded ); ?>"
-									   <?php echo esc_attr( $checked ); ?> />
-								<span class="toggle-switch"></span>
-								<div class="route-info">
-									<span class="route-path"><?php echo esc_html( $route ); ?></span>
-								</div>
-							</label>
-							<span class="route-status <?php echo $is_checked ? 'disabled' : 'enabled'; ?>">
-								<?php echo $is_checked ? esc_html__( 'Disabled', 'rest-api-manager' ) : esc_html__( 'Enabled', 'rest-api-manager' ); ?>
-							</span>
-						</div>
-						<?php
-					}
-					?>
-				</div>
-			</div>
-			<?php
+			$routes_data[ $namespace ] = array(
+				'disabled_count' => $disabled_count,
+				'routes'         => $namespace_routes,
+			);
 		}
+
+		ramp_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
 	}
 
 	/**

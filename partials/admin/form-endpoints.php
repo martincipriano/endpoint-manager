@@ -1,0 +1,53 @@
+<?php
+/**
+ * Endpoints field template.
+ *
+ * @package RestApiManager
+ *
+ * @var array $routes_data Keyed by namespace; each entry has 'disabled_count' and 'routes'.
+ *                         Each route entry: field_id, route_encoded, is_blocked.
+ */
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+?>
+
+<?php foreach ( $routes_data as $namespace => $namespace_data ) : ?>
+<div class="rest-api-namespace">
+	<div class="namespace-header" data-namespace="<?php echo esc_attr( $namespace ); ?>">
+		<div class="namespace-title">
+			<h3><?php echo esc_html( $namespace ); ?></h3>
+			<?php if ( $namespace_data['disabled_count'] > 0 ) : ?>
+				<span class="disabled-count">
+					<?php echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $namespace_data['disabled_count'], 'rest-api-manager' ), $namespace_data['disabled_count'] ) ); ?>
+				</span>
+			<?php endif; ?>
+		</div>
+		<button type="button" class="namespace-toggle" aria-expanded="false">
+			<span class="toggle-icon"></span>
+			<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'rest-api-manager' ); ?></span>
+		</button>
+	</div>
+	<div class="rest-api-routes" style="display: none;">
+		<?php foreach ( $namespace_data['routes'] as $route => $route_data ) : ?>
+		<div class="rest-api-route">
+			<label for="<?php echo esc_attr( $route_data['field_id'] ); ?>">
+				<input type="checkbox"
+					   id="<?php echo esc_attr( $route_data['field_id'] ); ?>"
+					   name="rest_api_manager_blocked_endpoints_encoded[]"
+					   value="<?php echo esc_attr( $route_data['route_encoded'] ); ?>"
+					   <?php checked( $route_data['is_blocked'] ); ?> />
+				<span class="toggle-switch"></span>
+				<div class="route-info">
+					<span class="route-path"><?php echo esc_html( $route ); ?></span>
+				</div>
+			</label>
+			<span class="route-status <?php echo $route_data['is_blocked'] ? 'disabled' : 'enabled'; ?>">
+				<?php echo $route_data['is_blocked'] ? esc_html__( 'Disabled', 'rest-api-manager' ) : esc_html__( 'Enabled', 'rest-api-manager' ); ?>
+			</span>
+		</div>
+		<?php endforeach; ?>
+	</div>
+</div>
+<?php endforeach; ?>
