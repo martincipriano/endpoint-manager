@@ -20,7 +20,10 @@ if ( ! defined( 'WPINC' ) ) {
 			<h3><?php echo esc_html( $namespace ); ?></h3>
 			<?php if ( $namespace_data['disabled_count'] > 0 ) : ?>
 				<span class="disabled-count">
-					<?php echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $namespace_data['disabled_count'], 'rest-api-manager' ), $namespace_data['disabled_count'] ) ); ?>
+					<?php
+					/* translators: %d: number of disabled endpoints */
+					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $namespace_data['disabled_count'], 'rest-api-manager' ), $namespace_data['disabled_count'] ) );
+					?>
 				</span>
 			<?php endif; ?>
 		</div>
@@ -43,7 +46,7 @@ if ( ! defined( 'WPINC' ) ) {
 					<span class="route-path"><?php echo esc_html( $route ); ?></span>
 				</div>
 			</label>
-			<span class="route-status <?php echo $route_data['is_blocked'] ? 'disabled' : 'enabled'; ?>">
+			<span class="route-status <?php echo esc_attr( $route_data['is_blocked'] ? 'disabled' : 'enabled' ); ?>">
 				<?php echo $route_data['is_blocked'] ? esc_html__( 'Disabled', 'rest-api-manager' ) : esc_html__( 'Enabled', 'rest-api-manager' ); ?>
 			</span>
 		</div>

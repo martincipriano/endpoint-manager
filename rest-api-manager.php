@@ -75,11 +75,7 @@ class REST_API_Manager {
 	 * Load plugin dependencies.
 	 */
 	private function load_dependencies() {
-		// Load template helpers
 		require_once REST_API_MANAGER_PATH . 'includes/helpers.php';
-
-		// Load feature manager
-		require_once REST_API_MANAGER_PATH . 'includes/class-feature-manager.php';
 	}
 
 	/**
@@ -158,6 +154,14 @@ class REST_API_Manager {
 	 * Handle encoded form submission.
 	 */
 	public function handle_encoded_form_submission() {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'rest_api_manager-options' ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		// Handle encoded form submission
 		if ( isset( $_POST['rest_api_manager_blocked_endpoints_encoded'] ) && is_array( $_POST['rest_api_manager_blocked_endpoints_encoded'] ) ) {
 			$decoded_endpoints = array();
