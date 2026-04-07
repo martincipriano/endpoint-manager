@@ -9,14 +9,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-07T12:11:12+00:00\n"
+"POT-Creation-Date: 2026-04-07T12:38:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: rest-api-manager\n"
 
 #. Plugin Name of the plugin
 #: rest-api-manager.php
-#: rest-api-manager.php:143
+#: rest-api-manager.php:135
 msgid "REST API Manager"
 msgstr ""
 
@@ -201,18 +201,18 @@ msgstr ""
 msgid "Helpdesk"
 msgstr ""
 
-#: rest-api-manager.php:144
+#: rest-api-manager.php:136
 msgid "API Manager"
 msgstr ""
 
-#: rest-api-manager.php:201
+#: rest-api-manager.php:195
 msgid "Manage Endpoints"
 msgstr ""
 
-#: rest-api-manager.php:244
+#: rest-api-manager.php:239
 msgid "Settings Saved"
 msgstr ""
 
-#: rest-api-manager.php:417
+#: rest-api-manager.php:412
 msgid "This REST API endpoint has been disabled."
 msgstr ""

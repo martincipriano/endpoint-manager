@@ -94,19 +94,11 @@ class REST_API_Manager {
 	 * Initialize hooks.
 	 */
 	private function init_hooks() {
-		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'handle_encoded_form_submission' ), 5 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
-	}
-
-	/**
-	 * Load plugin textdomain.
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain( 'rest-api-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
 
 	/**
@@ -163,9 +155,11 @@ class REST_API_Manager {
 		}
 
 		// Handle encoded form submission
-		if ( isset( $_POST['rest_api_manager_blocked_endpoints_encoded'] ) && is_array( $_POST['rest_api_manager_blocked_endpoints_encoded'] ) ) {
+		$raw = isset( $_POST['rest_api_manager_blocked_endpoints_encoded'] ) ? wp_unslash( $_POST['rest_api_manager_blocked_endpoints_encoded'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( is_array( $raw ) ) {
 			$decoded_endpoints = array();
-			foreach ( $_POST['rest_api_manager_blocked_endpoints_encoded'] as $encoded ) {
+			foreach ( $raw as $encoded ) {
+				$encoded = sanitize_text_field( $encoded );
 				$decoded = base64_decode( $encoded );
 				if ( $decoded !== false ) {
 					$decoded_endpoints[] = $decoded;
@@ -237,6 +231,7 @@ class REST_API_Manager {
 			return;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- set by WP options.php after its own nonce-verified save
 		if ( isset( $_GET['settings-updated'] ) ) {
 			add_settings_error(
 				'rest_api_manager_messages',
