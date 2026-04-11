@@ -274,7 +274,7 @@
  * Upgrade sidebar — fixed, right-side
  */
 body.rest-api-manager-has-sidebar #wpcontent {
-	padding-right: 320px;
+	padding-right: 360px;
 }
 .ramp-admin-sidebar {
 	bottom: 0;
