@@ -289,22 +289,22 @@
 }
 
 /**
- * Content and Sidebar Layout
+ * Upgrade sidebar — fixed, right-side
  */
-.rest-api-manager-container {
-	display: flex;
-	gap: 20px;
+body.rest-api-manager-has-sidebar #wpcontent {
+	padding-right: 320px;
 }
-.rest-api-manager-content {
-	flex: 1;
-	min-width: 0;
-}
-.rest-api-manager-sidebar {
+.ramp-admin-sidebar {
+	bottom: 0;
 	display: flex;
 	flex-direction: column;
-	flex-shrink: 0;
 	gap: 16px;
-	width: 280px;
+	overflow-y: auto;
+	padding: 20px 20px 20px 0;
+	position: fixed;
+	right: 0;
+	top: 32px;
+	width: 320px;
 }
 
 /**
@@ -342,24 +342,11 @@
 }
 
 
-/* Responsive sidebar */
-@media (max-width: 1200px) {
-	.rest-api-manager-container {
-		flex-direction: column;
+@media (max-width: 782px) {
+	body.rest-api-manager-has-sidebar #wpcontent {
+		padding-right: 0;
 	}
-
-	.rest-api-manager-sidebar {
-		width: 100%;
-		order: -1;
-	}
-}
-
-@media (max-width: 768px) {
-	.rest-api-manager-container {
-		gap: 15px;
-	}
-
-	.sidebar-widget {
-		padding: 15px;
+	.ramp-admin-sidebar {
+		display: none;
 	}
 }

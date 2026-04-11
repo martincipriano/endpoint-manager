@@ -76,6 +76,7 @@ class REST_API_Manager {
 	 */
 	private function load_dependencies() {
 		require_once REST_API_MANAGER_PATH . 'includes/helpers.php';
+		require_once REST_API_MANAGER_PATH . 'includes/class-admin-sidebar.php';
 	}
 
 	/**
@@ -243,17 +244,7 @@ class REST_API_Manager {
 
 		settings_errors( 'rest_api_manager_messages' );
 
-		$sidebar_html = $this->render_sidebar();
-		ramp_get_plugin_part( 'admin/page', 'main', compact( 'sidebar_html' ) );
-	}
-
-	/**
-	 * Render the admin sidebar and return it as a string.
-	 *
-	 * @return string Rendered sidebar HTML.
-	 */
-	private function render_sidebar() {
-		return ramp_return_plugin_part( 'admin/sidebar' );
+		ramp_get_plugin_part( 'admin/page', 'main' );
 	}
 
 	/**
