@@ -366,10 +366,6 @@ class REST_API_Manager {
 			if ( $route === $pattern ) {
 				return true;
 			}
-			// Prefix match — child routes inherit parent block
-			if ( strpos( $route, $pattern . '/' ) === 0 ) {
-				return true;
-			}
 		}
 
 		return false;
@@ -400,17 +396,8 @@ class REST_API_Manager {
 		foreach ( $blocked_endpoints as $blocked_pattern ) {
 			$blocked_pattern = rtrim( $blocked_pattern, '/' );
 
-			// Exact match
+			// Simple string comparison for non-regex routes
 			if ( $current_route === $blocked_pattern ) {
-				return new WP_Error(
-					'rest_forbidden',
-					__( 'This REST API endpoint has been disabled.', 'rest-api-manager' ),
-					array( 'status' => 403 )
-				);
-			}
-
-			// Prefix match — block child routes when parent is blocked
-			if ( strpos( $current_route, $blocked_pattern . '/' ) === 0 ) {
 				return new WP_Error(
 					'rest_forbidden',
 					__( 'This REST API endpoint has been disabled.', 'rest-api-manager' ),
