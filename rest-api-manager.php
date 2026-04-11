@@ -3,7 +3,7 @@
  * Plugin Name:       REST API Manager
  * Plugin URI:        https://wordpress.org/plugins/rest-api-manager/
  * Description:       Control which REST API endpoints are accessible on your WordPress site. Enable or disable specific endpoints to enhance security and performance.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.0
  * Requires PHP:      7.2
  * Author:            Jose Martin Cipriano
@@ -24,7 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Current plugin version.
  */
-define( 'REST_API_MANAGER_VERSION', '1.0.0' );
+define( 'REST_API_MANAGER_VERSION', '1.0.1' );
 
 /**
  * Plugin directory path.
