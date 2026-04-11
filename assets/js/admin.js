@@ -105,19 +105,30 @@
     };
 
     /**
-     * Show a confirmation dialog before saving when endpoints are being disabled.
+     * Show a confirmation dialog when endpoints are being newly disabled.
      */
     function initSaveConfirmation() {
         const form = document.getElementById('rest-api-manager-form');
         if (!form) return;
 
-        form.addEventListener('submit', function(e) {
-            const blocked = form.querySelectorAll('input[name="rest_api_manager_blocked_endpoints_encoded[]"]:checked');
-            if (blocked.length === 0) return;
+        // Snapshot which endpoints are already blocked on page load.
+        const initialBlocked = new Set();
+        form.querySelectorAll('input[name="rest_api_manager_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
+            initialBlocked.add(cb.value);
+        });
 
-            const count = blocked.length;
-            const label = count === 1 ? 'endpoint' : 'endpoints';
-            if (!window.confirm(count + ' ' + label + ' will be disabled. Disabled endpoints may break WordPress functionality, plugins, or themes that depend on the REST API. Are you sure you want to continue?')) {
+        form.addEventListener('submit', function(e) {
+            let newlyDisabled = 0;
+            form.querySelectorAll('input[name="rest_api_manager_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
+                if (!initialBlocked.has(cb.value)) {
+                    newlyDisabled++;
+                }
+            });
+
+            if (newlyDisabled === 0) return;
+
+            const label = newlyDisabled === 1 ? 'endpoint' : 'endpoints';
+            if (!window.confirm(newlyDisabled + ' ' + label + ' will be disabled. Disabled endpoints may break WordPress functionality, plugins, or themes that depend on the REST API. Are you sure you want to continue?')) {
                 e.preventDefault();
             }
         });
