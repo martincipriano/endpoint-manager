@@ -105,14 +105,19 @@
     };
 
     /**
-     * Show a confirmation dialog before saving changes.
+     * Show a confirmation dialog before saving when endpoints are being disabled.
      */
     function initSaveConfirmation() {
         const form = document.getElementById('rest-api-manager-form');
         if (!form) return;
 
         form.addEventListener('submit', function(e) {
-            if (!window.confirm('Disabling certain endpoints may affect WordPress functionality, plugins, or themes that depend on the REST API. Do you acknowledge the risks and accept full responsibility for any impact these changes may cause?')) {
+            const blocked = form.querySelectorAll('input[name="rest_api_manager_blocked_endpoints_encoded[]"]:checked');
+            if (blocked.length === 0) return;
+
+            const count = blocked.length;
+            const label = count === 1 ? 'endpoint' : 'endpoints';
+            if (!window.confirm(count + ' ' + label + ' will be disabled. Disabled endpoints may break WordPress functionality, plugins, or themes that depend on the REST API. Are you sure you want to continue?')) {
                 e.preventDefault();
             }
         });
