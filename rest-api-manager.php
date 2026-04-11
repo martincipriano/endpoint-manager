@@ -21,6 +21,14 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// If Pro is active, go dormant — Pro handles everything.
+if ( defined( 'REST_API_MANAGER_PRO' ) ) {
+	add_action( 'admin_notices', function() {
+		echo '<div class="notice notice-info"><p>' . esc_html__( 'REST API Manager Pro is active. The free version is dormant.', 'rest-api-manager' ) . '</p></div>';
+	} );
+	return;
+}
+
 /**
  * Current plugin version.
  */
