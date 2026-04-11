@@ -249,30 +249,12 @@
 
 /* Settings page specific styles */
 
-/* Confirmation checkbox */
 .rest-api-manager-footer {
 	padding: 16px 0;
-}
-.rest-api-manager-footer .rest-api-manager-save-confirmation {
-	align-items:center;
-	cursor: pointer;
-	display:flex;
-	margin-bottom: 24px;
-}
-.rest-api-manager-footer .rest-api-manager-save-confirmation input[type="checkbox"] {
-	margin: 0;
-	margin-right: 8px;
 }
 .rest-api-manager-footer .submit {
 	margin: 0;
 	padding: 0;
-}
-
-/* Disabled submit button */
-#rest-api-manager-form input[type="submit"]:disabled,
-#rest-api-manager-form input[type="submit"].disabled {
-	cursor: not-allowed !important;
-	opacity: 0.5;
 }
 
 /* Route info container */

@@ -21,11 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 		<hr>
 
 		<div class="rest-api-manager-footer">
-			<label class="rest-api-manager-save-confirmation">
-				<input type="checkbox" id="rest-api-manager-confirm" name="rest_api_manager_confirm" value="1">
-				<span><?php esc_html_e( 'I acknowledge the risks and accept full responsibility for any impact these changes may cause.', 'rest-api-manager' ); ?></span>
-			</label>
-			<?php submit_button( __( 'Save Changes', 'rest-api-manager' ), 'primary', 'submit', true, array( 'disabled' => 'disabled' ) ); ?>
+			<?php submit_button( __( 'Save Changes', 'rest-api-manager' ), 'primary', 'submit', true ); ?>
 		</div>
 	</form>
 </div>

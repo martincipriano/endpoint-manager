@@ -10,7 +10,7 @@
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
         initAccordion();
-        initConfirmationCheckbox();
+        initSaveConfirmation();
     });
 
     /**
@@ -105,22 +105,15 @@
     };
 
     /**
-     * Initialize confirmation checkbox functionality
+     * Show a confirmation dialog before saving changes.
      */
-    function initConfirmationCheckbox() {
-        const confirmCheckbox = document.getElementById('rest-api-manager-confirm');
-        const submitButton = document.querySelector('#rest-api-manager-form input[type="submit"]');
+    function initSaveConfirmation() {
+        const form = document.getElementById('rest-api-manager-form');
+        if (!form) return;
 
-        if (!confirmCheckbox || !submitButton) return;
-
-        // Handle checkbox change
-        confirmCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                submitButton.removeAttribute('disabled');
-                submitButton.classList.remove('disabled');
-            } else {
-                submitButton.setAttribute('disabled', 'disabled');
-                submitButton.classList.add('disabled');
+        form.addEventListener('submit', function(e) {
+            if (!window.confirm('Disabling certain endpoints may affect WordPress functionality, plugins, or themes that depend on the REST API. Do you acknowledge the risks and accept full responsibility for any impact these changes may cause?')) {
+                e.preventDefault();
             }
         });
     }
