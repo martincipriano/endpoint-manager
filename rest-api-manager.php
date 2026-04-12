@@ -24,7 +24,14 @@ if ( ! defined( 'WPINC' ) ) {
 // If Pro is active, go dormant — Pro handles everything.
 if ( defined( 'REST_API_MANAGER_PRO' ) ) {
 	add_action( 'admin_notices', function() {
-		echo '<div class="notice notice-info"><p>' . esc_html__( 'REST API Manager Pro is active. The free version is dormant.', 'rest-api-manager' ) . '</p></div>';
+		$deactivate_url = wp_nonce_url(
+			admin_url( 'plugins.php?action=deactivate&plugin=rest-api-manager%2Frest-api-manager.php' ),
+			'deactivate-plugin_rest-api-manager/rest-api-manager.php'
+		);
+		echo '<div class="notice notice-info"><p>' .
+			esc_html__( 'REST API Manager Pro is active — the free version is dormant and can be safely deactivated.', 'rest-api-manager' ) .
+			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'rest-api-manager' ) . '</a>' .
+		'</p></div>';
 	} );
 	return;
 }
