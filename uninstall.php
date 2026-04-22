@@ -1,8 +1,8 @@
 <?php
 /**
- * Uninstall script for REST API Manager
+ * Uninstall script for WPBuoy REST API Manager
  *
- * @package RestApiManager
+ * @package WpbuoyRestApiManager
  */
 
 // If uninstall not called from WordPress, exit.
@@ -11,7 +11,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Delete plugin options
-delete_option( 'rest_api_manager_blocked_endpoints' );
+delete_option( 'wpbuoy_rest_api_manager_blocked_endpoints' );
 
 // Clean up old option names (legacy support)
-delete_option( 'rest_api_manager_settings' );
+delete_option( 'wpbuoy_rest_api_manager_settings' );

@@ -2,7 +2,7 @@
 /**
  * Main admin page template.
  *
- * @package RestApiManager
+ * @package WpbuoyRestApiManager
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -12,16 +12,16 @@ if ( ! defined( 'WPINC' ) ) {
 <div class="wrap">
 	<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 
-	<form action="options.php" method="post" id="rest-api-manager-form">
+	<form action="options.php" method="post" id="wpbuoy-rest-api-manager-form">
 		<?php
-		settings_fields( 'rest_api_manager' );
-		do_settings_sections( 'rest-api-manager' );
+		settings_fields( 'wpbuoy_rest_api_manager' );
+		do_settings_sections( 'wpbuoy-rest-api-manager' );
 		?>
 
 		<hr>
 
-		<div class="rest-api-manager-footer">
-			<?php submit_button( __( 'Save Changes', 'rest-api-manager' ), 'primary', 'submit', true ); ?>
+		<div class="wpbuoy-rest-api-manager-footer">
+			<?php submit_button( __( 'Save Changes', 'wpbuoy-rest-api-manager' ), 'primary', 'submit', true ); ?>
 		</div>
 	</form>
 </div>

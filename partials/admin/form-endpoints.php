@@ -2,7 +2,7 @@
 /**
  * Endpoints field template.
  *
- * @package RestApiManager
+ * @package WpbuoyRestApiManager
  *
  * @var array $routes_data Keyed by namespace; each entry has 'disabled_count' and 'routes'.
  *                         Each route entry: field_id, route_encoded, is_blocked.
@@ -22,14 +22,14 @@ if ( ! defined( 'WPINC' ) ) {
 				<span class="disabled-count">
 					<?php
 					/* translators: %d: number of disabled endpoints */
-					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $ramp_namespace_data['disabled_count'], 'rest-api-manager' ), $ramp_namespace_data['disabled_count'] ) );
+					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $ramp_namespace_data['disabled_count'], 'wpbuoy-rest-api-manager' ), $ramp_namespace_data['disabled_count'] ) );
 					?>
 				</span>
 			<?php endif; ?>
 		</div>
 		<button type="button" class="namespace-toggle" aria-expanded="false">
 			<span class="toggle-icon"></span>
-			<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'rest-api-manager' ); ?></span>
+			<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'wpbuoy-rest-api-manager' ); ?></span>
 		</button>
 	</div>
 	<div class="rest-api-routes" style="display: none;">
@@ -38,7 +38,7 @@ if ( ! defined( 'WPINC' ) ) {
 			<label for="<?php echo esc_attr( $ramp_route_data['field_id'] ); ?>">
 				<input type="checkbox"
 					   id="<?php echo esc_attr( $ramp_route_data['field_id'] ); ?>"
-					   name="rest_api_manager_blocked_endpoints_encoded[]"
+					   name="wpbuoy_rest_api_manager_blocked_endpoints_encoded[]"
 					   value="<?php echo esc_attr( $ramp_route_data['route_encoded'] ); ?>"
 					   <?php checked( $ramp_route_data['is_blocked'] ); ?> />
 				<span class="toggle-switch"></span>
@@ -47,7 +47,7 @@ if ( ! defined( 'WPINC' ) ) {
 				</div>
 			</label>
 			<span class="route-status <?php echo esc_attr( $ramp_route_data['is_blocked'] ? 'disabled' : 'enabled' ); ?>">
-				<?php echo $ramp_route_data['is_blocked'] ? esc_html__( 'Disabled', 'rest-api-manager' ) : esc_html__( 'Enabled', 'rest-api-manager' ); ?>
+				<?php echo $ramp_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbuoy-rest-api-manager' ) : esc_html__( 'Enabled', 'wpbuoy-rest-api-manager' ); ?>
 			</span>
 		</div>
 		<?php endforeach; ?>

@@ -1,10 +1,10 @@
-=== REST API Manager ===
-Contributors: jmcipriano
+=== WPBuoy REST API Manager ===
+Contributors: martincipriano
 Tags: rest api, security, api, disable endpoints, rest api security
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Control which REST API endpoints are accessible on your WordPress site. Enable o
 
 == Description ==
 
-REST API Manager gives you complete control over your WordPress REST API endpoints. Easily enable or disable specific endpoints to enhance your site's security and performance.
+WPBuoy REST API Manager gives you complete control over your WordPress REST API endpoints. Easily enable or disable specific endpoints to enhance your site's security and performance.
 
 = Free Features =
 
@@ -24,7 +24,7 @@ REST API Manager gives you complete control over your WordPress REST API endpoin
 
 = Pro Features =
 
-Upgrade to **REST API Manager Pro** for advanced features:
+Upgrade to **WPBuoy REST API Manager Pro** for advanced features:
 
 * **Endpoint Filtering** - Filter endpoints by status, type, and namespace
 * **Security Logs** - Track all blocked API requests with detailed logs
@@ -35,11 +35,11 @@ Upgrade to **REST API Manager Pro** for advanced features:
 * **Dynamic Endpoints** - Support for dynamic/regex endpoints
 * **Priority Support** - Get help when you need it
 
-[Upgrade to Pro](https://wpbuoy.com/plugins/rest-api-manager-pro/)
+[Upgrade to Pro](https://wpbuoy.com/plugins/wpbuoy-rest-api-manager-pro/)
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/rest-api-manager` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/wpbuoy-rest-api-manager` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Settings -> API Manager screen to configure the plugin
 4. Toggle endpoints on/off as needed
@@ -70,6 +70,9 @@ Yes, but the plugin must be activated on each site individually. Network activat
 
 == Changelog ==
 
+= 1.0.1 =
+* Renamed to WPBuoy REST API Manager for clarity and uniqueness.
+
 = 1.0.0 =
 * Initial release
 * Manage WordPress core REST API endpoints
@@ -79,5 +82,5 @@ Yes, but the plugin must be activated on each site individually. Network activat
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release of REST API Manager.
+= 1.0.1 =
+Renamed to WPBuoy REST API Manager.

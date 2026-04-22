@@ -5,7 +5,7 @@
  * Injects the upgrade/support sidebar into the WordPress admin footer
  * on configured screens via a body class + fixed CSS positioning.
  *
- * @package RestApiManager
+ * @package WpbuoyRestApiManager
  */
 
 // If this file is called directly, abort.
@@ -14,12 +14,12 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * REST_API_Manager_Admin_Sidebar Class
+ * Wpbuoy_Rest_Api_Manager_Admin_Sidebar Class
  *
  * To add the sidebar to additional screens, pass their screen IDs
  * to the constructor below.
  */
-class REST_API_Manager_Admin_Sidebar {
+class Wpbuoy_Rest_Api_Manager_Admin_Sidebar {
 
 	/**
 	 * Screen IDs on which the sidebar should appear.
@@ -57,7 +57,7 @@ class REST_API_Manager_Admin_Sidebar {
 	 */
 	public function add_body_class( string $classes ): string {
 		if ( $this->is_sidebar_screen() ) {
-			$classes .= ' rest-api-manager-has-sidebar';
+			$classes .= ' wpbuoy-rest-api-manager-has-sidebar';
 		}
 		return $classes;
 	}
@@ -71,14 +71,14 @@ class REST_API_Manager_Admin_Sidebar {
 		if ( ! $this->is_sidebar_screen() ) {
 			return;
 		}
-		echo '<div class="ramp-admin-sidebar">';
-		ramp_get_plugin_part( 'admin/sidebar' );
+		echo '<div class="wpbuoy-ram-admin-sidebar">';
+		wpbuoy_ram_get_plugin_part( 'admin/sidebar' );
 		echo '</div>';
 	}
 }
 
-new REST_API_Manager_Admin_Sidebar(
+new Wpbuoy_Rest_Api_Manager_Admin_Sidebar(
 	array(
-		'toplevel_page_rest-api-manager',
+		'toplevel_page_wpbuoy-rest-api-manager',
 	)
 );
