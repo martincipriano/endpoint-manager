@@ -2,7 +2,7 @@
 /**
  * Admin section description template.
  *
- * @package WpbuoyRestApiManager
+ * @package WpbuoyEndpointManager
  */
 
 if ( ! defined( 'WPINC' ) ) {

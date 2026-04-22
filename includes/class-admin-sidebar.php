@@ -5,7 +5,7 @@
  * Injects the upgrade/support sidebar into the WordPress admin footer
  * on configured screens via a body class + fixed CSS positioning.
  *
- * @package WpbuoyRestApiManager
+ * @package WpbuoyEndpointManager
  */
 
 // If this file is called directly, abort.
@@ -57,7 +57,7 @@ class Wpbuoy_Rest_Api_Manager_Admin_Sidebar {
 	 */
 	public function add_body_class( string $classes ): string {
 		if ( $this->is_sidebar_screen() ) {
-			$classes .= ' wpbuoy-rest-api-manager-has-sidebar';
+			$classes .= ' wpbuoy-endpoint-manager-has-sidebar';
 		}
 		return $classes;
 	}
@@ -71,14 +71,14 @@ class Wpbuoy_Rest_Api_Manager_Admin_Sidebar {
 		if ( ! $this->is_sidebar_screen() ) {
 			return;
 		}
-		echo '<div class="wpbuoy-ram-admin-sidebar">';
-		wpbuoy_ram_get_plugin_part( 'admin/sidebar' );
+		echo '<div class="wpbuoy-em-admin-sidebar">';
+		wpbuoy_em_get_plugin_part( 'admin/sidebar' );
 		echo '</div>';
 	}
 }
 
 new Wpbuoy_Rest_Api_Manager_Admin_Sidebar(
 	array(
-		'toplevel_page_wpbuoy-rest-api-manager',
+		'toplevel_page_wpbuoy-endpoint-manager',
 	)
 );

@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:       WPBuoy REST API Manager
- * Plugin URI:        https://wordpress.org/plugins/wpbuoy-rest-api-manager/
+ * Plugin Name:       WPBuoy Endpoint Manager
+ * Plugin URI:        https://wordpress.org/plugins/wpbuoy-endpoint-manager/
  * Description:       Control which REST API endpoints are accessible on your WordPress site. Enable or disable specific endpoints to enhance security and performance.
  * Version:           1.0.1
  * Requires at least: 5.0
@@ -10,10 +10,10 @@
  * Author URI:        https://www.linkedin.com/in/jmcipriano
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       wpbuoy-rest-api-manager
+ * Text Domain:       wpbuoy-endpoint-manager
  * Domain Path:       /languages
  *
- * @package WpbuoyRestApiManager
+ * @package WpbuoyEndpointManager
  */
 
 // If this file is called directly, abort.
@@ -22,15 +22,15 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // If Pro is active, go dormant — Pro handles everything.
-if ( defined( 'WPBUOY_REST_API_MANAGER_PRO' ) ) {
+if ( defined( 'WPBUOY_ENDPOINT_MANAGER_PRO' ) ) {
 	add_action( 'admin_notices', function() {
 		$deactivate_url = wp_nonce_url(
-			admin_url( 'plugins.php?action=deactivate&plugin=wpbuoy-rest-api-manager%2Fwpbuoy-rest-api-manager.php' ),
-			'deactivate-plugin_wpbuoy-rest-api-manager/wpbuoy-rest-api-manager.php'
+			admin_url( 'plugins.php?action=deactivate&plugin=wpbuoy-endpoint-manager%2Fwpbuoy-endpoint-manager.php' ),
+			'deactivate-plugin_wpbuoy-endpoint-manager/wpbuoy-endpoint-manager.php'
 		);
 		echo '<div class="notice notice-info"><p>' .
-			esc_html__( 'WPBuoy REST API Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbuoy-rest-api-manager' ) .
-			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbuoy-rest-api-manager' ) . '</a>' .
+			esc_html__( 'WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbuoy-endpoint-manager' ) .
+			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbuoy-endpoint-manager' ) . '</a>' .
 		'</p></div>';
 	} );
 	return;
@@ -39,17 +39,17 @@ if ( defined( 'WPBUOY_REST_API_MANAGER_PRO' ) ) {
 /**
  * Current plugin version.
  */
-define( 'WPBUOY_REST_API_MANAGER_VERSION', '1.0.1' );
+define( 'WPBUOY_ENDPOINT_MANAGER_VERSION', '1.0.1' );
 
 /**
  * Plugin directory path.
  */
-define( 'WPBUOY_REST_API_MANAGER_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WPBUOY_ENDPOINT_MANAGER_PATH', plugin_dir_path( __FILE__ ) );
 
 /**
  * Plugin directory URL.
  */
-define( 'WPBUOY_REST_API_MANAGER_URL', plugin_dir_url( __FILE__ ) );
+define( 'WPBUOY_ENDPOINT_MANAGER_URL', plugin_dir_url( __FILE__ ) );
 
 /**
  * The main plugin class.
@@ -90,19 +90,19 @@ class Wpbuoy_Rest_Api_Manager {
 	 * Load plugin dependencies.
 	 */
 	private function load_dependencies() {
-		require_once WPBUOY_REST_API_MANAGER_PATH . 'includes/helpers.php';
-		require_once WPBUOY_REST_API_MANAGER_PATH . 'includes/class-admin-sidebar.php';
+		require_once WPBUOY_ENDPOINT_MANAGER_PATH . 'includes/helpers.php';
+		require_once WPBUOY_ENDPOINT_MANAGER_PATH . 'includes/class-admin-sidebar.php';
 	}
 
 	/**
 	 * Migrate old settings to new option name.
 	 */
 	private function migrate_old_settings() {
-		$old_settings = get_option( 'wpbuoy_rest_api_manager_settings', null );
+		$old_settings = get_option( 'wpbuoy_endpoint_manager_settings', null );
 		if ( ! is_null( $old_settings ) && is_array( $old_settings ) ) {
 			// Migrate old settings to new option name
-			update_option( 'wpbuoy_rest_api_manager_blocked_endpoints', $old_settings );
-			delete_option( 'wpbuoy_rest_api_manager_settings' );
+			update_option( 'wpbuoy_endpoint_manager_blocked_endpoints', $old_settings );
+			delete_option( 'wpbuoy_endpoint_manager_settings' );
 		}
 	}
 
@@ -123,22 +123,22 @@ class Wpbuoy_Rest_Api_Manager {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_admin_styles( $hook ) {
-		if ( 'toplevel_page_wpbuoy-rest-api-manager' !== $hook ) {
+		if ( 'toplevel_page_wpbuoy-endpoint-manager' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'wpbuoy-rest-api-manager-admin',
+			'wpbuoy-endpoint-manager-admin',
 			plugin_dir_url( __FILE__ ) . 'assets/css/admin.css',
 			array(),
-			WPBUOY_REST_API_MANAGER_VERSION
+			WPBUOY_ENDPOINT_MANAGER_VERSION
 		);
 
 		wp_enqueue_script(
-			'wpbuoy-rest-api-manager-admin',
+			'wpbuoy-endpoint-manager-admin',
 			plugin_dir_url( __FILE__ ) . 'assets/js/admin.js',
 			array(),
-			WPBUOY_REST_API_MANAGER_VERSION,
+			WPBUOY_ENDPOINT_MANAGER_VERSION,
 			true
 		);
 	}
@@ -148,10 +148,10 @@ class Wpbuoy_Rest_Api_Manager {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			__( 'WPBuoy REST API Manager', 'wpbuoy-rest-api-manager' ),
-			__( 'API Manager', 'wpbuoy-rest-api-manager' ),
+			__( 'WPBuoy Endpoint Manager', 'wpbuoy-endpoint-manager' ),
+			__( 'API Manager', 'wpbuoy-endpoint-manager' ),
 			'manage_options',
-			'wpbuoy-rest-api-manager',
+			'wpbuoy-endpoint-manager',
 			array( $this, 'render_admin_page' ),
 			'dashicons-superhero',
 			81
@@ -162,7 +162,7 @@ class Wpbuoy_Rest_Api_Manager {
 	 * Handle encoded form submission.
 	 */
 	public function handle_encoded_form_submission() {
-		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wpbuoy_rest_api_manager-options' ) ) {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wpbuoy_endpoint_manager-options' ) ) {
 			return;
 		}
 
@@ -171,7 +171,7 @@ class Wpbuoy_Rest_Api_Manager {
 		}
 
 		// Handle encoded form submission
-		$raw = isset( $_POST['wpbuoy_rest_api_manager_blocked_endpoints_encoded'] ) ? wp_unslash( $_POST['wpbuoy_rest_api_manager_blocked_endpoints_encoded'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw = isset( $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] ) ? wp_unslash( $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		if ( is_array( $raw ) ) {
 			$decoded_endpoints = array();
 			foreach ( $raw as $encoded ) {
@@ -181,7 +181,7 @@ class Wpbuoy_Rest_Api_Manager {
 					$decoded_endpoints[] = $decoded;
 				}
 			}
-			$_POST['wpbuoy_rest_api_manager_blocked_endpoints'] = $decoded_endpoints;
+			$_POST['wpbuoy_endpoint_manager_blocked_endpoints'] = $decoded_endpoints;
 		}
 	}
 
@@ -190,8 +190,8 @@ class Wpbuoy_Rest_Api_Manager {
 	 */
 	public function register_settings() {
 		register_setting(
-			'wpbuoy_rest_api_manager',
-			'wpbuoy_rest_api_manager_blocked_endpoints',
+			'wpbuoy_endpoint_manager',
+			'wpbuoy_endpoint_manager_blocked_endpoints',
 			array(
 				'type'              => 'array',
 				'sanitize_callback' => array( $this, 'sanitize_endpoints' ),
@@ -200,18 +200,18 @@ class Wpbuoy_Rest_Api_Manager {
 		);
 
 		add_settings_section(
-			'wpbuoy_rest_api_manager_main',
+			'wpbuoy_endpoint_manager_main',
 			'',
 			array( $this, 'render_section_description' ),
-			'wpbuoy-rest-api-manager'
+			'wpbuoy-endpoint-manager'
 		);
 
 		add_settings_field(
 			'blocked_endpoints',
-			__( 'Manage Endpoints', 'wpbuoy-rest-api-manager' ),
+			__( 'Manage Endpoints', 'wpbuoy-endpoint-manager' ),
 			array( $this, 'render_endpoints_field' ),
-			'wpbuoy-rest-api-manager',
-			'wpbuoy_rest_api_manager_main'
+			'wpbuoy-endpoint-manager',
+			'wpbuoy_endpoint_manager_main'
 		);
 	}
 
@@ -250,30 +250,30 @@ class Wpbuoy_Rest_Api_Manager {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- set by WP options.php after its own nonce-verified save
 		if ( isset( $_GET['settings-updated'] ) ) {
 			add_settings_error(
-				'wpbuoy_rest_api_manager_messages',
-				'wpbuoy_rest_api_manager_message',
-				__( 'Settings Saved', 'wpbuoy-rest-api-manager' ),
+				'wpbuoy_endpoint_manager_messages',
+				'wpbuoy_endpoint_manager_message',
+				__( 'Settings Saved', 'wpbuoy-endpoint-manager' ),
 				'updated'
 			);
 		}
 
-		settings_errors( 'wpbuoy_rest_api_manager_messages' );
+		settings_errors( 'wpbuoy_endpoint_manager_messages' );
 
-		wpbuoy_ram_get_plugin_part( 'admin/page', 'main' );
+		wpbuoy_em_get_plugin_part( 'admin/page', 'main' );
 	}
 
 	/**
 	 * Render section description.
 	 */
 	public function render_section_description() {
-		wpbuoy_ram_get_plugin_part( 'admin/section', 'description' );
+		wpbuoy_em_get_plugin_part( 'admin/section', 'description' );
 	}
 
 	/**
 	 * Render endpoints field.
 	 */
 	public function render_endpoints_field() {
-		$blocked_endpoints = get_option( 'wpbuoy_rest_api_manager_blocked_endpoints', array() );
+		$blocked_endpoints = get_option( 'wpbuoy_endpoint_manager_blocked_endpoints', array() );
 		$all_routes        = $this->get_rest_routes();
 
 		$routes_data = array();
@@ -301,7 +301,7 @@ class Wpbuoy_Rest_Api_Manager {
 			);
 		}
 
-		wpbuoy_ram_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
+		wpbuoy_em_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
 	}
 
 	/**
@@ -400,7 +400,7 @@ class Wpbuoy_Rest_Api_Manager {
 			return $result;
 		}
 
-		$blocked_endpoints = get_option( 'wpbuoy_rest_api_manager_blocked_endpoints', array() );
+		$blocked_endpoints = get_option( 'wpbuoy_endpoint_manager_blocked_endpoints', array() );
 		$current_route = $request->get_route();
 		$current_route = rtrim( $current_route, '/' );
 
@@ -415,7 +415,7 @@ class Wpbuoy_Rest_Api_Manager {
 			if ( $current_route === $blocked_pattern ) {
 				return new WP_Error(
 					'rest_forbidden',
-					__( 'This REST API endpoint has been disabled.', 'wpbuoy-rest-api-manager' ),
+					__( 'This REST API endpoint has been disabled.', 'wpbuoy-endpoint-manager' ),
 					array( 'status' => 403 )
 				);
 			}
@@ -430,9 +430,9 @@ class Wpbuoy_Rest_Api_Manager {
  *
  * @return Wpbuoy_Rest_Api_Manager
  */
-function wpbuoy_rest_api_manager() {
+function wpbuoy_endpoint_manager() {
 	return Wpbuoy_Rest_Api_Manager::instance();
 }
 
 // Initialize the plugin
-wpbuoy_rest_api_manager();
+wpbuoy_endpoint_manager();
