@@ -13,7 +13,7 @@
  * Text Domain:       wpbuoy-endpoint-manager
  * Domain Path:       /languages
  *
- * @package WpbuoyEndpointManager
+ * @package WPBuoy_Endpoint_Manager
  */
 
 // If this file is called directly, abort.
@@ -259,14 +259,14 @@ class Wpbuoy_Rest_Api_Manager {
 
 		settings_errors( 'wpbuoy_endpoint_manager_messages' );
 
-		wpbuoy_em_get_plugin_part( 'admin/page', 'main' );
+		wpb_em_get_plugin_part( 'admin/page', 'main' );
 	}
 
 	/**
 	 * Render section description.
 	 */
 	public function render_section_description() {
-		wpbuoy_em_get_plugin_part( 'admin/section', 'description' );
+		wpb_em_get_plugin_part( 'admin/section', 'description' );
 	}
 
 	/**
@@ -301,7 +301,7 @@ class Wpbuoy_Rest_Api_Manager {
 			);
 		}
 
-		wpbuoy_em_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
+		wpb_em_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
 	}
 
 	/**

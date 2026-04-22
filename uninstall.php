@@ -2,7 +2,7 @@
 /**
  * Uninstall script for WPBuoy Endpoint Manager
  *
- * @package WpbuoyEndpointManager
+ * @package WPBuoy_Endpoint_Manager
  */
 
 // If uninstall not called from WordPress, exit.

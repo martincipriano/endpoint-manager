@@ -2,7 +2,7 @@
 /**
  * Endpoints field template.
  *
- * @package WpbuoyEndpointManager
+ * @package WPBuoy_Endpoint_Manager
  *
  * @var array $routes_data Keyed by namespace; each entry has 'disabled_count' and 'routes'.
  *                         Each route entry: field_id, route_encoded, is_blocked.

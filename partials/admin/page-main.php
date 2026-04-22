@@ -2,7 +2,7 @@
 /**
  * Main admin page template.
  *
- * @package WpbuoyEndpointManager
+ * @package WPBuoy_Endpoint_Manager
  */
 
 if ( ! defined( 'WPINC' ) ) {

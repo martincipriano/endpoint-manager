@@ -5,7 +5,7 @@
  * Injects the upgrade/support sidebar into the WordPress admin footer
  * on configured screens via a body class + fixed CSS positioning.
  *
- * @package WpbuoyEndpointManager
+ * @package WPBuoy_Endpoint_Manager
  */
 
 // If this file is called directly, abort.
@@ -72,7 +72,7 @@ class Wpbuoy_Rest_Api_Manager_Admin_Sidebar {
 			return;
 		}
 		echo '<div class="wpbuoy-em-admin-sidebar">';
-		wpbuoy_em_get_plugin_part( 'admin/sidebar' );
+		wpb_em_get_plugin_part( 'admin/sidebar' );
 		echo '</div>';
 	}
 }
