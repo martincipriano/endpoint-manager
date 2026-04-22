@@ -14,12 +14,12 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Wpbuoy_Rest_Api_Manager_Admin_Sidebar Class
+ * WPBuoy_Endpoint_Manager_Admin_Sidebar Class
  *
  * To add the sidebar to additional screens, pass their screen IDs
  * to the constructor below.
  */
-class Wpbuoy_Rest_Api_Manager_Admin_Sidebar {
+class WPBuoy_Endpoint_Manager_Admin_Sidebar {
 
 	/**
 	 * Screen IDs on which the sidebar should appear.
@@ -77,7 +77,7 @@ class Wpbuoy_Rest_Api_Manager_Admin_Sidebar {
 	}
 }
 
-new Wpbuoy_Rest_Api_Manager_Admin_Sidebar(
+new WPBuoy_Endpoint_Manager_Admin_Sidebar(
 	array(
 		'toplevel_page_wpbuoy-endpoint-manager',
 	)

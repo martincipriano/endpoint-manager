@@ -13,16 +13,16 @@ if ( ! defined( 'WPINC' ) ) {
 }
 ?>
 
-<?php foreach ( $routes_data as $ramp_namespace => $ramp_namespace_data ) : ?>
+<?php foreach ( $routes_data as $em_namespace => $em_namespace_data ) : ?>
 <div class="rest-api-namespace">
-	<div class="namespace-header" data-namespace="<?php echo esc_attr( $ramp_namespace ); ?>">
+	<div class="namespace-header" data-namespace="<?php echo esc_attr( $em_namespace ); ?>">
 		<div class="namespace-title">
-			<h3><?php echo esc_html( $ramp_namespace ); ?></h3>
-			<?php if ( $ramp_namespace_data['disabled_count'] > 0 ) : ?>
+			<h3><?php echo esc_html( $em_namespace ); ?></h3>
+			<?php if ( $em_namespace_data['disabled_count'] > 0 ) : ?>
 				<span class="disabled-count">
 					<?php
 					/* translators: %d: number of disabled endpoints */
-					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $ramp_namespace_data['disabled_count'], 'wpbuoy-endpoint-manager' ), $ramp_namespace_data['disabled_count'] ) );
+					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $em_namespace_data['disabled_count'], 'wpbuoy-endpoint-manager' ), $em_namespace_data['disabled_count'] ) );
 					?>
 				</span>
 			<?php endif; ?>
@@ -33,21 +33,21 @@ if ( ! defined( 'WPINC' ) ) {
 		</button>
 	</div>
 	<div class="rest-api-routes" style="display: none;">
-		<?php foreach ( $ramp_namespace_data['routes'] as $ramp_route => $ramp_route_data ) : ?>
+		<?php foreach ( $em_namespace_data['routes'] as $em_route => $em_route_data ) : ?>
 		<div class="rest-api-route">
-			<label for="<?php echo esc_attr( $ramp_route_data['field_id'] ); ?>">
+			<label for="<?php echo esc_attr( $em_route_data['field_id'] ); ?>">
 				<input type="checkbox"
-					   id="<?php echo esc_attr( $ramp_route_data['field_id'] ); ?>"
+					   id="<?php echo esc_attr( $em_route_data['field_id'] ); ?>"
 					   name="wpbuoy_endpoint_manager_blocked_endpoints_encoded[]"
-					   value="<?php echo esc_attr( $ramp_route_data['route_encoded'] ); ?>"
-					   <?php checked( $ramp_route_data['is_blocked'] ); ?> />
+					   value="<?php echo esc_attr( $em_route_data['route_encoded'] ); ?>"
+					   <?php checked( $em_route_data['is_blocked'] ); ?> />
 				<span class="toggle-switch"></span>
 				<div class="route-info">
-					<span class="route-path"><?php echo esc_html( $ramp_route ); ?></span>
+					<span class="route-path"><?php echo esc_html( $em_route ); ?></span>
 				</div>
 			</label>
-			<span class="route-status <?php echo esc_attr( $ramp_route_data['is_blocked'] ? 'disabled' : 'enabled' ); ?>">
-				<?php echo $ramp_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbuoy-endpoint-manager' ) : esc_html__( 'Enabled', 'wpbuoy-endpoint-manager' ); ?>
+			<span class="route-status <?php echo esc_attr( $em_route_data['is_blocked'] ? 'disabled' : 'enabled' ); ?>">
+				<?php echo $em_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbuoy-endpoint-manager' ) : esc_html__( 'Enabled', 'wpbuoy-endpoint-manager' ); ?>
 			</span>
 		</div>
 		<?php endforeach; ?>

@@ -41,7 +41,7 @@ Upgrade to **WPBuoy Endpoint Manager Pro** for advanced features:
 
 1. Upload the plugin files to the `/wp-content/plugins/wpbuoy-endpoint-manager` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Use the Settings -> API Manager screen to configure the plugin
+3. Use the Endpoints screen in the WordPress admin menu to configure the plugin
 4. Toggle endpoints on/off as needed
 
 == Frequently Asked Questions ==

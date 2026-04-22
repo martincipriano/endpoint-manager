@@ -1,5 +1,5 @@
 /**
- * REST API Manager Admin JavaScript
+ * WPBuoy Endpoint Manager Admin JavaScript
  *
  * @package RestApiManager
  */

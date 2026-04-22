@@ -54,21 +54,21 @@ define( 'WPBUOY_ENDPOINT_MANAGER_URL', plugin_dir_url( __FILE__ ) );
 /**
  * The main plugin class.
  */
-class Wpbuoy_Rest_Api_Manager {
+class WPBuoy_Endpoint_Manager {
 
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var Wpbuoy_Rest_Api_Manager
+	 * @var WPBuoy_Endpoint_Manager
 	 */
 	protected static $instance = null;
 
 	/**
-	 * Main Wpbuoy_Rest_Api_Manager Instance.
+	 * Main WPBuoy_Endpoint_Manager Instance.
 	 *
-	 * Ensures only one instance of Wpbuoy_Rest_Api_Manager is loaded or can be loaded.
+	 * Ensures only one instance of WPBuoy_Endpoint_Manager is loaded or can be loaded.
 	 *
-	 * @return Wpbuoy_Rest_Api_Manager Main instance.
+	 * @return WPBuoy_Endpoint_Manager Main instance.
 	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -426,12 +426,12 @@ class Wpbuoy_Rest_Api_Manager {
 }
 
 /**
- * Returns the main instance of Wpbuoy_Rest_Api_Manager.
+ * Returns the main instance of WPBuoy_Endpoint_Manager.
  *
- * @return Wpbuoy_Rest_Api_Manager
+ * @return WPBuoy_Endpoint_Manager
  */
 function wpbuoy_endpoint_manager() {
-	return Wpbuoy_Rest_Api_Manager::instance();
+	return WPBuoy_Endpoint_Manager::instance();
 }
 
 // Initialize the plugin
