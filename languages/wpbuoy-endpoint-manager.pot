@@ -2,126 +2,42 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: REST API Manager 1.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rest-api-manager\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-07T12:38:03+00:00\n"
+"POT-Creation-Date: 2026-04-22T06:40:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: rest-api-manager\n"
+"X-Domain: wpbuoy-endpoint-manager\n"
 
 #. Plugin Name of the plugin
-#: rest-api-manager.php
-#: rest-api-manager.php:135
-msgid "REST API Manager"
+#: wpbuoy-endpoint-manager.php
+#: wpbuoy-endpoint-manager.php:151
+msgid "WPBuoy Endpoint Manager"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: rest-api-manager.php
-msgid "https://wordpress.org/plugins/rest-api-manager/"
+#: wpbuoy-endpoint-manager.php
+msgid "https://wordpress.org/plugins/wpbuoy-endpoint-manager/"
 msgstr ""
 
 #. Description of the plugin
-#: rest-api-manager.php
+#: wpbuoy-endpoint-manager.php
 msgid "Control which REST API endpoints are accessible on your WordPress site. Enable or disable specific endpoints to enhance security and performance."
 msgstr ""
 
 #. Author of the plugin
-#: rest-api-manager.php
+#: wpbuoy-endpoint-manager.php
 msgid "Jose Martin Cipriano"
 msgstr ""
 
 #. Author URI of the plugin
-#: rest-api-manager.php
+#: wpbuoy-endpoint-manager.php
 msgid "https://www.linkedin.com/in/jmcipriano"
-msgstr ""
-
-#: includes/class-feature-manager.php:51
-msgid "Static Endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:52
-msgid "Manage static REST API endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:57
-msgid "WordPress Core Endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:58
-msgid "Manage WordPress core REST API endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:64
-msgid "Endpoint Filters"
-msgstr ""
-
-#: includes/class-feature-manager.php:65
-msgid "Filter endpoints by namespace, type, and status"
-msgstr ""
-
-#: includes/class-feature-manager.php:70
-#: partials/admin/sidebar.php:19
-msgid "Endpoint Preview"
-msgstr ""
-
-#: includes/class-feature-manager.php:71
-msgid "Preview endpoints with sample data"
-msgstr ""
-
-#: includes/class-feature-manager.php:76
-msgid "Endpoint Summary"
-msgstr ""
-
-#: includes/class-feature-manager.php:77
-msgid "Display endpoint statistics and summary"
-msgstr ""
-
-#: includes/class-feature-manager.php:82
-#: partials/admin/sidebar.php:17
-msgid "All Namespaces"
-msgstr ""
-
-#: includes/class-feature-manager.php:83
-msgid "Include all namespaces including plugin endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:88
-msgid "Dynamic Endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:89
-msgid "Show and manage dynamic endpoints"
-msgstr ""
-
-#: includes/class-feature-manager.php:94
-#: partials/admin/sidebar.php:20
-msgid "Security Logs"
-msgstr ""
-
-#: includes/class-feature-manager.php:95
-msgid "Log blocked requests and security events"
-msgstr ""
-
-#: includes/class-feature-manager.php:100
-#: partials/admin/sidebar.php:21
-msgid "Export Logs"
-msgstr ""
-
-#: includes/class-feature-manager.php:101
-msgid "Export security logs to CSV"
-msgstr ""
-
-#: includes/class-feature-manager.php:106
-msgid "Log Cleanup"
-msgstr ""
-
-#: includes/class-feature-manager.php:107
-msgid "Automatically cleanup old logs"
 msgstr ""
 
 #. translators: %d: number of disabled endpoints
@@ -144,20 +60,8 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
-#: partials/admin/page-main.php:30
-msgid "I acknowledge the risks and accept full responsibility for any impact these changes may cause."
-msgstr ""
-
-#: partials/admin/page-main.php:32
+#: partials/admin/page-main.php:24
 msgid "Save Changes"
-msgstr ""
-
-#: partials/admin/section-description.php:14
-msgid "Warning:"
-msgstr ""
-
-#: partials/admin/section-description.php:15
-msgid "Disabling certain endpoints may affect WordPress functionality, plugins, or themes that depend on the REST API. Test thoroughly after making changes."
 msgstr ""
 
 #: partials/admin/sidebar.php:13
@@ -166,15 +70,31 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #: partials/admin/sidebar.php:14
-msgid "Upgrade to REST API Manager Pro for advanced features:"
+msgid "Upgrade to WPBuoy Endpoint Manager Pro for advanced features:"
 msgstr ""
 
 #: partials/admin/sidebar.php:16
 msgid "Advanced Filters"
 msgstr ""
 
+#: partials/admin/sidebar.php:17
+msgid "All Namespaces"
+msgstr ""
+
 #: partials/admin/sidebar.php:18
 msgid "Dynamic Endpoint Support"
+msgstr ""
+
+#: partials/admin/sidebar.php:19
+msgid "Endpoint Preview"
+msgstr ""
+
+#: partials/admin/sidebar.php:20
+msgid "Security Logs"
+msgstr ""
+
+#: partials/admin/sidebar.php:21
+msgid "Export Logs"
 msgstr ""
 
 #: partials/admin/sidebar.php:24
@@ -186,7 +106,7 @@ msgid "Need Help?"
 msgstr ""
 
 #: partials/admin/sidebar.php:29
-msgid "Get support and documentation for REST API Manager."
+msgid "Get support and documentation for WPBuoy Endpoint Manager."
 msgstr ""
 
 #: partials/admin/sidebar.php:31
@@ -201,18 +121,26 @@ msgstr ""
 msgid "Helpdesk"
 msgstr ""
 
-#: rest-api-manager.php:136
-msgid "API Manager"
+#: wpbuoy-endpoint-manager.php:32
+msgid "WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated."
 msgstr ""
 
-#: rest-api-manager.php:195
+#: wpbuoy-endpoint-manager.php:33
+msgid "Deactivate free version"
+msgstr ""
+
+#: wpbuoy-endpoint-manager.php:152
+msgid "Endpoints"
+msgstr ""
+
+#: wpbuoy-endpoint-manager.php:211
 msgid "Manage Endpoints"
 msgstr ""
 
-#: rest-api-manager.php:239
+#: wpbuoy-endpoint-manager.php:255
 msgid "Settings Saved"
 msgstr ""
 
-#: rest-api-manager.php:412
+#: wpbuoy-endpoint-manager.php:418
 msgid "This REST API endpoint has been disabled."
 msgstr ""

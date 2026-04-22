@@ -24,7 +24,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @param string|array $name Name suffix appended as "{slug}-{name}.php", or $args array when omitted.
  * @param array        $args Variables to extract into template scope.
  */
-function wpb_em_get_plugin_part( $slug, $name = '', $args = array() ) {
+function wpb_em_get_plugin_part( $slug, $name = '', $args = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 	if ( is_array( $name ) ) {
 		$args = $name;
 		$name = '';
@@ -49,7 +49,7 @@ function wpb_em_get_plugin_part( $slug, $name = '', $args = array() ) {
  * @param array        $args Variables to extract into template scope.
  * @return string Rendered HTML.
  */
-function wpb_em_return_plugin_part( $slug, $name = '', $args = array() ) {
+function wpb_em_return_plugin_part( $slug, $name = '', $args = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 	ob_start();
 	wpb_em_get_plugin_part( $slug, $name, $args );
 	return ob_get_clean();

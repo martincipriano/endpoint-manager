@@ -13,7 +13,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 ?>
 
-<?php foreach ( $routes_data as $em_namespace => $em_namespace_data ) : ?>
+<?php foreach ( $routes_data as $em_namespace => $em_namespace_data ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 <div class="rest-api-namespace">
 	<div class="namespace-header" data-namespace="<?php echo esc_attr( $em_namespace ); ?>">
 		<div class="namespace-title">
@@ -33,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
 		</button>
 	</div>
 	<div class="rest-api-routes" style="display: none;">
-		<?php foreach ( $em_namespace_data['routes'] as $em_route => $em_route_data ) : ?>
+		<?php foreach ( $em_namespace_data['routes'] as $em_route => $em_route_data ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 		<div class="rest-api-route">
 			<label for="<?php echo esc_attr( $em_route_data['field_id'] ); ?>">
 				<input type="checkbox"
