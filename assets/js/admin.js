@@ -127,8 +127,7 @@
 
             if (newlyDisabled === 0) return;
 
-            const label = newlyDisabled === 1 ? 'endpoint' : 'endpoints';
-            if (!window.confirm(newlyDisabled + ' ' + label + ' will be disabled. Disabled endpoints may break WordPress functionality, plugins, or themes that depend on the REST API. Are you sure you want to continue?')) {
+            if (!window.confirm('Some endpoints will be blocked and might affect functions that depend on them. You can re-enable them at any time. Save changes?')) {
                 e.preventDefault();
             }
         });
