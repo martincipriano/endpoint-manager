@@ -149,7 +149,7 @@ class Wpbuoy_Rest_Api_Manager {
 	public function add_admin_menu() {
 		add_menu_page(
 			__( 'WPBuoy Endpoint Manager', 'wpbuoy-endpoint-manager' ),
-			__( 'API Manager', 'wpbuoy-endpoint-manager' ),
+			__( 'Endpoint Manager', 'wpbuoy-endpoint-manager' ),
 			'manage_options',
 			'wpbuoy-endpoint-manager',
 			array( $this, 'render_admin_page' ),
