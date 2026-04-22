@@ -108,18 +108,18 @@
      * Show a confirmation dialog when endpoints are being newly disabled.
      */
     function initSaveConfirmation() {
-        const form = document.getElementById('rest-api-manager-form');
+        const form = document.getElementById('wpbuoy-endpoint-manager-form');
         if (!form) return;
 
         // Snapshot which endpoints are already blocked on page load.
         const initialBlocked = new Set();
-        form.querySelectorAll('input[name="rest_api_manager_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
+        form.querySelectorAll('input[name="wpbuoy_endpoint_manager_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
             initialBlocked.add(cb.value);
         });
 
         form.addEventListener('submit', function(e) {
             let newlyDisabled = 0;
-            form.querySelectorAll('input[name="rest_api_manager_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
+            form.querySelectorAll('input[name="wpbuoy_endpoint_manager_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
                 if (!initialBlocked.has(cb.value)) {
                     newlyDisabled++;
                 }
