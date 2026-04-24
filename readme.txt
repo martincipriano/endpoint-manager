@@ -2,9 +2,9 @@
 Contributors: martincipriano
 Tags: rest api, security, api, disable endpoints, rest api security
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 6.9.4
 Requires PHP: 7.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,12 @@ Yes, but the plugin must be activated on each site individually. Network activat
 3. View disabled endpoints count per namespace
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed: sanitize POST input at point of reading
+* Updated: plugin scoped to WordPress core static endpoints
+* Updated: sidebar links and added FAQ widget
+* Updated: tested up to WordPress 6.9
 
 = 1.0.1 =
 * Renamed to WPBuoy Endpoint Manager for clarity and uniqueness.

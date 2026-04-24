@@ -133,4 +133,21 @@
         });
     }
 
+    function initFaqToggle() {
+        document.querySelectorAll('.wpbuoy-endpoint-manager-faq-question').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var answer = btn.nextElementSibling;
+                var expanded = btn.getAttribute('aria-expanded') === 'true';
+                btn.setAttribute('aria-expanded', !expanded);
+                if (expanded) {
+                    answer.setAttribute('hidden', '');
+                } else {
+                    answer.removeAttribute('hidden');
+                }
+            });
+        });
+    }
+
+    initFaqToggle();
+
 })();
