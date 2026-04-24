@@ -171,11 +171,12 @@ class WPBuoy_Endpoint_Manager {
 		}
 
 		// Handle encoded form submission
-		$raw = isset( $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] ) ? wp_unslash( $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw = isset( $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] )
+			? array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] ) )
+			: array();
 		if ( is_array( $raw ) ) {
 			$decoded_endpoints = array();
 			foreach ( $raw as $encoded ) {
-				$encoded = sanitize_text_field( $encoded );
 				$decoded = base64_decode( $encoded );
 				if ( $decoded !== false ) {
 					$decoded_endpoints[] = $decoded;
@@ -306,7 +307,6 @@ class WPBuoy_Endpoint_Manager {
 
 	/**
 	 * Get all REST routes grouped by namespace.
-	 * Free version only shows WordPress core endpoints and static routes.
 	 *
 	 * @return array Grouped routes.
 	 */
@@ -315,17 +315,9 @@ class WPBuoy_Endpoint_Manager {
 		$routes  = $server->get_routes();
 		$grouped = array();
 
-		// WordPress core namespaces only in free version
-		$wp_namespaces = array( 'wp/v2', 'oembed/1.0', 'wp-site-health/v1', 'wp-block-editor/v1' );
-
 		foreach ( $routes as $route => $route_data ) {
 			// Skip the root endpoint
 			if ( '/' === $route ) {
-				continue;
-			}
-
-			// Skip dynamic/regex routes in free version
-			if ( $this->is_regex_route( $route ) ) {
 				continue;
 			}
 
@@ -335,11 +327,6 @@ class WPBuoy_Endpoint_Manager {
 				$namespace = $parts[0] . '/' . $parts[1];
 			} else {
 				$namespace = $parts[0];
-			}
-
-			// Only show WordPress core namespaces in free version
-			if ( ! in_array( $namespace, $wp_namespaces, true ) ) {
-				continue;
 			}
 
 			if ( ! isset( $grouped[ $namespace ] ) ) {

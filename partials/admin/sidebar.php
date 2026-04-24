@@ -14,8 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
 	<p><?php esc_html_e( 'Upgrade to WPBuoy Endpoint Manager Pro for advanced features:', 'wpbuoy-endpoint-manager' ); ?></p>
 	<ul class="wpbuoy-endpoint-manager-pro-features">
 		<li class="wpbuoy-endpoint-manager-pro-feature"><?php esc_html_e( 'Advanced Filters', 'wpbuoy-endpoint-manager' ); ?></li>
-		<li class="wpbuoy-endpoint-manager-pro-feature"><?php esc_html_e( 'All Namespaces', 'wpbuoy-endpoint-manager' ); ?></li>
-		<li class="wpbuoy-endpoint-manager-pro-feature"><?php esc_html_e( 'Dynamic Endpoint Support', 'wpbuoy-endpoint-manager' ); ?></li>
 		<li class="wpbuoy-endpoint-manager-pro-feature"><?php esc_html_e( 'Endpoint Preview', 'wpbuoy-endpoint-manager' ); ?></li>
 		<li class="wpbuoy-endpoint-manager-pro-feature"><?php esc_html_e( 'Security Logs', 'wpbuoy-endpoint-manager' ); ?></li>
 		<li class="wpbuoy-endpoint-manager-pro-feature"><?php esc_html_e( 'Export Logs', 'wpbuoy-endpoint-manager' ); ?></li>
@@ -30,6 +28,6 @@ if ( ! defined( 'WPINC' ) ) {
 	<ul class="support-links">
 		<li><a href="https://wpbuoy.com/product/wpbuoy-endpoint-manager/#faqs" target="_blank"><?php esc_html_e( 'FAQ', 'wpbuoy-endpoint-manager' ); ?></a></li>
 		<li><a href="https://wpbuoy.com/docs/wpbuoy-endpoint-manager" target="_blank"><?php esc_html_e( 'Documentation', 'wpbuoy-endpoint-manager' ); ?></a></li>
-		<li><a href="https://wpbuoy.com/support" target="_blank"><?php esc_html_e( 'Helpdesk', 'wpbuoy-endpoint-manager' ); ?></a></li>
+		<li><a href="https://wpbuoy.com/my-account/support" target="_blank"><?php esc_html_e( 'Support', 'wpbuoy-endpoint-manager' ); ?></a></li>
 	</ul>
 </div>

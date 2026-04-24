@@ -127,7 +127,7 @@
 
             if (newlyDisabled === 0) return;
 
-            if (!window.confirm('Some endpoints will be blocked and might affect functions that depend on them. You can re-enable them at any time. Save changes?')) {
+            if (!window.confirm('You are attempting to block ' + newlyDisabled + ' endpoint' + (newlyDisabled === 1 ? '' : 's') + ' which might affect functions that depend on them. You can re-enable them at any time. Save changes?')) {
                 e.preventDefault();
             }
         });
