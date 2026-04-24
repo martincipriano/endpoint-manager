@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       WPBuoy Endpoint Manager
  * Plugin URI:        https://wordpress.org/plugins/wpbuoy-endpoint-manager/
- * Description:       Control which REST API endpoints are accessible on your WordPress site. Enable or disable specific endpoints to enhance security and performance.
+ * Description:       Manage and block WordPress core static REST API endpoints to enhance your site's security and performance.
  * Version:           1.0.1
  * Requires at least: 5.0
  * Requires PHP:      7.2
@@ -307,6 +307,7 @@ class WPBuoy_Endpoint_Manager {
 
 	/**
 	 * Get all REST routes grouped by namespace.
+	 * Shows WordPress core static endpoints only.
 	 *
 	 * @return array Grouped routes.
 	 */
@@ -315,9 +316,16 @@ class WPBuoy_Endpoint_Manager {
 		$routes  = $server->get_routes();
 		$grouped = array();
 
+		$wp_namespaces = array( 'wp/v2', 'oembed/1.0', 'wp-site-health/v1', 'wp-block-editor/v1' );
+
 		foreach ( $routes as $route => $route_data ) {
 			// Skip the root endpoint
 			if ( '/' === $route ) {
+				continue;
+			}
+
+			// Skip dynamic/regex routes
+			if ( $this->is_regex_route( $route ) ) {
 				continue;
 			}
 
@@ -327,6 +335,11 @@ class WPBuoy_Endpoint_Manager {
 				$namespace = $parts[0] . '/' . $parts[1];
 			} else {
 				$namespace = $parts[0];
+			}
+
+			// WordPress core namespaces only
+			if ( ! in_array( $namespace, $wp_namespaces, true ) ) {
+				continue;
 			}
 
 			if ( ! isset( $grouped[ $namespace ] ) ) {

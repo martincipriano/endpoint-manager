@@ -8,11 +8,11 @@ Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Control which REST API endpoints are accessible on your WordPress site. Enable or disable specific endpoints to enhance security and performance.
+Manage and block WordPress core static REST API endpoints to enhance your site's security and performance.
 
 == Description ==
 
-WPBuoy Endpoint Manager gives you complete control over your WordPress REST API endpoints. Easily enable or disable specific endpoints to enhance your site's security and performance.
+WPBuoy Endpoint Manager lets you manage and block WordPress core static REST API endpoints. Easily enable or disable specific endpoints to reduce your site's attack surface and improve performance.
 
 = Free Features =
 
