@@ -71,7 +71,7 @@ class WPBuoy_Endpoint_Manager_Admin_Sidebar {
 		if ( ! $this->is_sidebar_screen() ) {
 			return;
 		}
-		echo '<div class="wpbuoy-em-admin-sidebar">';
+		echo '<div class="wpbuoy-admin-sidebar">';
 		wpb_em_get_plugin_part( 'admin/sidebar' );
 		echo '</div>';
 	}

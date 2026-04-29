@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 1.0.3\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.0.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-28T23:09:02+00:00\n"
+"POT-Creation-Date: 2026-04-29T12:54:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
@@ -65,7 +65,7 @@ msgid "Save Changes"
 msgstr ""
 
 #: partials/admin/sidebar.php:13
-#: partials/admin/sidebar.php:21
+#: partials/admin/sidebar.php:22
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -89,44 +89,19 @@ msgstr ""
 msgid "Export Logs"
 msgstr ""
 
-#: partials/admin/sidebar.php:25
-#: partials/admin/sidebar.php:57
-msgid "FAQ"
-msgstr ""
-
-#: partials/admin/sidebar.php:29
-msgid "Will disabling endpoints break my site?"
-msgstr ""
-
-#: partials/admin/sidebar.php:32
-msgid "Disabling certain endpoints may affect WordPress functionality, plugins, or themes that depend on the REST API. Always test thoroughly after making changes."
-msgstr ""
-
-#: partials/admin/sidebar.php:37
-msgid "Can I manage endpoints from plugins and themes?"
-msgstr ""
-
-#: partials/admin/sidebar.php:40
-msgid "Yes. All registered static REST API endpoints are shown, including those from plugins and themes."
-msgstr ""
-
-#: partials/admin/sidebar.php:45
-msgid "Does this work with WordPress multisite?"
-msgstr ""
-
-#: partials/admin/sidebar.php:48
-msgid "Yes, but the plugin must be activated on each site individually. Network activation is not currently supported."
-msgstr ""
-
-#: partials/admin/sidebar.php:55
+#: partials/admin/sidebar.php:27
 msgid "Need Help?"
 msgstr ""
 
-#: partials/admin/sidebar.php:58
+#: partials/admin/sidebar.php:29
+msgid "FAQ"
+msgstr ""
+
+#: partials/admin/sidebar.php:30
 msgid "Documentation"
 msgstr ""
 
-#: partials/admin/sidebar.php:59
+#: partials/admin/sidebar.php:31
 msgid "Support"
 msgstr ""
 

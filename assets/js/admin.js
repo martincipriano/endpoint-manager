@@ -85,26 +85,6 @@
     }
 
     /**
-     * Expand all namespaces (for debugging or user convenience)
-     */
-    window.expandAllNamespaces = function() {
-        const headers = document.querySelectorAll('.namespace-header:not(.expanded)');
-        headers.forEach(function(header) {
-            toggleNamespace(header);
-        });
-    };
-
-    /**
-     * Collapse all namespaces
-     */
-    window.collapseAllNamespaces = function() {
-        const headers = document.querySelectorAll('.namespace-header.expanded');
-        headers.forEach(function(header) {
-            toggleNamespace(header);
-        });
-    };
-
-    /**
      * Show a confirmation dialog when endpoints are being newly disabled.
      */
     function initSaveConfirmation() {
@@ -133,21 +113,5 @@
         });
     }
 
-    function initFaqToggle() {
-        document.querySelectorAll('.wpbuoy-endpoint-manager-faq-question').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var answer = btn.nextElementSibling;
-                var expanded = btn.getAttribute('aria-expanded') === 'true';
-                btn.setAttribute('aria-expanded', !expanded);
-                if (expanded) {
-                    answer.setAttribute('hidden', '');
-                } else {
-                    answer.removeAttribute('hidden');
-                }
-            });
-        });
-    }
-
-    initFaqToggle();
 
 })();
