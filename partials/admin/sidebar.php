@@ -37,7 +37,7 @@ if ( ! defined( 'WPINC' ) ) {
 				<?php esc_html_e( 'Can I manage endpoints from plugins and themes?', 'wpbuoy-endpoint-manager' ); ?>
 			</button>
 			<div class="wpbuoy-endpoint-manager-faq-answer" hidden>
-				<?php esc_html_e( 'Plugin and theme endpoints are available in the Pro version. The free version manages WordPress core endpoints only.', 'wpbuoy-endpoint-manager' ); ?>
+				<?php esc_html_e( 'Yes. All registered static REST API endpoints are shown, including those from plugins and themes.', 'wpbuoy-endpoint-manager' ); ?>
 			</div>
 		</li>
 		<li class="wpbuoy-endpoint-manager-faq-item">

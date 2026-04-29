@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       WPBuoy Endpoint Manager
  * Plugin URI:        https://wordpress.org/plugins/wpbuoy-endpoint-manager/
- * Description:       Manage and block WordPress core static REST API endpoints to enhance your site's security and performance.
- * Version:           1.0.2
+ * Description:       Manage and block REST API endpoints to enhance your site's security and performance.
+ * Version:           1.0.3
  * Requires at least: 5.0
  * Requires PHP:      7.2
  * Author:            Jose Martin Cipriano
@@ -39,7 +39,7 @@ if ( defined( 'WPBUOY_ENDPOINT_MANAGER_PRO' ) ) {
 /**
  * Current plugin version.
  */
-define( 'WPBUOY_ENDPOINT_MANAGER_VERSION', '1.0.2' );
+define( 'WPBUOY_ENDPOINT_MANAGER_VERSION', '1.0.3' );
 
 /**
  * Plugin directory path.
@@ -229,9 +229,7 @@ class WPBuoy_Endpoint_Manager {
 
 		$sanitized = array();
 		foreach ( $input as $endpoint ) {
-			// Only trim whitespace and remove null bytes
-			$endpoint = trim( $endpoint );
-			$endpoint = str_replace( "\0", '', $endpoint );
+			$endpoint = sanitize_text_field( $endpoint );
 			if ( ! empty( $endpoint ) ) {
 				$sanitized[] = $endpoint;
 			}
@@ -306,8 +304,7 @@ class WPBuoy_Endpoint_Manager {
 	}
 
 	/**
-	 * Get all REST routes grouped by namespace.
-	 * Shows WordPress core static endpoints only.
+	 * Get all registered static REST routes grouped by namespace.
 	 *
 	 * @return array Grouped routes.
 	 */
@@ -316,30 +313,23 @@ class WPBuoy_Endpoint_Manager {
 		$routes  = $server->get_routes();
 		$grouped = array();
 
-		$wp_namespaces = array( 'wp/v2', 'oembed/1.0', 'wp-site-health/v1', 'wp-block-editor/v1' );
-
 		foreach ( $routes as $route => $route_data ) {
-			// Skip the root endpoint
+			// Skip the root endpoint.
 			if ( '/' === $route ) {
 				continue;
 			}
 
-			// Skip dynamic/regex routes
+			// Skip dynamic/regex routes.
 			if ( $this->is_regex_route( $route ) ) {
 				continue;
 			}
 
-			// Extract namespace from route
+			// Extract namespace from route.
 			$parts = explode( '/', trim( $route, '/' ) );
 			if ( count( $parts ) >= 2 ) {
 				$namespace = $parts[0] . '/' . $parts[1];
 			} else {
 				$namespace = $parts[0];
-			}
-
-			// WordPress core namespaces only
-			if ( ! in_array( $namespace, $wp_namespaces, true ) ) {
-				continue;
 			}
 
 			if ( ! isset( $grouped[ $namespace ] ) ) {
@@ -349,7 +339,7 @@ class WPBuoy_Endpoint_Manager {
 			$grouped[ $namespace ][ $route ] = $route_data;
 		}
 
-		// Sort namespaces and routes
+		// Sort namespaces and routes.
 		ksort( $grouped );
 		foreach ( $grouped as $namespace => &$routes ) {
 			ksort( $routes );

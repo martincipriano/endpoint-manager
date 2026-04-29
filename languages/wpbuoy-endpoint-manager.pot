@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 1.0.1\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-24T10:47:15+00:00\n"
+"POT-Creation-Date: 2026-04-28T23:09:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
@@ -27,7 +27,7 @@ msgstr ""
 
 #. Description of the plugin
 #: wpbuoy-endpoint-manager.php
-msgid "Manage and block WordPress core static REST API endpoints to enhance your site's security and performance."
+msgid "Manage and block REST API endpoints to enhance your site's security and performance."
 msgstr ""
 
 #. Author of the plugin
@@ -107,7 +107,7 @@ msgid "Can I manage endpoints from plugins and themes?"
 msgstr ""
 
 #: partials/admin/sidebar.php:40
-msgid "Plugin and theme endpoints are available in the Pro version. The free version manages WordPress core endpoints only."
+msgid "Yes. All registered static REST API endpoints are shown, including those from plugins and themes."
 msgstr ""
 
 #: partials/admin/sidebar.php:45
@@ -146,10 +146,10 @@ msgstr ""
 msgid "Manage Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:256
+#: wpbuoy-endpoint-manager.php:254
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:418
+#: wpbuoy-endpoint-manager.php:408
 msgid "This REST API endpoint has been disabled."
 msgstr ""

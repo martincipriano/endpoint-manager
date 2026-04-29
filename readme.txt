@@ -4,38 +4,22 @@ Tags: rest api, security, api, disable endpoints, rest api security
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Manage and block WordPress core static REST API endpoints to enhance your site's security and performance.
+Manage and block REST API endpoints to enhance your site's security and performance.
 
 == Description ==
 
-WPBuoy Endpoint Manager lets you manage and block WordPress core static REST API endpoints. Easily enable or disable specific endpoints to reduce your site's attack surface and improve performance.
+WPBuoy Endpoint Manager lets you manage and block REST API endpoints from WordPress core, plugins, and themes. Easily enable or disable specific endpoints to reduce your site's attack surface and improve performance.
 
-= Free Features =
+= Features =
 
-* **Manage WordPress Core Endpoints** - Control access to all WordPress core REST API endpoints
-* **Static Endpoints Support** - Manage static REST API endpoints
+* **Manage All Static Endpoints** - Control access to REST API endpoints from WordPress core, plugins, and themes
 * **Simple Toggle Interface** - Easy-to-use interface for enabling/disabling endpoints
 * **Organized by Namespace** - Endpoints grouped by namespace for easy management
 * **Security Enhancement** - Reduce your site's attack surface by disabling unused endpoints
-
-= Pro Features =
-
-Upgrade to **WPBuoy Endpoint Manager Pro** for advanced features:
-
-* **Endpoint Filtering** - Filter endpoints by status, type, and namespace
-* **Security Logs** - Track all blocked API requests with detailed logs
-* **Export Logs** - Export security logs to CSV for analysis
-* **Endpoint Preview** - Preview endpoints with sample data
-* **Endpoint Summary** - View statistics and summary of your endpoints
-* **All Namespaces** - Manage endpoints from plugins and themes, not just WordPress core
-* **Dynamic Endpoints** - Support for dynamic/regex endpoints
-* **Priority Support** - Get help when you need it
-
-[Upgrade to Pro](https://wpbuoy.com/plugins/wpbuoy-endpoint-manager-pro/)
 
 == Installation ==
 
@@ -50,13 +34,9 @@ Upgrade to **WPBuoy Endpoint Manager Pro** for advanced features:
 
 Disabling certain endpoints may affect WordPress functionality, plugins, or themes that depend on the REST API. Always test thoroughly after making changes. We recommend testing on a staging site first.
 
-= What's the difference between free and pro versions? =
-
-The free version allows you to manage WordPress core static endpoints. The Pro version adds advanced features like endpoint filtering, security logs, support for plugin/theme endpoints, dynamic endpoint support, and more.
-
 = Can I manage endpoints from plugins and themes? =
 
-Plugin and theme endpoints are only available in the Pro version. The free version focuses on WordPress core endpoints.
+Yes. The plugin shows all registered static REST API endpoints, including those from plugins and themes.
 
 = Does this plugin work with WordPress multisite? =
 
@@ -64,11 +44,15 @@ Yes, but the plugin must be activated on each site individually. Network activat
 
 == Screenshots ==
 
-1. Main settings page showing WordPress core endpoints organized by namespace
+1. Main settings page showing REST API endpoints organized by namespace
 2. Toggle endpoints on/off with a simple switch interface
 3. View disabled endpoints count per namespace
 
 == Changelog ==
+
+= 1.0.3 =
+* Added: support for all registered REST API namespaces including plugins and themes
+* Fixed: endpoint sanitization uses sanitize_text_field()
 
 = 1.0.2 =
 * Fixed: sanitize POST input at point of reading
