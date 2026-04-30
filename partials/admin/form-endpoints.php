@@ -49,6 +49,12 @@ if ( ! defined( 'WPINC' ) ) {
 			<span class="route-status <?php echo esc_attr( $em_route_data['is_blocked'] ? 'disabled' : 'enabled' ); ?>">
 				<?php echo $em_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbuoy-endpoint-manager' ) : esc_html__( 'Enabled', 'wpbuoy-endpoint-manager' ); ?>
 			</span>
+			<a href="<?php echo esc_url( $em_route_data['preview_url'] ); ?>"
+			   target="_blank"
+			   rel="noopener noreferrer"
+			   class="route-preview">
+				<?php esc_html_e( 'Preview', 'wpbuoy-endpoint-manager' ); ?>
+			</a>
 		</div>
 		<?php endforeach; ?>
 	</div>

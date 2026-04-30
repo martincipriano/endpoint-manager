@@ -225,6 +225,23 @@
 	color: #d63638;
 }
 
+.route-preview {
+	color: #2271b1;
+	text-decoration: none;
+	font-size: 12px;
+	padding: 4px 8px;
+	border: 1px solid #2271b1;
+	border-radius: 3px;
+	transition: all 0.2s ease;
+	flex-shrink: 0;
+}
+
+.route-preview:hover {
+	background: #2271b1;
+	color: #fff;
+	text-decoration: none;
+}
+
 .rest-api-route:hover {
 	background: #f6f7f7;
 }
@@ -240,6 +257,10 @@
 
 	.rest-api-route label {
 		width: 100%;
+	}
+
+	.route-preview {
+		align-self: flex-end;
 	}
 
 	.toggle-switch {

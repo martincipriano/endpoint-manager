@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 1.0.4\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.0.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-29T12:54:17+00:00\n"
+"POT-Creation-Date: 2026-04-30T11:51:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
@@ -60,12 +60,16 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
+#: partials/admin/form-endpoints.php:56
+msgid "Preview"
+msgstr ""
+
 #: partials/admin/page-main.php:24
 msgid "Save Changes"
 msgstr ""
 
 #: partials/admin/sidebar.php:13
-#: partials/admin/sidebar.php:22
+#: partials/admin/sidebar.php:21
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -78,30 +82,26 @@ msgid "Advanced Filters"
 msgstr ""
 
 #: partials/admin/sidebar.php:17
-msgid "Endpoint Preview"
-msgstr ""
-
-#: partials/admin/sidebar.php:18
 msgid "Security Logs"
 msgstr ""
 
-#: partials/admin/sidebar.php:19
+#: partials/admin/sidebar.php:18
 msgid "Export Logs"
 msgstr ""
 
-#: partials/admin/sidebar.php:27
+#: partials/admin/sidebar.php:26
 msgid "Need Help?"
 msgstr ""
 
-#: partials/admin/sidebar.php:29
+#: partials/admin/sidebar.php:28
 msgid "FAQ"
 msgstr ""
 
-#: partials/admin/sidebar.php:30
+#: partials/admin/sidebar.php:29
 msgid "Documentation"
 msgstr ""
 
-#: partials/admin/sidebar.php:31
+#: partials/admin/sidebar.php:30
 msgid "Support"
 msgstr ""
 
@@ -125,6 +125,6 @@ msgstr ""
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:408
+#: wpbuoy-endpoint-manager.php:409
 msgid "This REST API endpoint has been disabled."
 msgstr ""

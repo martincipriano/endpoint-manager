@@ -14,7 +14,6 @@ if ( ! defined( 'WPINC' ) ) {
 	<p><?php esc_html_e( 'Upgrade to WPBuoy Endpoint Manager Pro for advanced features:', 'wpbuoy-endpoint-manager' ); ?></p>
 	<ul>
 		<li><?php esc_html_e( 'Advanced Filters', 'wpbuoy-endpoint-manager' ); ?></li>
-		<li><?php esc_html_e( 'Endpoint Preview', 'wpbuoy-endpoint-manager' ); ?></li>
 		<li><?php esc_html_e( 'Security Logs', 'wpbuoy-endpoint-manager' ); ?></li>
 		<li><?php esc_html_e( 'Export Logs', 'wpbuoy-endpoint-manager' ); ?></li>
 	</ul>
