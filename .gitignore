@@ -3,4 +3,9 @@
 node_modules/
 .idea/
 .vscode/
-tests/
+.env
+
+# Playwright
+test-results/
+playwright-report/
+.auth/

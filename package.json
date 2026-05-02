@@ -1,0 +1,12 @@
+{
+  "name": "wpbuoy-endpoint-manager",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "dotenv": "^16.5.0"
+  }
+}
