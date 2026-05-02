@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       WPBuoy Endpoint Manager
- * Plugin URI:        https://wordpress.org/plugins/wpbuoy-endpoint-manager/
+ * Plugin URI:        https://wordpress.org/plugins/wpbyem/
  * Description:       Manage and block REST API endpoints to enhance your site's security and performance.
  * Version:           1.0.6
  * Requires at least: 5.0
@@ -10,7 +10,7 @@
  * Author URI:        https://www.linkedin.com/in/jmcipriano
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       wpbuoy-endpoint-manager
+ * Text Domain:       wpbyem
  * Domain Path:       /languages
  *
  * @package WPBuoy_Endpoint_Manager
@@ -22,15 +22,15 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // If Pro is active, go dormant — Pro handles everything.
-if ( defined( 'WPBUOY_ENDPOINT_MANAGER_PRO' ) ) {
+if ( defined( 'WPBYEM_PRO' ) ) {
 	add_action( 'admin_notices', function() {
 		$deactivate_url = wp_nonce_url(
-			admin_url( 'plugins.php?action=deactivate&plugin=wpbuoy-endpoint-manager%2Fwpbuoy-endpoint-manager.php' ),
-			'deactivate-plugin_wpbuoy-endpoint-manager/wpbuoy-endpoint-manager.php'
+			admin_url( 'plugins.php?action=deactivate&plugin=wpbyem%2Fwpbyem.php' ),
+			'deactivate-plugin_wpbyem/wpbyem.php'
 		);
 		echo '<div class="notice notice-info"><p>' .
-			esc_html__( 'WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbuoy-endpoint-manager' ) .
-			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbuoy-endpoint-manager' ) . '</a>' .
+			esc_html__( 'WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbyem' ) .
+			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbyem' ) . '</a>' .
 		'</p></div>';
 	} );
 	return;
@@ -39,17 +39,17 @@ if ( defined( 'WPBUOY_ENDPOINT_MANAGER_PRO' ) ) {
 /**
  * Current plugin version.
  */
-define( 'WPBUOY_ENDPOINT_MANAGER_VERSION', '1.0.6' );
+define( 'WPBYEM_VERSION', '1.0.6' );
 
 /**
  * Plugin directory path.
  */
-define( 'WPBUOY_ENDPOINT_MANAGER_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WPBYEM_PATH', plugin_dir_path( __FILE__ ) );
 
 /**
  * Plugin directory URL.
  */
-define( 'WPBUOY_ENDPOINT_MANAGER_URL', plugin_dir_url( __FILE__ ) );
+define( 'WPBYEM_URL', plugin_dir_url( __FILE__ ) );
 
 /**
  * The main plugin class.
@@ -90,19 +90,19 @@ class WPBuoy_Endpoint_Manager {
 	 * Load plugin dependencies.
 	 */
 	private function load_dependencies() {
-		require_once WPBUOY_ENDPOINT_MANAGER_PATH . 'includes/helpers.php';
-		require_once WPBUOY_ENDPOINT_MANAGER_PATH . 'includes/class-admin-sidebar.php';
+		require_once WPBYEM_PATH . 'includes/helpers.php';
+		require_once WPBYEM_PATH . 'includes/class-admin-sidebar.php';
 	}
 
 	/**
 	 * Migrate old settings to new option name.
 	 */
 	private function migrate_old_settings() {
-		$old_settings = get_option( 'wpbuoy_endpoint_manager_settings', null );
+		$old_settings = get_option( 'wpbyem_settings', null );
 		if ( ! is_null( $old_settings ) && is_array( $old_settings ) ) {
 			// Migrate old settings to new option name
-			update_option( 'wpbuoy_endpoint_manager_blocked_endpoints', $old_settings );
-			delete_option( 'wpbuoy_endpoint_manager_settings' );
+			update_option( 'wpbyem_blocked_endpoints', $old_settings );
+			delete_option( 'wpbyem_settings' );
 		}
 	}
 
@@ -123,22 +123,22 @@ class WPBuoy_Endpoint_Manager {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_admin_styles( $hook ) {
-		if ( 'toplevel_page_wpbuoy-endpoint-manager' !== $hook ) {
+		if ( 'toplevel_page_wpbyem' !== $hook ) {
 			return;
 		}
 
 		wp_enqueue_style(
-			'wpbuoy-endpoint-manager-admin',
+			'wpbyem-admin',
 			plugin_dir_url( __FILE__ ) . 'assets/css/admin.css',
 			array(),
-			WPBUOY_ENDPOINT_MANAGER_VERSION
+			WPBYEM_VERSION
 		);
 
 		wp_enqueue_script(
-			'wpbuoy-endpoint-manager-admin',
+			'wpbyem-admin',
 			plugin_dir_url( __FILE__ ) . 'assets/js/admin.js',
 			array(),
-			WPBUOY_ENDPOINT_MANAGER_VERSION,
+			WPBYEM_VERSION,
 			true
 		);
 	}
@@ -148,10 +148,10 @@ class WPBuoy_Endpoint_Manager {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			__( 'WPBuoy Endpoint Manager', 'wpbuoy-endpoint-manager' ),
-			__( 'Endpoints', 'wpbuoy-endpoint-manager' ),
+			__( 'WPBuoy Endpoint Manager', 'wpbyem' ),
+			__( 'Endpoints', 'wpbyem' ),
 			'manage_options',
-			'wpbuoy-endpoint-manager',
+			'wpbyem',
 			array( $this, 'render_admin_page' ),
 			'dashicons-superhero',
 			81
@@ -162,7 +162,7 @@ class WPBuoy_Endpoint_Manager {
 	 * Handle encoded form submission.
 	 */
 	public function handle_encoded_form_submission() {
-		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wpbuoy_endpoint_manager-options' ) ) {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'wpbyem-options' ) ) {
 			return;
 		}
 
@@ -171,8 +171,8 @@ class WPBuoy_Endpoint_Manager {
 		}
 
 		// Handle encoded form submission
-		$raw = isset( $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] )
-			? array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['wpbuoy_endpoint_manager_blocked_endpoints_encoded'] ) )
+		$raw = isset( $_POST['wpbyem_blocked_endpoints_encoded'] )
+			? array_map( 'sanitize_text_field', wp_unslash( (array) $_POST['wpbyem_blocked_endpoints_encoded'] ) )
 			: array();
 		if ( is_array( $raw ) ) {
 			$decoded_endpoints = array();
@@ -182,7 +182,7 @@ class WPBuoy_Endpoint_Manager {
 					$decoded_endpoints[] = $decoded;
 				}
 			}
-			$_POST['wpbuoy_endpoint_manager_blocked_endpoints'] = $decoded_endpoints;
+			$_POST['wpbyem_blocked_endpoints'] = $decoded_endpoints;
 		}
 	}
 
@@ -191,8 +191,8 @@ class WPBuoy_Endpoint_Manager {
 	 */
 	public function register_settings() {
 		register_setting(
-			'wpbuoy_endpoint_manager',
-			'wpbuoy_endpoint_manager_blocked_endpoints',
+			'wpbyem',
+			'wpbyem_blocked_endpoints',
 			array(
 				'type'              => 'array',
 				'sanitize_callback' => array( $this, 'sanitize_endpoints' ),
@@ -201,18 +201,18 @@ class WPBuoy_Endpoint_Manager {
 		);
 
 		add_settings_section(
-			'wpbuoy_endpoint_manager_main',
+			'wpbyem_main',
 			'',
 			array( $this, 'render_section_description' ),
-			'wpbuoy-endpoint-manager'
+			'wpbyem'
 		);
 
 		add_settings_field(
 			'blocked_endpoints',
-			__( 'Manage Endpoints', 'wpbuoy-endpoint-manager' ),
+			__( 'Manage Endpoints', 'wpbyem' ),
 			array( $this, 'render_endpoints_field' ),
-			'wpbuoy-endpoint-manager',
-			'wpbuoy_endpoint_manager_main'
+			'wpbyem',
+			'wpbyem_main'
 		);
 	}
 
@@ -249,30 +249,30 @@ class WPBuoy_Endpoint_Manager {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- set by WP options.php after its own nonce-verified save
 		if ( isset( $_GET['settings-updated'] ) ) {
 			add_settings_error(
-				'wpbuoy_endpoint_manager_messages',
-				'wpbuoy_endpoint_manager_message',
-				__( 'Settings Saved', 'wpbuoy-endpoint-manager' ),
+				'wpbyem_messages',
+				'wpbyem_message',
+				__( 'Settings Saved', 'wpbyem' ),
 				'updated'
 			);
 		}
 
-		settings_errors( 'wpbuoy_endpoint_manager_messages' );
+		settings_errors( 'wpbyem_messages' );
 
-		wpb_em_get_plugin_part( 'admin/page', 'main' );
+		wpbyem_get_plugin_part( 'admin/page', 'main' );
 	}
 
 	/**
 	 * Render section description.
 	 */
 	public function render_section_description() {
-		wpb_em_get_plugin_part( 'admin/section', 'description' );
+		wpbyem_get_plugin_part( 'admin/section', 'description' );
 	}
 
 	/**
 	 * Render endpoints field.
 	 */
 	public function render_endpoints_field() {
-		$blocked_endpoints = get_option( 'wpbuoy_endpoint_manager_blocked_endpoints', array() );
+		$blocked_endpoints = get_option( 'wpbyem_blocked_endpoints', array() );
 		$all_routes        = $this->get_rest_routes();
 
 		$routes_data = array();
@@ -301,7 +301,7 @@ class WPBuoy_Endpoint_Manager {
 			);
 		}
 
-		wpb_em_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
+		wpbyem_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
 	}
 
 	/**
@@ -391,7 +391,7 @@ class WPBuoy_Endpoint_Manager {
 			return $result;
 		}
 
-		$blocked_endpoints = get_option( 'wpbuoy_endpoint_manager_blocked_endpoints', array() );
+		$blocked_endpoints = get_option( 'wpbyem_blocked_endpoints', array() );
 		$current_route = $request->get_route();
 		$current_route = rtrim( $current_route, '/' );
 
@@ -406,7 +406,7 @@ class WPBuoy_Endpoint_Manager {
 			if ( $current_route === $blocked_pattern ) {
 				return new WP_Error(
 					'rest_forbidden',
-					__( 'This REST API endpoint has been disabled.', 'wpbuoy-endpoint-manager' ),
+					__( 'This REST API endpoint has been disabled.', 'wpbyem' ),
 					array( 'status' => 403 )
 				);
 			}
@@ -421,9 +421,9 @@ class WPBuoy_Endpoint_Manager {
  *
  * @return WPBuoy_Endpoint_Manager
  */
-function wpbuoy_endpoint_manager() {
+function wpbyem() {
 	return WPBuoy_Endpoint_Manager::instance();
 }
 
 // Initialize the plugin
-wpbuoy_endpoint_manager();
+wpbyem();

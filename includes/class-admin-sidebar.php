@@ -57,7 +57,7 @@ class WPBuoy_Endpoint_Manager_Admin_Sidebar {
 	 */
 	public function add_body_class( string $classes ): string {
 		if ( $this->is_sidebar_screen() ) {
-			$classes .= ' wpbuoy-endpoint-manager-has-sidebar';
+			$classes .= ' wpbyem-has-sidebar';
 		}
 		return $classes;
 	}
@@ -72,13 +72,13 @@ class WPBuoy_Endpoint_Manager_Admin_Sidebar {
 			return;
 		}
 		echo '<div class="wpbuoy-admin-sidebar">';
-		wpb_em_get_plugin_part( 'admin/sidebar' );
+		wpbyem_get_plugin_part( 'admin/sidebar' );
 		echo '</div>';
 	}
 }
 
 new WPBuoy_Endpoint_Manager_Admin_Sidebar(
 	array(
-		'toplevel_page_wpbuoy-endpoint-manager',
+		'toplevel_page_wpbyem',
 	)
 );

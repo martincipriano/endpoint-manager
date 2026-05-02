@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WPBuoy Endpoint Manager 1.0.6\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbyem\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -12,31 +12,31 @@ msgstr ""
 "POT-Creation-Date: 2026-04-30T13:00:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: wpbuoy-endpoint-manager\n"
+"X-Domain: wpbyem\n"
 
 #. Plugin Name of the plugin
-#: wpbuoy-endpoint-manager.php
-#: wpbuoy-endpoint-manager.php:151
+#: wpbyem.php
+#: wpbyem.php:151
 msgid "WPBuoy Endpoint Manager"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: wpbuoy-endpoint-manager.php
-msgid "https://wordpress.org/plugins/wpbuoy-endpoint-manager/"
+#: wpbyem.php
+msgid "https://wordpress.org/plugins/wpbyem/"
 msgstr ""
 
 #. Description of the plugin
-#: wpbuoy-endpoint-manager.php
+#: wpbyem.php
 msgid "Manage and block REST API endpoints to enhance your site's security and performance."
 msgstr ""
 
 #. Author of the plugin
-#: wpbuoy-endpoint-manager.php
+#: wpbyem.php
 msgid "Jose Martin Cipriano"
 msgstr ""
 
 #. Author URI of the plugin
-#: wpbuoy-endpoint-manager.php
+#: wpbyem.php
 msgid "https://www.linkedin.com/in/jmcipriano"
 msgstr ""
 
@@ -105,26 +105,26 @@ msgstr ""
 msgid "Support"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:32
+#: wpbyem.php:32
 msgid "WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:33
+#: wpbyem.php:33
 msgid "Deactivate free version"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:152
+#: wpbyem.php:152
 msgid "Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:212
+#: wpbyem.php:212
 msgid "Manage Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:254
+#: wpbyem.php:254
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:409
+#: wpbyem.php:409
 msgid "This REST API endpoint has been disabled."
 msgstr ""

@@ -13,24 +13,24 @@ if ( ! defined( 'WPINC' ) ) {
  * Load a plugin template part.
  *
  * Mirrors WordPress get_template_part() naming convention:
- *   wpb_em_get_plugin_part( 'admin/page', 'main', $args )
+ *   wpbyem_get_plugin_part( 'admin/page', 'main', $args )
  *   → partials/admin/page-main.php
  *
  * Also accepts the two-argument form when no name suffix is needed:
- *   wpb_em_get_plugin_part( 'admin/sidebar', $args )
+ *   wpbyem_get_plugin_part( 'admin/sidebar', $args )
  *   → partials/admin/sidebar.php
  *
  * @param string       $slug Base template slug relative to /partials/ (without .php).
  * @param string|array $name Name suffix appended as "{slug}-{name}.php", or $args array when omitted.
  * @param array        $args Variables to extract into template scope.
  */
-function wpb_em_get_plugin_part( $slug, $name = '', $args = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+function wpbyem_get_plugin_part( $slug, $name = '', $args = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 	if ( is_array( $name ) ) {
 		$args = $name;
 		$name = '';
 	}
 	$path = ltrim( $slug, '/' ) . ( $name !== '' ? '-' . $name : '' );
-	$file = WPBUOY_ENDPOINT_MANAGER_PATH . 'partials/' . $path . '.php';
+	$file = WPBYEM_PATH . 'partials/' . $path . '.php';
 	if ( ! file_exists( $file ) ) {
 		return;
 	}
@@ -49,8 +49,8 @@ function wpb_em_get_plugin_part( $slug, $name = '', $args = array() ) { // phpcs
  * @param array        $args Variables to extract into template scope.
  * @return string Rendered HTML.
  */
-function wpb_em_return_plugin_part( $slug, $name = '', $args = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+function wpbyem_return_plugin_part( $slug, $name = '', $args = array() ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 	ob_start();
-	wpb_em_get_plugin_part( $slug, $name, $args );
+	wpbyem_get_plugin_part( $slug, $name, $args );
 	return ob_get_clean();
 }

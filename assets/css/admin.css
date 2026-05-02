@@ -270,10 +270,10 @@
 
 /* Settings page specific styles */
 
-.wpbuoy-endpoint-manager-footer {
+.wpbyem-footer {
 	padding: 16px 0;
 }
-.wpbuoy-endpoint-manager-footer .submit {
+.wpbyem-footer .submit {
 	margin: 0;
 	padding: 0;
 }
@@ -333,7 +333,7 @@
 /**
  * Sidebar layout — fixed, right-side
  */
-body.wpbuoy-endpoint-manager-has-sidebar #wpcontent {
+body.wpbyem-has-sidebar #wpcontent {
 	padding-right: 360px;
 }
 .wpbuoy-admin-sidebar {
@@ -349,7 +349,7 @@ body.wpbuoy-endpoint-manager-has-sidebar #wpcontent {
 	width: 320px;
 }
 @media (max-width: 782px) {
-	body.wpbuoy-endpoint-manager-has-sidebar #wpcontent {
+	body.wpbyem-has-sidebar #wpcontent {
 		padding-right: 0;
 	}
 	.wpbuoy-admin-sidebar {
