@@ -22,14 +22,14 @@ if ( ! defined( 'WPINC' ) ) {
 				<span class="disabled-count">
 					<?php
 					/* translators: %d: number of disabled endpoints */
-					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $em_namespace_data['disabled_count'], 'wpbyem' ), $em_namespace_data['disabled_count'] ) );
+					echo esc_html( sprintf( _n( '%d disabled', '%d disabled', $em_namespace_data['disabled_count'], 'wpbuoy-endpoint-manager' ), $em_namespace_data['disabled_count'] ) );
 					?>
 				</span>
 			<?php endif; ?>
 		</div>
 		<button type="button" class="namespace-toggle" aria-expanded="false">
 			<span class="toggle-icon"></span>
-			<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'wpbyem' ); ?></span>
+			<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'wpbuoy-endpoint-manager' ); ?></span>
 		</button>
 	</div>
 	<div class="rest-api-routes" style="display: none;">
@@ -47,13 +47,13 @@ if ( ! defined( 'WPINC' ) ) {
 				</div>
 			</label>
 			<span class="route-status <?php echo esc_attr( $em_route_data['is_blocked'] ? 'disabled' : 'enabled' ); ?>">
-				<?php echo $em_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbyem' ) : esc_html__( 'Enabled', 'wpbyem' ); ?>
+				<?php echo $em_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbuoy-endpoint-manager' ) : esc_html__( 'Enabled', 'wpbuoy-endpoint-manager' ); ?>
 			</span>
 			<a href="<?php echo esc_url( $em_route_data['preview_url'] ); ?>"
 			   target="_blank"
 			   rel="noopener noreferrer"
 			   class="route-preview">
-				<?php esc_html_e( 'Preview', 'wpbyem' ); ?>
+				<?php esc_html_e( 'Preview', 'wpbuoy-endpoint-manager' ); ?>
 			</a>
 		</div>
 		<?php endforeach; ?>

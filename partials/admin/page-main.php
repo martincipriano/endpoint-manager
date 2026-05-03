@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 		<hr>
 
 		<div class="wpbyem-footer">
-			<?php submit_button( __( 'Save Changes', 'wpbyem' ), 'primary', 'submit', true ); ?>
+			<?php submit_button( __( 'Save Changes', 'wpbuoy-endpoint-manager' ), 'primary', 'submit', true ); ?>
 		</div>
 	</form>
 </div>

@@ -34,7 +34,7 @@ test.describe('Endpoint Manager — Free', () => {
   // ---------------------------------------------------------------------------
   // TEST: View all REST API namespaces
   // ---------------------------------------------------------------------------
-  test('shows namespaces collapsed, expands on click, collapses on second click, and shows endpoint details when expanded', async ({ page }) => {
+  test('shows namespaces collapsed, expands on click, collapses on second click, and shows static endpoint details when expanded', async ({ page }) => {
     const firstNamespace = page.locator('.rest-api-namespace').first();
 
     // Collapsed by default

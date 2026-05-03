@@ -3,17 +3,17 @@
  * Plugin Name:       WPBuoy Endpoint Manager
  * Plugin URI:        https://wordpress.org/plugins/wpbyem/
  * Description:       Manage and block REST API endpoints to enhance your site's security and performance.
- * Version:           1.0.6
+ * Version:           1.0.7
  * Requires at least: 5.0
  * Requires PHP:      7.2
  * Author:            Jose Martin Cipriano
  * Author URI:        https://www.linkedin.com/in/jmcipriano
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       wpbyem
+ * Text Domain:       wpbuoy-endpoint-manager
  * Domain Path:       /languages
  *
- * @package WPBuoy_Endpoint_Manager
+ * @package Wpbyem_Endpoint_Manager
  */
 
 // If this file is called directly, abort.
@@ -29,8 +29,8 @@ if ( defined( 'WPBYEM_PRO' ) ) {
 			'deactivate-plugin_wpbyem/wpbyem.php'
 		);
 		echo '<div class="notice notice-info"><p>' .
-			esc_html__( 'WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbyem' ) .
-			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbyem' ) . '</a>' .
+			esc_html__( 'WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbuoy-endpoint-manager' ) .
+			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbuoy-endpoint-manager' ) . '</a>' .
 		'</p></div>';
 	} );
 	return;
@@ -54,21 +54,21 @@ define( 'WPBYEM_URL', plugin_dir_url( __FILE__ ) );
 /**
  * The main plugin class.
  */
-class WPBuoy_Endpoint_Manager {
+class Wpbyem_Endpoint_Manager {
 
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var WPBuoy_Endpoint_Manager
+	 * @var Wpbyem_Endpoint_Manager
 	 */
 	protected static $instance = null;
 
 	/**
-	 * Main WPBuoy_Endpoint_Manager Instance.
+	 * Main Wpbyem_Endpoint_Manager Instance.
 	 *
-	 * Ensures only one instance of WPBuoy_Endpoint_Manager is loaded or can be loaded.
+	 * Ensures only one instance of Wpbyem_Endpoint_Manager is loaded or can be loaded.
 	 *
-	 * @return WPBuoy_Endpoint_Manager Main instance.
+	 * @return Wpbyem_Endpoint_Manager Main instance.
 	 */
 	public static function instance() {
 		if ( is_null( self::$instance ) ) {
@@ -148,8 +148,8 @@ class WPBuoy_Endpoint_Manager {
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			__( 'WPBuoy Endpoint Manager', 'wpbyem' ),
-			__( 'Endpoints', 'wpbyem' ),
+			__( 'WPBuoy Endpoint Manager', 'wpbuoy-endpoint-manager' ),
+			__( 'Endpoints', 'wpbuoy-endpoint-manager' ),
 			'manage_options',
 			'wpbyem',
 			array( $this, 'render_admin_page' ),
@@ -209,7 +209,7 @@ class WPBuoy_Endpoint_Manager {
 
 		add_settings_field(
 			'blocked_endpoints',
-			__( 'Manage Endpoints', 'wpbyem' ),
+			__( 'Manage Endpoints', 'wpbuoy-endpoint-manager' ),
 			array( $this, 'render_endpoints_field' ),
 			'wpbyem',
 			'wpbyem_main'
@@ -251,7 +251,7 @@ class WPBuoy_Endpoint_Manager {
 			add_settings_error(
 				'wpbyem_messages',
 				'wpbyem_message',
-				__( 'Settings Saved', 'wpbyem' ),
+				__( 'Settings Saved', 'wpbuoy-endpoint-manager' ),
 				'updated'
 			);
 		}
@@ -406,7 +406,7 @@ class WPBuoy_Endpoint_Manager {
 			if ( $current_route === $blocked_pattern ) {
 				return new WP_Error(
 					'rest_forbidden',
-					__( 'This REST API endpoint has been disabled.', 'wpbyem' ),
+					__( 'This REST API endpoint has been disabled.', 'wpbuoy-endpoint-manager' ),
 					array( 'status' => 403 )
 				);
 			}
@@ -417,12 +417,12 @@ class WPBuoy_Endpoint_Manager {
 }
 
 /**
- * Returns the main instance of WPBuoy_Endpoint_Manager.
+ * Returns the main instance of Wpbyem_Endpoint_Manager.
  *
- * @return WPBuoy_Endpoint_Manager
+ * @return Wpbyem_Endpoint_Manager
  */
 function wpbyem() {
-	return WPBuoy_Endpoint_Manager::instance();
+	return Wpbyem_Endpoint_Manager::instance();
 }
 
 // Initialize the plugin

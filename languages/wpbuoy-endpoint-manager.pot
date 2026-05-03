@@ -2,41 +2,41 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 1.0.6\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbyem\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.0.7\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-30T13:00:56+00:00\n"
+"POT-Creation-Date: 2026-05-03T02:55:48+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: wpbyem\n"
+"X-Domain: wpbuoy-endpoint-manager\n"
 
 #. Plugin Name of the plugin
-#: wpbyem.php
-#: wpbyem.php:151
+#: wpbuoy-endpoint-manager.php
+#: wpbuoy-endpoint-manager.php:151
 msgid "WPBuoy Endpoint Manager"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: wpbyem.php
+#: wpbuoy-endpoint-manager.php
 msgid "https://wordpress.org/plugins/wpbyem/"
 msgstr ""
 
 #. Description of the plugin
-#: wpbyem.php
+#: wpbuoy-endpoint-manager.php
 msgid "Manage and block REST API endpoints to enhance your site's security and performance."
 msgstr ""
 
 #. Author of the plugin
-#: wpbyem.php
+#: wpbuoy-endpoint-manager.php
 msgid "Jose Martin Cipriano"
 msgstr ""
 
 #. Author URI of the plugin
-#: wpbyem.php
+#: wpbuoy-endpoint-manager.php
 msgid "https://www.linkedin.com/in/jmcipriano"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgid "Save Changes"
 msgstr ""
 
 #: partials/admin/sidebar.php:13
-#: partials/admin/sidebar.php:21
+#: partials/admin/sidebar.php:22
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -78,53 +78,57 @@ msgid "Upgrade to WPBuoy Endpoint Manager Pro for advanced features:"
 msgstr ""
 
 #: partials/admin/sidebar.php:16
-msgid "Advanced Filters"
+msgid "Per-route granular control"
 msgstr ""
 
 #: partials/admin/sidebar.php:17
-msgid "Security Logs"
+msgid "Custom endpoint allowlists"
 msgstr ""
 
 #: partials/admin/sidebar.php:18
-msgid "Export Logs"
+msgid "Rate limiting per namespace"
 msgstr ""
 
-#: partials/admin/sidebar.php:26
+#: partials/admin/sidebar.php:19
+msgid "Logging and analytics"
+msgstr ""
+
+#: partials/admin/sidebar.php:27
 msgid "Need Help?"
 msgstr ""
 
-#: partials/admin/sidebar.php:28
+#: partials/admin/sidebar.php:29
 msgid "FAQ"
 msgstr ""
 
-#: partials/admin/sidebar.php:29
+#: partials/admin/sidebar.php:30
 msgid "Documentation"
 msgstr ""
 
-#: partials/admin/sidebar.php:30
+#: partials/admin/sidebar.php:31
 msgid "Support"
 msgstr ""
 
-#: wpbyem.php:32
+#: wpbuoy-endpoint-manager.php:32
 msgid "WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated."
 msgstr ""
 
-#: wpbyem.php:33
+#: wpbuoy-endpoint-manager.php:33
 msgid "Deactivate free version"
 msgstr ""
 
-#: wpbyem.php:152
+#: wpbuoy-endpoint-manager.php:152
 msgid "Endpoints"
 msgstr ""
 
-#: wpbyem.php:212
+#: wpbuoy-endpoint-manager.php:212
 msgid "Manage Endpoints"
 msgstr ""
 
-#: wpbyem.php:254
+#: wpbuoy-endpoint-manager.php:254
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbyem.php:409
+#: wpbuoy-endpoint-manager.php:409
 msgid "This REST API endpoint has been disabled."
 msgstr ""

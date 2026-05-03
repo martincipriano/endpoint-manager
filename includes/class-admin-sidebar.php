@@ -5,7 +5,7 @@
  * Injects the upgrade/support sidebar into the WordPress admin footer
  * on configured screens via a body class + fixed CSS positioning.
  *
- * @package WPBuoy_Endpoint_Manager
+ * @package Wpbyem_Endpoint_Manager
  */
 
 // If this file is called directly, abort.
@@ -14,12 +14,12 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * WPBuoy_Endpoint_Manager_Admin_Sidebar Class
+ * Wpbyem_Admin_Sidebar Class
  *
  * To add the sidebar to additional screens, pass their screen IDs
  * to the constructor below.
  */
-class WPBuoy_Endpoint_Manager_Admin_Sidebar {
+class Wpbyem_Admin_Sidebar {
 
 	/**
 	 * Screen IDs on which the sidebar should appear.
@@ -77,7 +77,7 @@ class WPBuoy_Endpoint_Manager_Admin_Sidebar {
 	}
 }
 
-new WPBuoy_Endpoint_Manager_Admin_Sidebar(
+new Wpbyem_Admin_Sidebar(
 	array(
 		'toplevel_page_wpbyem',
 	)

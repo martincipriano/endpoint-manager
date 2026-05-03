@@ -10,23 +10,24 @@ if ( ! defined( 'WPINC' ) ) {
 }
 ?>
 <div class="wpbuoy-sidebar-widget wpbuoy-upgrade-widget">
-	<h3><?php esc_html_e( 'Upgrade to Pro', 'wpbyem' ); ?></h3>
-	<p><?php esc_html_e( 'Upgrade to WPBuoy Endpoint Manager Pro for advanced features:', 'wpbyem' ); ?></p>
+	<h3><?php esc_html_e( 'Upgrade to Pro', 'wpbuoy-endpoint-manager' ); ?></h3>
+	<p><?php esc_html_e( 'Upgrade to WPBuoy Endpoint Manager Pro for advanced features:', 'wpbuoy-endpoint-manager' ); ?></p>
 	<ul>
-		<li><?php esc_html_e( 'Advanced Filters', 'wpbyem' ); ?></li>
-		<li><?php esc_html_e( 'Security Logs', 'wpbyem' ); ?></li>
-		<li><?php esc_html_e( 'Export Logs', 'wpbyem' ); ?></li>
+		<li><?php esc_html_e( 'Per-route granular control', 'wpbuoy-endpoint-manager' ); ?></li>
+		<li><?php esc_html_e( 'Custom endpoint allowlists', 'wpbuoy-endpoint-manager' ); ?></li>
+		<li><?php esc_html_e( 'Rate limiting per namespace', 'wpbuoy-endpoint-manager' ); ?></li>
+		<li><?php esc_html_e( 'Logging and analytics', 'wpbuoy-endpoint-manager' ); ?></li>
 	</ul>
 	<a href="https://wpbuoy.com/product/endpoint-manager/" target="_blank" class="button button-primary">
-		<?php esc_html_e( 'Upgrade to Pro', 'wpbyem' ); ?>
+		<?php esc_html_e( 'Upgrade to Pro', 'wpbuoy-endpoint-manager' ); ?>
 	</a>
 </div>
 
 <div class="wpbuoy-sidebar-widget wpbuoy-support-widget">
-	<h3><?php esc_html_e( 'Need Help?', 'wpbyem' ); ?></h3>
+	<h3><?php esc_html_e( 'Need Help?', 'wpbuoy-endpoint-manager' ); ?></h3>
 	<ul>
-		<li><a href="https://wpbuoy.com/product/endpoint-manager/#faqs" target="_blank"><?php esc_html_e( 'FAQ', 'wpbyem' ); ?></a></li>
-		<li><a href="https://wpbuoy.com/endpoint-manager/documentation/" target="_blank"><?php esc_html_e( 'Documentation', 'wpbyem' ); ?></a></li>
-		<li><a href="https://wpbuoy.com/my-account/support/" target="_blank"><?php esc_html_e( 'Support', 'wpbyem' ); ?></a></li>
+		<li><a href="https://wpbuoy.com/product/endpoint-manager/#faqs" target="_blank"><?php esc_html_e( 'FAQ', 'wpbuoy-endpoint-manager' ); ?></a></li>
+		<li><a href="https://wpbuoy.com/endpoint-manager/documentation/" target="_blank"><?php esc_html_e( 'Documentation', 'wpbuoy-endpoint-manager' ); ?></a></li>
+		<li><a href="https://wpbuoy.com/my-account/support/" target="_blank"><?php esc_html_e( 'Support', 'wpbuoy-endpoint-manager' ); ?></a></li>
 	</ul>
 </div>
