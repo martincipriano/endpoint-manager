@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 1.1.0\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-03T18:00:34+00:00\n"
+"POT-Creation-Date: 2026-05-04T14:58:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
@@ -69,7 +69,7 @@ msgid "Save Changes"
 msgstr ""
 
 #: partials/admin/sidebar.php:13
-#: partials/admin/sidebar.php:22
+#: partials/admin/sidebar.php:23
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -78,34 +78,38 @@ msgid "Upgrade to WPBuoy Endpoint Manager Pro for advanced features:"
 msgstr ""
 
 #: partials/admin/sidebar.php:16
-msgid "Per-route granular control"
+msgid "Advanced endpoint filtering and search"
 msgstr ""
 
 #: partials/admin/sidebar.php:17
-msgid "Custom endpoint allowlists"
+msgid "Dynamic route management"
 msgstr ""
 
 #: partials/admin/sidebar.php:18
-msgid "Rate limiting per namespace"
+msgid "Security logs and analytics"
 msgstr ""
 
 #: partials/admin/sidebar.php:19
-msgid "Logging and analytics"
+msgid "Export logs to CSV"
 msgstr ""
 
-#: partials/admin/sidebar.php:27
+#: partials/admin/sidebar.php:20
+msgid "Automatic plugin updates"
+msgstr ""
+
+#: partials/admin/sidebar.php:28
 msgid "Need Help?"
 msgstr ""
 
-#: partials/admin/sidebar.php:29
+#: partials/admin/sidebar.php:30
 msgid "FAQ"
 msgstr ""
 
-#: partials/admin/sidebar.php:30
+#: partials/admin/sidebar.php:31
 msgid "Documentation"
 msgstr ""
 
-#: partials/admin/sidebar.php:31
+#: partials/admin/sidebar.php:32
 msgid "Support"
 msgstr ""
 
