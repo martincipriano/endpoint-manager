@@ -21,18 +21,55 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Block activation when Pro is already active.
+register_activation_hook(
+	__FILE__,
+	function () {
+		if ( defined( 'WPBYEM_PRO' ) || in_array( 'endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
+			wp_die(
+				esc_html__( 'WPBuoy Endpoint Manager cannot be activated while the Pro version is active.', 'wpbuoy-endpoint-manager' ),
+				esc_html__( 'Plugin Activation Error', 'wpbuoy-endpoint-manager' ),
+				array( 'back_link' => true )
+			);
+		}
+	}
+);
+
 // If Pro is active, go dormant — Pro handles everything.
 if ( defined( 'WPBYEM_PRO' ) ) {
-	add_action( 'admin_notices', function() {
-		$deactivate_url = wp_nonce_url(
-			admin_url( 'plugins.php?action=deactivate&plugin=wpbuoy-endpoint-manager%2Fwpbuoy-endpoint-manager.php' ),
-			'deactivate-plugin_wpbuoy-endpoint-manager/wpbuoy-endpoint-manager.php'
-		);
-		echo '<div class="notice notice-info"><p>' .
-			esc_html__( 'WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated.', 'wpbuoy-endpoint-manager' ) .
-			' <a href="' . esc_url( $deactivate_url ) . '">' . esc_html__( 'Deactivate free version', 'wpbuoy-endpoint-manager' ) . '</a>' .
-		'</p></div>';
-	} );
+	add_action(
+		'admin_init',
+		function () {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+		}
+	);
+	add_action(
+		'admin_notices',
+		function () {
+			echo '<div class="notice notice-warning is-dismissible"><p>' .
+				esc_html__( 'WPBuoy Endpoint Manager (free) has been automatically deactivated because the Pro version is active.', 'wpbuoy-endpoint-manager' ) .
+			'</p></div>';
+		}
+	);
+	return;
+}
+
+// Safety net: deactivate free if pro is in the active plugins list.
+if ( in_array( 'endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
+	add_action(
+		'admin_init',
+		function () {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+		}
+	);
+	add_action(
+		'admin_notices',
+		function () {
+			echo '<div class="notice notice-warning is-dismissible"><p>' .
+				esc_html__( 'WPBuoy Endpoint Manager (free) has been automatically deactivated because the Pro version is active.', 'wpbuoy-endpoint-manager' ) .
+			'</p></div>';
+		}
+	);
 	return;
 }
 
