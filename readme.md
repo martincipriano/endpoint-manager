@@ -1,4 +1,4 @@
-# REST API Manager
+# WPBuoy Endpoint Manager
 
 Control which REST API endpoints are accessible on your WordPress site. Enable or disable specific endpoints to enhance security and performance.
 
@@ -7,34 +7,32 @@ Control which REST API endpoints are accessible on your WordPress site. Enable o
 ### Free Version
 
 - **Manage WordPress Core Endpoints** - Control access to all WordPress core REST API endpoints
-- **Static Endpoints Support** - Manage static REST API endpoints
+- **Static Endpoint Preview** - Preview any static endpoint and inspect its response without leaving the dashboard
 - **Simple Toggle Interface** - Easy-to-use interface for enabling/disabling endpoints
 - **Organized by Namespace** - Endpoints grouped by namespace for easy management
 - **Security Enhancement** - Reduce your site's attack surface by disabling unused endpoints
 
 ### Pro Version
 
-Upgrade to [REST API Manager Pro](https://wpbuoy.com/plugins/rest-api-manager-pro/) for advanced features:
+Upgrade to [WPBuoy Endpoint Manager Pro](https://wpbuoy.com/product/endpoint-manager/) for advanced features:
 
+- **All Namespaces** - Manage endpoints from plugins and themes, not just WordPress core
+- **Dynamic Endpoints** - Support for dynamic/regex endpoints with a guided fill-in-the-blanks preview modal
 - **Endpoint Filtering** - Filter endpoints by status, type, and namespace
 - **Security Logs** - Track all blocked API requests with detailed logs
 - **Export Logs** - Export security logs to CSV for analysis
-- **Endpoint Preview** - Preview endpoints with sample data
 - **Endpoint Summary** - View statistics and summary of your endpoints
-- **All Namespaces** - Manage endpoints from plugins and themes, not just WordPress core
-- **Dynamic Endpoints** - Support for dynamic/regex endpoints
 - **Priority Support** - Get help when you need it
 
 ## Installation
 
-1. Upload the plugin files to the `/wp-content/plugins/rest-api-manager` directory
-2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Navigate to Settings -> API Manager to configure the plugin
-4. Toggle endpoints on/off as needed
+1. Upload the plugin ZIP via **WordPress Admin → Plugins → Add New → Upload Plugin**, then activate.
+2. Navigate to **Endpoints → Manage Endpoints** to configure endpoint access.
+3. Toggle endpoints on/off as needed.
 
 ## Usage
 
-1. Go to **Settings -> API Manager** in your WordPress admin
+1. Go to **Endpoints** in your WordPress admin
 2. Browse through the available endpoints organized by namespace
 3. Click on a namespace to expand and view its endpoints
 4. Use the toggle switch to enable or disable specific endpoints
