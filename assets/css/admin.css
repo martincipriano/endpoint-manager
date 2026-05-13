@@ -84,7 +84,7 @@
 .toggle-icon {
 	width: 24px;
 	height: 24px;
-	background: url('../images/arrow-drop-down.svg') no-repeat center;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='%23666'%3E%3Cpath d='M480-360 280-560h400L480-360Z'/%3E%3C/svg%3E") no-repeat center;
 	background-size: 24px 24px;
 	transition: all 0.3s ease;
 	display: inline-block;
@@ -92,7 +92,7 @@
 }
 
 .namespace-header.expanded .toggle-icon {
-	background-image: url('../images/arrow-drop-up.svg');
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='%23666'%3E%3Cpath d='m280-400 200-200 200 200H280Z'/%3E%3C/svg%3E");
 }
 
 /* Screen reader only text */

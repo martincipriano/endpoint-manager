@@ -5,7 +5,7 @@
  * Description:       Manage and block REST API endpoints to enhance your site's security and performance.
  * Version:           1.1.1
  * Requires at least: 5.0
- * Requires PHP:      7.2
+ * Requires PHP:      7.4
  * Author:            Jose Martin Cipriano
  * Author URI:        https://www.linkedin.com/in/jmcipriano
  * License:           GPL v2 or later
@@ -119,7 +119,7 @@ class Wpbyem_Endpoint_Manager {
 	 */
 	public function __construct() {
 		$this->load_dependencies();
-		$this->migrate_old_settings();
+
 		$this->init_hooks();
 	}
 
@@ -131,17 +131,6 @@ class Wpbyem_Endpoint_Manager {
 		require_once WPBYEM_PATH . 'includes/class-admin-sidebar.php';
 	}
 
-	/**
-	 * Migrate old settings to new option name.
-	 */
-	private function migrate_old_settings() {
-		$old_settings = get_option( 'wpbyem_settings', null );
-		if ( ! is_null( $old_settings ) && is_array( $old_settings ) ) {
-			// Migrate old settings to new option name
-			update_option( 'wpbyem_blocked_endpoints', $old_settings );
-			delete_option( 'wpbyem_settings' );
-		}
-	}
 
 	/**
 	 * Initialize hooks.
