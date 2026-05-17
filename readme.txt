@@ -4,7 +4,7 @@ Tags: rest api, security, api, disable endpoints, rest api security
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,9 @@ Yes, but the plugin must be activated on each site individually. Network activat
 3. View disabled endpoints count per namespace
 
 == Changelog ==
+
+= 1.1.3 =
+* Updated: tested up to WordPress 6.9
 
 = 1.1.2 =
 * Fixed: private constructor enforces singleton pattern
