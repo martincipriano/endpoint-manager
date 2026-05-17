@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
 		</div>
 		<button type="button" class="namespace-toggle" aria-expanded="false">
 			<span class="toggle-icon"></span>
-			<span class="sr-only"><?php esc_html_e( 'Toggle namespace', 'wpbuoy-endpoint-manager' ); ?></span>
+			<span class="screen-reader-text"><?php esc_html_e( 'Toggle namespace', 'wpbuoy-endpoint-manager' ); ?></span>
 		</button>
 	</div>
 	<div class="rest-api-routes" style="display: none;">
@@ -50,7 +50,7 @@ if ( ! defined( 'WPINC' ) ) {
 				<?php echo $em_route_data['is_blocked'] ? esc_html__( 'Disabled', 'wpbuoy-endpoint-manager' ) : esc_html__( 'Enabled', 'wpbuoy-endpoint-manager' ); ?>
 			</span>
 			<a href="<?php echo esc_url( $em_route_data['preview_url'] ); ?>"
-			   target="_blank"
+			   target="_blank" rel="noopener noreferrer"
 			   rel="noopener noreferrer"
 			   class="route-preview">
 				<?php esc_html_e( 'Preview', 'wpbuoy-endpoint-manager' ); ?>

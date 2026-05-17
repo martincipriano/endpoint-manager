@@ -117,7 +117,7 @@ class Wpbyem_Endpoint_Manager {
 	/**
 	 * Constructor.
 	 */
-	public function __construct() {
+	private function __construct() {
 		$this->load_dependencies();
 
 		$this->init_hooks();
@@ -136,11 +136,19 @@ class Wpbyem_Endpoint_Manager {
 	 * Initialize hooks.
 	 */
 	private function init_hooks() {
+		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'handle_encoded_form_submission' ), 5 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
+	}
+
+	/**
+	 * Load plugin text domain.
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain( 'wpbuoy-endpoint-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
 
 	/**
