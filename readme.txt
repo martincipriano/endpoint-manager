@@ -50,6 +50,12 @@ Yes, but the plugin must be activated on each site individually. Network activat
 
 == Changelog ==
 
+= 1.1.2 =
+* Fixed: private constructor enforces singleton pattern
+* Fixed: text domain loaded via init hook to prevent early-load notices
+* Fixed: comprehensive uninstall cleanup (options, transients, multisite)
+* Fixed: accessibility improvements (screen-reader-text, rel attributes)
+
 = 1.1.1 =
 * Updated: sidebar "Upgrade to Pro" features list updated to match current pro feature set.
 
