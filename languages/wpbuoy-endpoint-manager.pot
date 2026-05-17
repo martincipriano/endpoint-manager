@@ -1,28 +1,28 @@
-# Copyright (C) 2026 Jose Martin Cipriano
+# Copyright (C) 2026 WPBuoy
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 1.1.1\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 1.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-04T14:58:50+00:00\n"
+"POT-Creation-Date: 2026-05-17T08:35:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
 
 #. Plugin Name of the plugin
 #: wpbuoy-endpoint-manager.php
-#: wpbuoy-endpoint-manager.php:151
+#: wpbuoy-endpoint-manager.php:185
 msgid "WPBuoy Endpoint Manager"
 msgstr ""
 
 #. Plugin URI of the plugin
 #: wpbuoy-endpoint-manager.php
-msgid "https://wordpress.org/plugins/wpbyem/"
+msgid "https://wordpress.org/plugins/wpbuoy-endpoint-manager"
 msgstr ""
 
 #. Description of the plugin
@@ -32,12 +32,12 @@ msgstr ""
 
 #. Author of the plugin
 #: wpbuoy-endpoint-manager.php
-msgid "Jose Martin Cipriano"
+msgid "WPBuoy"
 msgstr ""
 
 #. Author URI of the plugin
 #: wpbuoy-endpoint-manager.php
-msgid "https://www.linkedin.com/in/jmcipriano"
+msgid "https://wpbuoy.com"
 msgstr ""
 
 #. translators: %d: number of disabled endpoints
@@ -69,7 +69,7 @@ msgid "Save Changes"
 msgstr ""
 
 #: partials/admin/sidebar.php:13
-#: partials/admin/sidebar.php:23
+#: partials/admin/sidebar.php:21
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -78,61 +78,58 @@ msgid "Upgrade to WPBuoy Endpoint Manager Pro for advanced features:"
 msgstr ""
 
 #: partials/admin/sidebar.php:16
-msgid "Advanced endpoint filtering and search"
+msgid "Advanced search and filters"
 msgstr ""
 
 #: partials/admin/sidebar.php:17
-msgid "Dynamic route management"
+msgid "Dynamic endpoint support"
 msgstr ""
 
 #: partials/admin/sidebar.php:18
-msgid "Security logs and analytics"
+msgid "Security logs with CSV export"
 msgstr ""
 
-#: partials/admin/sidebar.php:19
-msgid "Export logs to CSV"
-msgstr ""
-
-#: partials/admin/sidebar.php:20
-msgid "Automatic plugin updates"
-msgstr ""
-
-#: partials/admin/sidebar.php:28
+#: partials/admin/sidebar.php:26
 msgid "Need Help?"
 msgstr ""
 
-#: partials/admin/sidebar.php:30
+#: partials/admin/sidebar.php:28
 msgid "FAQ"
 msgstr ""
 
-#: partials/admin/sidebar.php:31
+#: partials/admin/sidebar.php:29
 msgid "Documentation"
 msgstr ""
 
-#: partials/admin/sidebar.php:32
+#: partials/admin/sidebar.php:30
 msgid "Support"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:32
-msgid "WPBuoy Endpoint Manager Pro is active — the free version is dormant and can be safely deactivated."
+#: wpbuoy-endpoint-manager.php:30
+msgid "WPBuoy Endpoint Manager cannot be activated while the Pro version is active."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:33
-msgid "Deactivate free version"
+#: wpbuoy-endpoint-manager.php:31
+msgid "Plugin Activation Error"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:152
+#: wpbuoy-endpoint-manager.php:50
+#: wpbuoy-endpoint-manager.php:69
+msgid "WPBuoy Endpoint Manager (free) has been automatically deactivated because the Pro version is active."
+msgstr ""
+
+#: wpbuoy-endpoint-manager.php:186
 msgid "Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:212
+#: wpbuoy-endpoint-manager.php:246
 msgid "Manage Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:254
+#: wpbuoy-endpoint-manager.php:288
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:409
+#: wpbuoy-endpoint-manager.php:443
 msgid "This REST API endpoint has been disabled."
 msgstr ""
