@@ -26,7 +26,7 @@ if ( ! defined( 'WPINC' ) ) {
 	<h3><?php esc_html_e( 'Need Help?', 'wpbuoy-endpoint-manager' ); ?></h3>
 	<ul>
 		<li><a href="https://wpbuoy.com/product/endpoint-manager/#faqs" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'FAQ', 'wpbuoy-endpoint-manager' ); ?></a></li>
-		<li><a href="https://wpbuoy.com/endpoint-manager/documentation/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Documentation', 'wpbuoy-endpoint-manager' ); ?></a></li>
+		<li><a href="https://wpbuoy.com/endpoint-manager/knowledge-base/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Knowledge Base', 'wpbuoy-endpoint-manager' ); ?></a></li>
 		<li><a href="https://wpbuoy.com/my-account/support/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Support', 'wpbuoy-endpoint-manager' ); ?></a></li>
 	</ul>
 </div>
