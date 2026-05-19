@@ -4,26 +4,52 @@ Tags: rest api, security, api, disable endpoints, rest api security
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Manage and block REST API endpoints to enhance your site's security and performance.
+See every REST API endpoint your WordPress site exposes — and disable the ones you don't need. Reduce your attack surface in minutes.
 
 == Description ==
 
-WPBuoy Endpoint Manager lets you manage and block REST API endpoints from WordPress core, plugins, and themes. Easily enable or disable specific endpoints to reduce your site's attack surface and improve performance.
+Every plugin and theme you install registers REST API endpoints. Most are public by default — including the ones your site never uses.
 
-= Features =
+Unused endpoints are unnecessary exposure. They reveal information about your stack, invite probing, and become liabilities when a vulnerability is discovered in a plugin you forgot to audit.
 
-* **Manage All Static Endpoints** - Control access to REST API endpoints from WordPress core, plugins, and themes
-* **Simple Toggle Interface** - Easy-to-use interface for enabling/disabling endpoints
-* **Organized by Namespace** - Endpoints grouped by namespace for easy management
-* **Security Enhancement** - Reduce your site's attack surface by disabling unused endpoints
+WPBuoy Endpoint Manager gives you a clear view of every endpoint on your site and a one-click toggle to disable the ones you don't need.
+
+**See your full API surface**
+Every endpoint from WordPress core, plugins, and themes in one organized view — grouped by namespace, with a count of how many are currently disabled.
+
+**Block endpoints instantly**
+Toggle any endpoint off and it returns a 403. No code, no rules, no guesswork. One click.
+
+**Preview before you block**
+Open any endpoint's live response in a new tab before making changes. Know exactly what you're disabling.
+
+**Clean and accessible**
+Built to WordPress admin standards. Fully keyboard-navigable with screen reader support.
+
+= Who it's for =
+
+Agencies hardening client sites. Developers locking down staging environments. Site owners running WooCommerce, membership, or any setup where API exposure is a real risk.
+
+= Go further with Pro =
+
+WPBuoy Endpoint Manager Pro adds:
+
+* Advanced search with keyboard shortcut and result highlighting
+* Multi-criteria filtering by status, route type, and namespace
+* Dynamic route support with regex pattern matching
+* Security log — IP address, endpoint, user agent, timestamp
+* CSV export and automatic 30-day log cleanup
+* License management and automatic updates
+
+[Learn more about Endpoint Manager Pro](https://wpbuoy.com/plugins/endpoint-manager/)
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/wpbyem` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/wpbuoy-endpoint-manager` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Endpoints screen in the WordPress admin menu to configure the plugin
 4. Toggle endpoints on/off as needed
@@ -49,6 +75,10 @@ Yes, but the plugin must be activated on each site individually. Network activat
 3. View disabled endpoints count per namespace
 
 == Changelog ==
+
+= 1.1.4 =
+* Updated: WP.org listing copy — rewritten description, short description, and Pro upsell section
+* Fixed: incorrect installation directory path in readme.txt
 
 = 1.1.3 =
 * Updated: tested up to WordPress 6.9
