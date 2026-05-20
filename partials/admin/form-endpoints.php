@@ -14,11 +14,13 @@ if ( ! defined( 'WPINC' ) ) {
 ?>
 
 <div class="wpbyem-accordion-controls">
-	<button type="button" id="expand-all" class="button">
-		<?php esc_html_e( 'Expand All', 'wpbuoy-endpoint-manager' ); ?>
+	<button type="button" id="expand-all" class="wpbyem-accordion-btn" data-tooltip="<?php esc_attr_e( 'Expand All', 'wpbuoy-endpoint-manager' ); ?>" aria-label="<?php esc_attr_e( 'Expand All', 'wpbuoy-endpoint-manager' ); ?>">
+		<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-93.85 253.85-320l42.77-42.77L480-180.15l183.38-182.62L706.15-320 480-93.85Zm-182.77-504L253.85-640 480-866.15 706.15-640l-43.38 42.15-182.77-182-182.77 182Z"/></svg>
+		<span class="screen-reader-text"><?php esc_html_e( 'Expand All', 'wpbuoy-endpoint-manager' ); ?></span>
 	</button>
-	<button type="button" id="collapse-all" class="button">
-		<?php esc_html_e( 'Collapse All', 'wpbuoy-endpoint-manager' ); ?>
+	<button type="button" id="collapse-all" class="wpbyem-accordion-btn" data-tooltip="<?php esc_attr_e( 'Collapse All', 'wpbuoy-endpoint-manager' ); ?>" aria-label="<?php esc_attr_e( 'Collapse All', 'wpbuoy-endpoint-manager' ); ?>">
+		<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M296-93.85 253.85-136 480-362.15 706.15-136 664-93.85l-184-184-184 184Zm184-504L253.85-824 296-866.15l184 184 184-184L706.15-824 480-597.85Z"/></svg>
+		<span class="screen-reader-text"><?php esc_html_e( 'Collapse All', 'wpbuoy-endpoint-manager' ); ?></span>
 	</button>
 </div>
 
