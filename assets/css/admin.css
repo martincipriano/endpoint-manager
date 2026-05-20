@@ -4,6 +4,12 @@
  * @package WPBuoy_Endpoint_Manager_Pro
  */
 
+.wpbyem-accordion-controls {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
 .rest-api-namespace {
 	margin-bottom: 15px;
 	border: 1px solid #c3c4c7; /* WordPress border gray */
@@ -102,7 +108,7 @@
 .rest-api-route {
 	display: flex;
 	flex-direction: column;
-	padding: 1rem;
+	padding: .75rem 1rem;
 	border-bottom: 1px solid #f0f0f1; /* WordPress light gray */
 }
 
@@ -196,20 +202,20 @@
 }
 
 .route-type {
-	margin-left: 8px;
-	padding: 2px 6px;
-	background: #f0f0f1; /* WordPress gray background */
-	color: #50575e; /* WordPress gray text */
-	font-size: 11px;
+	background: #50575e; /* WordPress gray background */
+	color: #fff; /* WordPress gray text */
+	font-size: 10px;
+	padding: 1px 5px;
 	border-radius: 3px;
-	font-weight: normal;
+	font-weight: 600;
+	text-transform: uppercase;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Method badges */
 .route-methods {
 	display: inline-flex;
-	gap: 4px;
+	gap: .5rem;
 }
 
 .method-badge {
@@ -228,19 +234,23 @@
 .method-patch { background: #3B00C0; color: #fff; }
 
 .route-preview {
-	color: #2271b1; /* WordPress link blue */
+	background: none;
+	border: none;
+	padding: 0;
+	color: #838485;
 	text-decoration: none;
-	font-size: 12px;
-	padding: 4px 8px;
-	border: 1px solid #2271b1;
-	border-radius: 3px;
-	transition: all 0.2s ease;
+	width: 40px;
+	height: 40px;
+	line-height: 1;
 	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.2s ease;
 }
 
 .route-preview:hover {
-	background: #2271b1;
-	color: #fff;
+	color: #2271b1;
 	text-decoration: none;
 }
 
@@ -253,7 +263,7 @@
 }
 
 .rest-api-route:hover {
-	background: #f6f7f7; /* WordPress hover background */
+	background: #FCFCFC; /* WordPress hover background */
 }
 
 /* Responsive design */
@@ -296,7 +306,7 @@
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 8px;
+	gap: .5rem;
 }
 
 .button {
@@ -455,7 +465,7 @@ body.wpbyem-has-sidebar #wpcontent {
 	width: 320px;
 }
 @media (max-width: 782px) {
-	body.wpbyem-pro-has-sidebar #wpcontent {
+	body.wpbyem-has-sidebar #wpcontent {
 		padding-right: 0;
 	}
 	.wpbuoy-admin-sidebar {
@@ -968,14 +978,84 @@ button[disabled] {
 }
 
 /* Per-endpoint rate limit overrides */
-button.route-rate-limit-toggle {
+.route-rate-limit-toggle {
+	background: none;
+	border: none;
+	padding: 0;
 	cursor: pointer;
+	color: #838485;
+	width: 40px;
+	height: 40px;
+	line-height: 1;
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.2s ease;
 }
 
+.route-rate-limit-toggle:hover,
 .route-rate-limit-toggle.has-override {
-	background: #2271b1;
+	color: #2271b1;
+}
+
+.route-rate-limit-toggle:disabled {
+	cursor: not-allowed;
+	opacity: 0.4;
+}
+
+.route-rate-limit-toggle:disabled:hover {
+	color: #838485;
+}
+
+.route-rate-limit-toggle,
+.route-preview {
+	position: relative;
+}
+
+.route-rate-limit-toggle::before,
+.route-rate-limit-toggle::after,
+.route-preview::before,
+.route-preview::after {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+.route-rate-limit-toggle::before,
+.route-preview::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% - 2px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1d2327;
 	color: #fff;
-	border-color: #2271b1;
+	font-size: 10px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	padding: 3px 5px;
+	border-radius: 3px;
+	white-space: nowrap;
+	z-index: 100000;
+}
+
+.route-rate-limit-toggle::after,
+.route-preview::after {
+	content: "";
+	position: absolute;
+	bottom: calc(100% - 10px);
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+	z-index: 100000;
+}
+
+.route-rate-limit-toggle:hover::before,
+.route-rate-limit-toggle:hover::after,
+.route-preview:hover::before,
+.route-preview:hover::after {
+	opacity: 1;
 }
 
 .route-rate-limit-fields {
