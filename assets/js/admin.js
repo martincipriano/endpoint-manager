@@ -10,7 +10,6 @@
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
         initAccordion();
-        initAccordionControls();
         initSaveConfirmation();
     });
 
@@ -82,30 +81,6 @@
             setTimeout(function() {
                 routes.style.maxHeight = '';
             }, 300);
-        }
-    }
-
-    /**
-     * Wire up expand all / collapse all buttons.
-     */
-    function initAccordionControls() {
-        var expandBtn   = document.getElementById('expand-all');
-        var collapseBtn = document.getElementById('collapse-all');
-
-        if (expandBtn) {
-            expandBtn.addEventListener('click', function () {
-                document.querySelectorAll('.namespace-header:not(.expanded)').forEach(function (header) {
-                    toggleNamespace(header);
-                });
-            });
-        }
-
-        if (collapseBtn) {
-            collapseBtn.addEventListener('click', function () {
-                document.querySelectorAll('.namespace-header.expanded').forEach(function (header) {
-                    toggleNamespace(header);
-                });
-            });
         }
     }
 

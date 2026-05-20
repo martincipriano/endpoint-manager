@@ -4,31 +4,6 @@
  * @package WPBuoy_Endpoint_Manager_Pro
  */
 
-.wpbyem-accordion-controls {
-	display: flex;
-	justify-content: flex-end;
-	gap: 4px;
-	margin-bottom: 8px;
-}
-
-.wpbyem-accordion-btn {
-	background: none;
-	border: none;
-	padding: 0;
-	cursor: pointer;
-	color: #838485;
-	width: 36px;
-	height: 36px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	transition: color 0.2s ease;
-}
-
-.wpbyem-accordion-btn:hover {
-	color: #2271b1;
-}
-
 .rest-api-namespace {
 	margin-bottom: 15px;
 	border: 1px solid #c3c4c7; /* WordPress border gray */
