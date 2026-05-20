@@ -5,7 +5,7 @@
  * @package WPBuoy_Endpoint_Manager
  *
  * @var array $routes_data Keyed by namespace; each entry has 'disabled_count' and 'routes'.
- *                         Each route entry: field_id, route_encoded, is_blocked.
+ *                         Each route entry: field_id, route_encoded, is_blocked, preview_url, methods.
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -45,6 +45,11 @@ if ( ! defined( 'WPINC' ) ) {
 					<span class="toggle-switch"></span>
 					<div class="route-info">
 						<span class="route-path"><?php echo esc_html( $em_route ); ?></span>
+						<span class="route-methods">
+							<?php foreach ( $em_route_data['methods'] as $em_method ) : ?>
+								<span class="method-badge method-<?php echo esc_attr( strtolower( $em_method ) ); ?>"><?php echo esc_html( $em_method ); ?></span>
+							<?php endforeach; ?>
+						</span>
 					</div>
 				</label>
 				<a href="<?php echo esc_url( $em_route_data['preview_url'] ); ?>"

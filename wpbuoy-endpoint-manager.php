@@ -321,11 +321,22 @@ class Wpbyem_Endpoint_Manager {
 					$disabled_count++;
 				}
 
+				// Extract HTTP methods from all endpoint definitions for this route.
+				$methods = array();
+				foreach ( $route_data as $endpoint ) {
+					if ( isset( $endpoint['methods'] ) ) {
+						$methods = array_merge( $methods, array_keys( $endpoint['methods'] ) );
+					}
+				}
+				$methods = array_unique( $methods );
+				sort( $methods );
+
 				$namespace_routes[ $route ] = array(
 					'field_id'      => 'endpoint_' . md5( $route ),
 					'route_encoded' => base64_encode( $route ),
 					'is_blocked'    => $is_blocked,
 					'preview_url'   => rest_url( $route ),
+					'methods'       => $methods,
 				);
 			}
 
