@@ -6,12 +6,66 @@
  *
  * @var array $routes_data Keyed by namespace; each entry has 'disabled_count' and 'routes'.
  *                         Each route entry: field_id, route_encoded, is_blocked, preview_url, methods.
+ * @var array $namespaces  List of namespace strings for the namespace filter dropdown.
+ * @var array $all_methods List of unique HTTP method strings for the method filter dropdown.
  */
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 ?>
+
+<div class="rest-api-controls-container">
+	<div class="rest-api-controls-row no-clear-button">
+		<div class="control-group">
+			<label for="rest-api-search"><?php esc_html_e( 'Search', 'wpbuoy-endpoint-manager' ); ?></label>
+			<div class="rest-api-search-input-wrapper">
+				<input type="text" id="rest-api-search" class="rest-api-search" placeholder="<?php esc_attr_e( 'Search endpoints...', 'wpbuoy-endpoint-manager' ); ?>" />
+				<button type="button" id="rest-api-search-clear" class="rest-api-search-clear" aria-label="<?php esc_attr_e( 'Clear search', 'wpbuoy-endpoint-manager' ); ?>"></button>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label for="status-filter"><?php esc_html_e( 'Status', 'wpbuoy-endpoint-manager' ); ?></label>
+			<select id="status-filter" class="rest-api-filter-select">
+				<option value="all"><?php esc_html_e( 'Show All', 'wpbuoy-endpoint-manager' ); ?></option>
+				<option value="enabled"><?php esc_html_e( 'Enabled Only', 'wpbuoy-endpoint-manager' ); ?></option>
+				<option value="disabled"><?php esc_html_e( 'Disabled Only', 'wpbuoy-endpoint-manager' ); ?></option>
+			</select>
+		</div>
+
+		<div class="control-group">
+			<label for="method-filter"><?php esc_html_e( 'Method', 'wpbuoy-endpoint-manager' ); ?></label>
+			<select id="method-filter" class="rest-api-filter-select">
+				<option value="all"><?php esc_html_e( 'All Methods', 'wpbuoy-endpoint-manager' ); ?></option>
+				<?php foreach ( $all_methods as $em_method ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+					<option value="<?php echo esc_attr( $em_method ); ?>"><?php echo esc_html( $em_method ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+
+		<div class="control-group">
+			<label for="namespace-filter"><?php esc_html_e( 'Namespace', 'wpbuoy-endpoint-manager' ); ?></label>
+			<select id="namespace-filter" class="rest-api-filter-select">
+				<option value="all"><?php esc_html_e( 'All Namespaces', 'wpbuoy-endpoint-manager' ); ?></option>
+				<?php foreach ( $namespaces as $em_namespace_option ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+					<option value="<?php echo esc_attr( $em_namespace_option ); ?>"><?php echo esc_html( $em_namespace_option ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+
+		<div class="control-group">
+			<label>&nbsp;</label>
+			<button type="button" id="clear-filters" class="rest-api-clear-filters">
+				<?php esc_html_e( 'Clear Filters', 'wpbuoy-endpoint-manager' ); ?>
+			</button>
+		</div>
+	</div>
+
+	<div class="search-results-info">
+		<span class="search-results-count"></span>
+	</div>
+</div>
 
 <?php foreach ( $routes_data as $em_namespace => $em_namespace_data ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 <div class="rest-api-namespace">
@@ -34,7 +88,7 @@ if ( ! defined( 'WPINC' ) ) {
 	</div>
 	<div class="rest-api-routes" style="display: none;">
 		<?php foreach ( $em_namespace_data['routes'] as $em_route => $em_route_data ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
-		<div class="rest-api-route">
+		<div class="rest-api-route" data-methods="<?php echo esc_attr( implode( ',', $em_route_data['methods'] ) ); ?>">
 			<div class="route-row">
 				<label for="<?php echo esc_attr( $em_route_data['field_id'] ); ?>">
 					<input type="checkbox"
@@ -45,8 +99,23 @@ if ( ! defined( 'WPINC' ) ) {
 					<span class="toggle-switch"></span>
 					<div class="route-info">
 						<span class="route-path"><?php echo esc_html( $em_route ); ?></span>
+						<?php if ( $em_route_data['is_restricted'] ) : ?>
+							<?php
+							$em_restricted_source = $em_route_data['restricted_source'] ?? null; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+							$em_restricted_tooltip = $em_restricted_source // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+								/* translators: %s: plugin or theme name */
+								? sprintf( __( 'Restricted by %s — public requests may be denied (403).', 'wpbuoy-endpoint-manager' ), $em_restricted_source )
+								: __( 'Restricted by its plugin or theme — public requests may be denied (403).', 'wpbuoy-endpoint-manager' );
+							?>
+							<span class="route-restricted"
+							      data-tooltip="<?php echo esc_attr( $em_restricted_tooltip ); ?>"
+							      aria-label="<?php esc_attr_e( 'Restricted endpoint', 'wpbuoy-endpoint-manager' ); ?>">
+								<?php esc_html_e( 'Restricted', 'wpbuoy-endpoint-manager' ); ?>
+							</span>
+						<?php endif; ?>
 						<span class="route-methods">
 							<?php foreach ( $em_route_data['methods'] as $em_method ) : ?>
+								<?php if ( 'GET' === $em_method ) : continue; endif; ?>
 								<span class="method-badge method-<?php echo esc_attr( strtolower( $em_method ) ); ?>"><?php echo esc_html( $em_method ); ?></span>
 							<?php endforeach; ?>
 						</span>
