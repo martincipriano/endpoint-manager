@@ -181,7 +181,7 @@ class Wpbyem_Endpoint_Manager {
 	 * Add admin menu.
 	 */
 	public function add_admin_menu() {
-		add_menu_page(
+		$hook = add_menu_page(
 			__( 'WPBuoy Endpoint Manager', 'wpbuoy-endpoint-manager' ),
 			__( 'Endpoints', 'wpbuoy-endpoint-manager' ),
 			'manage_options',
@@ -189,6 +189,29 @@ class Wpbyem_Endpoint_Manager {
 			array( $this, 'render_admin_page' ),
 			'dashicons-superhero',
 			81
+		);
+
+		add_action( "load-{$hook}", array( $this, 'add_help_tabs' ) );
+	}
+
+	/**
+	 * Register Help tab content for the plugin admin page.
+	 */
+	public function add_help_tabs() {
+		$screen = get_current_screen();
+
+		$screen->add_help_tab(
+			array(
+				'id'      => 'wpbyem-help-support',
+				'title'   => __( 'Need Help?', 'wpbuoy-endpoint-manager' ),
+				'content' =>
+					'<h2>' . esc_html__( 'Need Help?', 'wpbuoy-endpoint-manager' ) . '</h2>' .
+					'<ul>' .
+						'<li><a href="https://wpbuoy.com/product/endpoint-manager/#faqs" target="_blank" rel="noopener noreferrer">' . esc_html__( 'FAQ', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+						'<li><a href="https://wpbuoy.com/endpoint-manager/knowledge-base/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Knowledge Base', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+						'<li><a href="https://wpbuoy.com/my-account/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'</ul>',
+			)
 		);
 	}
 
@@ -310,6 +333,9 @@ class Wpbyem_Endpoint_Manager {
 		$all_routes        = $this->get_rest_routes();
 
 		$routes_data = array();
+		$all_methods = array();
+		$namespaces  = array_keys( $all_routes );
+
 		foreach ( $all_routes as $namespace => $routes ) {
 			$disabled_count   = 0;
 			$namespace_routes = array();
@@ -321,22 +347,33 @@ class Wpbyem_Endpoint_Manager {
 					$disabled_count++;
 				}
 
-				// Extract HTTP methods from all endpoint definitions for this route.
-				$methods = array();
+				// Extract HTTP methods and check permission callbacks for all endpoint definitions.
+				$methods           = array();
+				$is_restricted     = true;
+				$restricted_source = null;
 				foreach ( $route_data as $endpoint ) {
 					if ( isset( $endpoint['methods'] ) ) {
 						$methods = array_merge( $methods, array_keys( $endpoint['methods'] ) );
 					}
+					$cb = $endpoint['permission_callback'] ?? null;
+					if ( '__return_true' === $cb || null === $cb ) {
+						$is_restricted = false;
+					} elseif ( $is_restricted && null === $restricted_source && $cb ) {
+						$restricted_source = $this->get_restricted_source( $cb );
+					}
 				}
-				$methods = array_unique( $methods );
+				$methods     = array_unique( $methods );
 				sort( $methods );
+				$all_methods = array_merge( $all_methods, $methods );
 
 				$namespace_routes[ $route ] = array(
-					'field_id'      => 'endpoint_' . md5( $route ),
-					'route_encoded' => base64_encode( $route ),
-					'is_blocked'    => $is_blocked,
-					'preview_url'   => rest_url( $route ),
-					'methods'       => $methods,
+					'field_id'          => 'endpoint_' . md5( $route ),
+					'route_encoded'     => base64_encode( $route ),
+					'is_blocked'        => $is_blocked,
+					'is_restricted'     => $is_restricted,
+					'restricted_source' => $restricted_source,
+					'preview_url'       => rest_url( $route ),
+					'methods'           => $methods,
 				);
 			}
 
@@ -346,7 +383,10 @@ class Wpbyem_Endpoint_Manager {
 			);
 		}
 
-		wpbyem_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data' ) );
+		$all_methods = array_unique( $all_methods );
+		sort( $all_methods );
+
+		wpbyem_get_plugin_part( 'admin/form', 'endpoints', compact( 'routes_data', 'namespaces', 'all_methods' ) );
 	}
 
 	/**
@@ -420,6 +460,55 @@ class Wpbyem_Endpoint_Manager {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Resolve the plugin or theme name that registered a given permission callback.
+	 *
+	 * @param callable $callback The permission_callback to inspect.
+	 * @return string|null Plugin/theme name, or null if it can't be determined.
+	 */
+	private function get_restricted_source( $callback ) {
+		if ( ! $callback || '__return_true' === $callback ) {
+			return null;
+		}
+
+		try {
+			if ( is_array( $callback ) ) {
+				$ref = new ReflectionMethod( $callback[0], $callback[1] );
+			} elseif ( is_string( $callback ) && strpos( $callback, '::' ) !== false ) {
+				list( $class, $method ) = explode( '::', $callback, 2 );
+				$ref = new ReflectionMethod( $class, $method );
+			} else {
+				$ref = new ReflectionFunction( $callback );
+			}
+
+			$file = wp_normalize_path( (string) $ref->getFileName() );
+			if ( ! $file ) {
+				return null;
+			}
+
+			$plugins_dir = trailingslashit( wp_normalize_path( WP_PLUGIN_DIR ) );
+			if ( str_starts_with( $file, $plugins_dir ) ) {
+				$relative     = substr( $file, strlen( $plugins_dir ) );
+				$plugin_folder = strtok( $relative, '/' );
+				foreach ( get_plugins() as $plugin_file => $plugin_data ) {
+					if ( str_starts_with( $plugin_file, $plugin_folder . '/' ) ) {
+						return $plugin_data['Name'];
+					}
+				}
+				return $plugin_folder;
+			}
+
+			$themes_dir = trailingslashit( wp_normalize_path( get_theme_root() ) );
+			if ( str_starts_with( $file, $themes_dir ) ) {
+				return wp_get_theme()->get( 'Name' );
+			}
+		} catch ( Exception $e ) {
+			return null;
+		}
+
+		return null;
 	}
 
 	/**
