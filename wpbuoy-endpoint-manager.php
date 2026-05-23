@@ -199,19 +199,49 @@ class Wpbyem_Endpoint_Manager {
 	 */
 	public function add_help_tabs() {
 		$screen = get_current_screen();
+		$kb     = 'https://wpbuoy.com/endpoint-manager/knowledge-base/';
 
-		$screen->add_help_tab(
-			array(
-				'id'      => 'wpbyem-help-support',
-				'title'   => __( 'Need Help?', 'wpbuoy-endpoint-manager' ),
-				'content' =>
-					'<h2>' . esc_html__( 'Need Help?', 'wpbuoy-endpoint-manager' ) . '</h2>' .
-					'<ul>' .
-						'<li><a href="https://wpbuoy.com/product/endpoint-manager/#faqs" target="_blank" rel="noopener noreferrer">' . esc_html__( 'FAQ', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
-						'<li><a href="https://wpbuoy.com/endpoint-manager/knowledge-base/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Knowledge Base', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
-						'<li><a href="https://wpbuoy.com/my-account/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
-					'</ul>',
-			)
+		$screen->add_help_tab( array(
+			'id'      => 'wpbyem-help-getting-started',
+			'title'   => __( 'Getting Started', 'wpbuoy-endpoint-manager' ),
+			'content' =>
+				'<h2>' . esc_html__( 'Getting Started', 'wpbuoy-endpoint-manager' ) . '</h2>' .
+				'<ul>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#what-is-a-rest-api-endpoint' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'What is a REST API endpoint?', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#static-vs-dynamic-endpoints' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Static vs dynamic endpoints', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#minimum-requirements' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Minimum requirements', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#initial-configuration' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Initial configuration', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#will-this-break-my-site' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Will this break my site?', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#privacy-and-data-collection' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Privacy and data collection', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+				'</ul>',
+		) );
+
+		$screen->add_help_tab( array(
+			'id'      => 'wpbyem-help-features',
+			'title'   => __( 'Features & Usage', 'wpbuoy-endpoint-manager' ),
+			'content' =>
+				'<h2>' . esc_html__( 'Features & Usage', 'wpbuoy-endpoint-manager' ) . '</h2>' .
+				'<ul>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#which-endpoints-are-safe-to-disable' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Which endpoints are safe to disable?', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#endpoint-preview' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Endpoint preview', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#compatibility' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Compatibility', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+				'</ul>',
+		) );
+
+		$screen->add_help_tab( array(
+			'id'      => 'wpbyem-help-troubleshooting',
+			'title'   => __( 'Troubleshooting', 'wpbuoy-endpoint-manager' ),
+			'content' =>
+				'<h2>' . esc_html__( 'Troubleshooting', 'wpbuoy-endpoint-manager' ) . '</h2>' .
+				'<ul>' .
+					'<li><a href="' . esc_url( $kb . 'troubleshooting/#how-to-get-support' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to get support', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+				'</ul>',
+		) );
+
+		$screen->set_help_sidebar(
+			'<p><strong>' . esc_html__( 'For more information:', 'wpbuoy-endpoint-manager' ) . '</strong></p>' .
+			'<p><a href="' . esc_url( $kb ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Knowledge Base', 'wpbuoy-endpoint-manager' ) . '</a></p>' .
+			'<p><a href="https://wpbuoy.com/my-account/support/" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Support', 'wpbuoy-endpoint-manager' ) . '</a></p>'
 		);
 	}
 
