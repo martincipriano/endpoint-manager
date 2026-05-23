@@ -95,7 +95,6 @@
 
 
 .rest-api-routes {
-	overflow: hidden;
 	transition: all 0.3s ease;
 }
 
@@ -120,9 +119,7 @@
 .rest-api-route label {
 	display: flex;
 	align-items: center;
-	flex: 1;
 	cursor: pointer;
-	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 /* Hide the actual checkbox */
@@ -196,14 +193,69 @@
 }
 
 .route-type {
-	background: #50575e; /* WordPress gray background */
-	color: #fff; /* WordPress gray text */
+	background: #00A32A;
+	color: #fff;
 	font-size: 10px;
 	padding: 1px 5px;
 	border-radius: 3px;
 	font-weight: 600;
 	text-transform: uppercase;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.route-restricted {
+	position: relative;
+	background: #50575e;
+	color: #fff;
+	border: none;
+	font-size: 10px;
+	padding: 1px 5px;
+	border-radius: 3px;
+	font-weight: 600;
+	text-transform: uppercase;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	cursor: default;
+}
+
+.route-restricted::before,
+.route-restricted::after {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+.route-restricted::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% + 10px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1d2327;
+	color: #fff;
+	font-size: 10px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	text-transform: initial;
+	padding: 8px 16px;
+	border-radius: 3px;
+	width: 200px;
+	z-index: 100000;
+}
+
+.route-restricted::after {
+	content: "";
+	position: absolute;
+	bottom: calc(100% + 0px);
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+	width: auto;
+	z-index: 100000;
+}
+
+.route-restricted:hover::before,
+.route-restricted:hover::after {
+	opacity: 1;
 }
 
 /* Method badges */
@@ -272,7 +324,7 @@
 		padding: 15px 0;
 	}
 
-	.rest-api-route label {
+	.route-info {
 		width: 100%;
 	}
 
@@ -299,8 +351,10 @@
 .route-info {
 	display: flex;
 	align-items: center;
+	flex: 1;
 	flex-wrap: wrap;
 	gap: .5rem;
+	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 .button {
@@ -1027,7 +1081,7 @@ button[disabled] {
 	color: #fff;
 	font-size: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	padding: 3px 5px;
+	padding: 8px 16px;
 	border-radius: 3px;
 	white-space: nowrap;
 	z-index: 100000;
