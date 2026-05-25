@@ -3,7 +3,7 @@
  * Plugin Name:       WPBuoy Endpoint Manager
  * Plugin URI:        https://wordpress.org/plugins/wpbuoy-endpoint-manager
  * Description:       Manage and block REST API endpoints to enhance your site's security and performance.
- * Version:           1.1.4
+ * Version:           2.0.0
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            WPBuoy
@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Block activation when Pro is already active.
+// Block activation when Pro is already active; create logs table.
 register_activation_hook(
 	__FILE__,
 	function () {
@@ -32,6 +32,21 @@ register_activation_hook(
 				array( 'back_link' => true )
 			);
 		}
+
+		global $wpdb;
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		$charset_collate = $wpdb->get_charset_collate();
+		$table           = $wpdb->prefix . 'wpbyem_logs';
+		$sql             = "CREATE TABLE $table (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			endpoint varchar(255) NOT NULL,
+			ip_address varchar(45) NOT NULL DEFAULT '',
+			user_agent text NOT NULL,
+			blocked_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY blocked_at (blocked_at)
+		) $charset_collate;";
+		dbDelta( $sql );
 	}
 );
 
@@ -76,7 +91,7 @@ if ( in_array( 'endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) g
 /**
  * Current plugin version.
  */
-define( 'WPBYEM_VERSION', '1.1.4' );
+define( 'WPBYEM_VERSION', '2.0.0' );
 
 /**
  * Plugin directory path.
@@ -99,6 +114,13 @@ class Wpbyem_Endpoint_Manager {
 	 * @var Wpbyem_Endpoint_Manager
 	 */
 	protected static $instance = null;
+
+	/**
+	 * Admin page hook suffixes, populated in add_admin_menu().
+	 *
+	 * @var array
+	 */
+	protected $admin_hooks = array();
 
 	/**
 	 * Main Wpbyem_Endpoint_Manager Instance.
@@ -128,7 +150,6 @@ class Wpbyem_Endpoint_Manager {
 	 */
 	private function load_dependencies() {
 		require_once WPBYEM_PATH . 'includes/helpers.php';
-		require_once WPBYEM_PATH . 'includes/class-admin-sidebar.php';
 	}
 
 
@@ -140,6 +161,7 @@ class Wpbyem_Endpoint_Manager {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'handle_encoded_form_submission' ), 5 );
+		add_action( 'admin_init', array( $this, 'handle_clear_logs' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
 	}
@@ -157,7 +179,7 @@ class Wpbyem_Endpoint_Manager {
 	 * @param string $hook The current admin page.
 	 */
 	public function enqueue_admin_styles( $hook ) {
-		if ( 'toplevel_page_wpbyem' !== $hook ) {
+		if ( ! in_array( $hook, $this->admin_hooks, true ) ) {
 			return;
 		}
 
@@ -181,8 +203,8 @@ class Wpbyem_Endpoint_Manager {
 	 * Add admin menu.
 	 */
 	public function add_admin_menu() {
-		$hook = add_menu_page(
-			__( 'WPBuoy Endpoint Manager', 'wpbuoy-endpoint-manager' ),
+		$hook                = add_menu_page(
+			__( 'Endpoint Manager', 'wpbuoy-endpoint-manager' ),
 			__( 'Endpoints', 'wpbuoy-endpoint-manager' ),
 			'manage_options',
 			'wpbyem',
@@ -190,8 +212,41 @@ class Wpbyem_Endpoint_Manager {
 			'dashicons-superhero',
 			81
 		);
-
+		$this->admin_hooks[] = $hook;
 		add_action( "load-{$hook}", array( $this, 'add_help_tabs' ) );
+
+		$block_list_hook     = add_submenu_page(
+			'wpbyem',
+			__( 'Block List', 'wpbuoy-endpoint-manager' ),
+			__( 'Block List', 'wpbuoy-endpoint-manager' ),
+			'manage_options',
+			'wpbyem-block-list',
+			array( $this, 'render_block_list_page' )
+		);
+		$this->admin_hooks[] = $block_list_hook;
+		add_action( "load-{$block_list_hook}", array( $this, 'add_help_tabs' ) );
+
+		$logs_hook           = add_submenu_page(
+			'wpbyem',
+			__( 'Security Logs', 'wpbuoy-endpoint-manager' ),
+			__( 'Logs', 'wpbuoy-endpoint-manager' ),
+			'manage_options',
+			'wpbyem-logs',
+			array( $this, 'render_logs_page' )
+		);
+		$this->admin_hooks[] = $logs_hook;
+		add_action( "load-{$logs_hook}", array( $this, 'add_help_tabs' ) );
+
+		$settings_hook       = add_submenu_page(
+			'wpbyem',
+			__( 'Settings', 'wpbuoy-endpoint-manager' ),
+			__( 'Settings', 'wpbuoy-endpoint-manager' ),
+			'manage_options',
+			'wpbyem-settings',
+			array( $this, 'render_settings_page' )
+		);
+		$this->admin_hooks[] = $settings_hook;
+		add_action( "load-{$settings_hook}", array( $this, 'add_help_tabs' ) );
 	}
 
 	/**
@@ -208,6 +263,7 @@ class Wpbyem_Endpoint_Manager {
 				'<h2>' . esc_html__( 'Getting Started', 'wpbuoy-endpoint-manager' ) . '</h2>' .
 				'<ul>' .
 					'<li><a href="' . esc_url( $kb . 'getting-started/#what-is-a-rest-api-endpoint' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'What is a REST API endpoint?', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'getting-started/#free-vs-pro' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Free vs Pro', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 					'<li><a href="' . esc_url( $kb . 'getting-started/#static-vs-dynamic-endpoints' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Static vs dynamic endpoints', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 					'<li><a href="' . esc_url( $kb . 'getting-started/#minimum-requirements' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Minimum requirements', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 					'<li><a href="' . esc_url( $kb . 'getting-started/#initial-configuration' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Initial configuration', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
@@ -224,7 +280,28 @@ class Wpbyem_Endpoint_Manager {
 				'<ul>' .
 					'<li><a href="' . esc_url( $kb . 'features-and-usage/#which-endpoints-are-safe-to-disable' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Which endpoints are safe to disable?', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 					'<li><a href="' . esc_url( $kb . 'features-and-usage/#endpoint-preview' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Endpoint preview', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#search-and-filters' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Search and filters', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#security-logging' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Security logging', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#log-filters' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Log filters', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#rate-limiting-pro' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Rate limiting', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#ip-block-list-pro' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'IP Block List', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#shared-ips-and-auto-block-pro' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Shared IPs and auto-block', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'features-and-usage/#csv-export-pro' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'CSV export', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 					'<li><a href="' . esc_url( $kb . 'features-and-usage/#compatibility' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Compatibility', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+				'</ul>',
+		) );
+
+		$screen->add_help_tab( array(
+			'id'      => 'wpbyem-help-licensing',
+			'title'   => __( 'Licensing & Billing', 'wpbuoy-endpoint-manager' ),
+			'content' =>
+				'<h2>' . esc_html__( 'Licensing & Billing', 'wpbuoy-endpoint-manager' ) . '</h2>' .
+				'<ul>' .
+					'<li><a href="' . esc_url( $kb . 'licensing-and-billing/#how-to-activate-your-license' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to activate your license', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'licensing-and-billing/#using-one-license-on-multiple-sites' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Using one license on multiple sites', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'licensing-and-billing/#what-happens-when-your-license-expires' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'What happens when your license expires', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'licensing-and-billing/#what-does-pro-features-paused-mean' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'What does "Pro Features Paused" mean?', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'licensing-and-billing/#refunds' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Refunds', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 				'</ul>',
 		) );
 
@@ -234,6 +311,9 @@ class Wpbyem_Endpoint_Manager {
 			'content' =>
 				'<h2>' . esc_html__( 'Troubleshooting', 'wpbuoy-endpoint-manager' ) . '</h2>' .
 				'<ul>' .
+					'<li><a href="' . esc_url( $kb . 'troubleshooting/#i-disabled-an-endpoint-and-now-my-site-isnt-working' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'I disabled an endpoint and now my site isn\'t working', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'troubleshooting/#i-cant-activate-my-license' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( "I can't activate my license", 'wpbuoy-endpoint-manager' ) . '</a></li>' .
+					'<li><a href="' . esc_url( $kb . 'troubleshooting/#security-logs-arent-showing-any-data-pro' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( "Security logs aren't showing any data", 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 					'<li><a href="' . esc_url( $kb . 'troubleshooting/#how-to-get-support' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'How to get support', 'wpbuoy-endpoint-manager' ) . '</a></li>' .
 				'</ul>',
 		) );
@@ -400,6 +480,7 @@ class Wpbyem_Endpoint_Manager {
 					'field_id'          => 'endpoint_' . md5( $route ),
 					'route_encoded'     => base64_encode( $route ),
 					'is_blocked'        => $is_blocked,
+					'is_dynamic'        => $this->is_regex_route( $route ),
 					'is_restricted'     => $is_restricted,
 					'restricted_source' => $restricted_source,
 					'preview_url'       => rest_url( $route ),
@@ -435,12 +516,7 @@ class Wpbyem_Endpoint_Manager {
 				continue;
 			}
 
-			// Skip dynamic/regex routes.
-			if ( $this->is_regex_route( $route ) ) {
-				continue;
-			}
-
-			// Extract namespace from route.
+				// Extract namespace from route.
 			$parts = explode( '/', trim( $route, '/' ) );
 			if ( count( $parts ) >= 2 ) {
 				$namespace = $parts[0] . '/' . $parts[1];
@@ -568,6 +644,7 @@ class Wpbyem_Endpoint_Manager {
 
 			// Simple string comparison for non-regex routes
 			if ( $current_route === $blocked_pattern ) {
+				$this->log_blocked_request( $current_route );
 				return new WP_Error(
 					'rest_forbidden',
 					__( 'This REST API endpoint has been disabled.', 'wpbuoy-endpoint-manager' ),
@@ -577,6 +654,139 @@ class Wpbyem_Endpoint_Manager {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Render Block List page — Pro feature teaser.
+	 */
+	public function render_block_list_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		wpbyem_get_plugin_part(
+			'admin/upgrade',
+			'banner',
+			array(
+				'heading'     => __( 'Keep your REST API protected with IP blocking', 'wpbuoy-endpoint-manager' ),
+				'description' => __( 'Block malicious IPs, auto-block repeat offenders, and maintain an allowlist for trusted sources — all from one place.', 'wpbuoy-endpoint-manager' ),
+				'features' => array(
+					__('Block any REST API endpoint with a configurable response code and message', 'wpbuoy-endpoint-manager'),
+					__('Rate limiting — global and per-endpoint request thresholds', 'wpbuoy-endpoint-manager'),
+					__('IP Block List — manual blocks, auto-block, and allowlist', 'wpbuoy-endpoint-manager'),
+					__('Endpoint preview — inspect live API responses in an inline modal', 'wpbuoy-endpoint-manager'),
+					__('Intuitive admin UI — namespace accordion, live search, and multi-criteria filters', 'wpbuoy-endpoint-manager'),
+				),
+				'cta_url'  => 'https://wpbuoy.com/product/endpoint-manager/#pricing',
+			)
+		);
+	}
+
+	/**
+	 * Render Logs page.
+	 */
+	public function render_logs_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		global $wpdb;
+		$table = $wpdb->prefix . 'wpbyem_logs';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table" );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$logs = $wpdb->get_results( "SELECT * FROM $table ORDER BY blocked_at DESC LIMIT 500", ARRAY_A );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$cleared          = isset( $_GET['cleared'] ) && '1' === $_GET['cleared'];
+		$unique_ips       = array_values( array_unique( array_column( $logs, 'ip_address' ) ) );
+		$unique_endpoints = array_values( array_unique( array_column( $logs, 'endpoint' ) ) );
+		$logs_page_url    = admin_url( 'admin.php?page=wpbyem-logs' );
+
+		sort( $unique_ips );
+		sort( $unique_endpoints );
+
+		wpbyem_get_plugin_part( 'admin/page', 'logs', compact( 'logs', 'total', 'cleared', 'unique_ips', 'unique_endpoints', 'logs_page_url' ) );
+	}
+
+	/**
+	 * Render Settings page — Pro feature teaser.
+	 */
+	public function render_settings_page() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		wpbyem_get_plugin_part(
+			'admin/upgrade',
+			'banner',
+			array(
+				'heading'     => __( 'Fine-tune how your REST API handles threats', 'wpbuoy-endpoint-manager' ),
+				'description' => __( 'Set rate limits, configure auto-blocking thresholds, manage your IP allowlist, and control exactly what blocked endpoints return.', 'wpbuoy-endpoint-manager' ),
+				'features' => array(
+					__('Block any REST API endpoint with a configurable response code and message', 'wpbuoy-endpoint-manager'),
+					__('Rate limiting — global and per-endpoint request thresholds', 'wpbuoy-endpoint-manager'),
+					__('IP Block List — manual blocks, auto-block, and allowlist', 'wpbuoy-endpoint-manager'),
+					__('Endpoint preview — inspect live API responses in an inline modal', 'wpbuoy-endpoint-manager'),
+					__('Intuitive admin UI — namespace accordion, live search, and multi-criteria filters', 'wpbuoy-endpoint-manager'),
+				),
+				'cta_url'  => 'https://wpbuoy.com/product/endpoint-manager/#pricing',
+			)
+		);
+	}
+
+	/**
+	 * Log a blocked REST request to the database.
+	 *
+	 * @param string $route The blocked route path.
+	 */
+	private function log_blocked_request( $route ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->insert(
+			$wpdb->prefix . 'wpbyem_logs',
+			array(
+				'endpoint'   => $route,
+				'ip_address' => isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '',
+				'user_agent' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '',
+				'blocked_at' => gmdate( 'Y-m-d H:i:s' ),
+			),
+			array( '%s', '%s', '%s', '%s' )
+		);
+	}
+
+	/**
+	 * Handle Clear Logs form submission.
+	 */
+	public function handle_clear_logs() {
+		if ( ! isset( $_POST['wpbyem_clear_logs_nonce'] ) ) {
+			return;
+		}
+
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wpbyem_clear_logs_nonce'] ) ), 'wpbyem_clear_logs' ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}wpbyem_logs" );
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'wpbyem-logs',
+					'cleared' => '1',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
 	}
 }
 

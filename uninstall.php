@@ -14,7 +14,10 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
  * Clean up all plugin data for a single site.
  */
 function wpbyem_uninstall_site() {
+	global $wpdb;
 	delete_option( 'wpbyem_blocked_endpoints' );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
+	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpbyem_logs" );
 }
 
 if ( is_multisite() ) {

@@ -4,6 +4,10 @@
  * @package WPBuoy_Endpoint_Manager_Pro
  */
 
+.wrap h1 {
+	margin-bottom: 16px;
+}
+
 .rest-api-namespace {
 	margin-bottom: 15px;
 	border: 1px solid #c3c4c7; /* WordPress border gray */
@@ -233,8 +237,9 @@
 	color: #fff;
 	font-size: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	line-height: 16px;
 	text-transform: initial;
-	padding: 8px 16px;
+	padding: 6px 10px;
 	border-radius: 3px;
 	width: 200px;
 	z-index: 100000;
@@ -282,7 +287,8 @@
 	background: none;
 	border: none;
 	padding: 0;
-	color: #838485;
+	cursor: pointer;
+	color: #999;
 	text-decoration: none;
 	width: 40px;
 	height: 40px;
@@ -295,7 +301,6 @@
 }
 
 .route-preview:hover {
-	color: #2271b1;
 	text-decoration: none;
 }
 
@@ -360,166 +365,6 @@
 	text-align: center;
 }
 
-/**
- * Sidebar widgets
- */
-.wpbuoy-sidebar-widget {
-	background: #fff;
-	border: 1px solid #c3c4c7;
-	border-radius: 4px;
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-	padding: 20px;
-}
-.wpbuoy-sidebar-widget > * {
-	margin: 0;
-	padding: 0;
-}
-.wpbuoy-sidebar-widget h3 {
-	font-weight: 600;
-	color: #1d2327;
-}
-.wpbuoy-license-widget ul,
-.wpbuoy-upgrade-widget ul {
-	list-style: none;
-	margin: 0;
-	padding-left: 0;
-}
-.wpbuoy-license-widget ul li {
-	align-items: center;
-	background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%23d63638"><path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>');
-	background-repeat: no-repeat;
-	background-size: 24px 24px;
-	background-position: left top;
-	display: flex;
-	font-size: 13px;
-	color: #646970;
-	min-height: 24px;
-	padding-left: 32px;
-}
-.wpbuoy-upgrade-widget ul li {
-	align-items: center;
-	background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%2300a32a"><path d="m424-296 282-282-56-56-226 226-114-114-56 56 170 170Zm56 216q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>');
-	background-repeat: no-repeat;
-	background-size: 24px 24px;
-	background-position: left top;
-	display: flex;
-	font-size: 13px;
-	color: #646970;
-	min-height: 24px;
-	padding-left: 32px;
-}
-.wpbuoy-license-widget .button,
-.wpbuoy-upgrade-widget .button {
-	box-sizing: border-box;
-	text-align: center;
-	width: 100%;
-}
-
-/**
- * Endpoint Summary widget
- */
-.wpbuoy-endpoint-summaries {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-.wpbuoy-endpoint-summary {
-	border-radius: 4px;
-	display: flex;
-	justify-content: space-between;
-	margin: 0;
-	padding: 10px;
-}
-.wpbuoy-total-endpoints {
-	background: #eaf3fa;
-	border: 1px solid #2271b1;
-}
-.wpbuoy-enabled-endpoints {
-	background: #ecf7ed;
-	border: 1px solid #46b450;
-}
-.wpbuoy-blocked-endpoints {
-	background: #fbeaea;
-	border: 1px solid #dc3232;
-}
-
-/**
- * Recent Blocks widget
- */
-.wpbuoy-recent-blocks {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-.wpbuoy-recent-block {
-	background: #fbeaea;
-	border: 1px solid #dc3232;
-	border-radius: 4px;
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	margin: 0;
-	padding: 10px;
-}
-.wpbuoy-recent-block-endpoint {
-	font-family: monospace;
-	margin: 0;
-}
-.wpbuoy-recent-block-meta {
-	display: flex;
-	justify-content: space-between;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-.wpbuoy-recent-block-meta li {
-	margin: 0;
-}
-.wpbuoy-recent-blocks-widget > a {
-	display: block;
-	font-size: 13px;
-	color: #2271b1;
-	text-decoration: none;
-}
-.wpbuoy-recent-blocks-widget > a:hover {
-	color: #135e96;
-}
-
-/**
- * Sidebar layout — fixed, right-side
- */
-body.wpbyem-has-sidebar #wpcontent {
-	padding-right: 360px;
-}
-.wpbuoy-admin-sidebar {
-	bottom: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-	overflow-y: auto;
-	padding: 20px 20px 20px 0;
-	position: fixed;
-	right: 0;
-	top: 32px;
-	width: 320px;
-}
-@media (max-width: 782px) {
-	body.wpbyem-has-sidebar #wpcontent {
-		padding-right: 0;
-	}
-	.wpbuoy-admin-sidebar {
-		display: none;
-	}
-}
-
 /* Controls container */
 .rest-api-controls-container {
 	padding: 20px;
@@ -569,6 +414,7 @@ body.wpbyem-has-sidebar #wpcontent {
 
 .rest-api-search {
 	width: 100%;
+	max-width: none !important;
 	padding: 3px 40px 3px 8px;
 	font-size: 14px;
 	line-height: 2;
@@ -669,6 +515,8 @@ mark {
 	color: #2c3338; /* WordPress input text color */
 	min-height: 30px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	max-width: none !important;
+	width: 100%;
 }
 
 .rest-api-filter-select:focus {
@@ -740,30 +588,158 @@ mark {
 }
 
 /* Logs page styles */
-.wpbuoy-em-logs-summary {
-	margin-bottom: 15px;
-}
-
 .wpbuoy-em-logs-actions {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
 	align-items: center;
-	margin-top: 0;
+	margin-top: 12px;
+}
+
+.wpbuoy-em-logs-actions-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.wpbuoy-em-logs-actions-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.wpbuoy-em-logs-total {
+	font-size: 13px;
+	color: #50575e;
 }
 
 .wpbuoy-em-logs-table {
 	margin-bottom: 12px;
 }
 
-.wpbuoy-em-logs-empty {
-	padding: 40px 20px;
-	text-align: center;
-	color: #646970;
+.wpbuoy-em-logs-table td {
+	vertical-align: middle;
 }
 
-.wpbuoy-em-logs-empty p {
-	font-size: 16px;
-	margin: 0;
+.wpbuoy-em-logs-table .log-user-agent {
+	max-width: 300px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wpbuoy-em-logs-table .log-actions,
+.wpbuoy-em-logs-table th:last-child {
+	width: 60px;
+	text-align: center;
+	white-space: nowrap;
+}
+
+/* Log reason badges */
+.log-reason {
+	position: relative;
+	font-size: 10px;
+	padding: 1px 5px;
+	border-radius: 3px;
+	font-weight: 600;
+	text-transform: uppercase;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	white-space: nowrap;
+}
+
+.log-reason--403 {
+	background: #DC3232;
+	color: #fff;
+}
+
+.log-reason--429 {
+	background: #DBA617;
+	color: #fff;
+}
+
+.log-reason::before,
+.log-reason::after {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+.log-reason::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% + 6px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1d2327;
+	color: #fff;
+	font-size: 10px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	line-height: 16px;
+	padding: 6px 10px;
+	border-radius: 3px;
+	white-space: nowrap;
+	z-index: 100000;
+}
+
+.log-reason::after {
+	content: "";
+	position: absolute;
+	bottom: calc(100% - 2px);
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+	z-index: 100000;
+}
+
+.log-reason:hover::before,
+.log-reason:hover::after {
+	opacity: 1;
+}
+
+button[disabled][data-tooltip] {
+	position: relative;
+	pointer-events: auto;
+}
+
+button[disabled][data-tooltip]::before,
+button[disabled][data-tooltip]::after {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+button[disabled][data-tooltip]::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% + 10px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1d2327;
+	color: #fff;
+	font-size: 11px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	line-height: 16px;
+	padding: 6px 10px;
+	border-radius: 3px;
+	white-space: nowrap;
+	z-index: 100000;
+}
+
+button[disabled][data-tooltip]::after {
+	content: "";
+	position: absolute;
+	bottom: calc(100% + 0px);
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+	width: auto;
+	z-index: 100000;
+}
+
+button[disabled][data-tooltip]:hover::before,
+button[disabled][data-tooltip]:hover::after {
+	opacity: 1;
 }
 
 /**
@@ -819,7 +795,6 @@ button[disabled] .pro-badge {
 /* Disabled button styles */
 button[disabled] {
 	cursor: not-allowed !important; /* stylelint-disable-line declaration-no-important */
-	opacity: 0.6;
 }
 
 /**
@@ -831,14 +806,6 @@ button[disabled] {
 .rest-api-clear-filters,
 .search-results-info {
 	display: none;
-}
-
-/**
- * Logs page utility styles.
- */
-.wpbuoy-em-logs-clear-form {
-	display: inline-block;
-	margin-left: 10px;
 }
 
 /**
@@ -923,114 +890,13 @@ button[disabled] {
 	margin-top: 20px;
 }
 
-/**
- * Preview Modal — Fill-in-the-blanks for dynamic endpoints
- */
-.wpb-emp-preview-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 100000;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.wpb-emp-preview-modal {
-	background: #fff;
-	border-radius: 4px;
-	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
-	max-width: 600px;
-	width: 90%;
-	padding: 24px;
-}
-
-.wpb-emp-preview-title {
-	font-size: 16px;
-	font-weight: 600;
-	color: #1d2327;
-	margin: 0 0 16px;
-}
-
-.wpb-emp-preview-route {
-	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-	font-size: 13px;
-	color: #50575e;
-	background: #f6f7f7;
-	border: 1px solid #c3c4c7;
-	border-radius: 3px;
-	padding: 12px;
-	line-height: 2.2;
-	word-break: break-all;
-}
-
-.wpb-emp-preview-segment {
-	white-space: nowrap;
-}
-
-.wpb-emp-preview-input {
-	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-	font-size: 13px;
-	width: 60px;
-	padding: 2px 6px;
-	border: 1px solid #2271b1;
-	border-radius: 3px;
-	background: #fff;
-	color: #1d2327;
-	text-align: center;
-	line-height: 1.4;
-}
-
-.wpb-emp-preview-input:focus {
-	border-color: #2271b1;
-	box-shadow: 0 0 0 1px #2271b1;
-	outline: 2px solid transparent;
-}
-
-.wpb-emp-preview-actions {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin-top: 20px;
-	justify-content: flex-end;
-}
-
-.wpb-emp-preview-actions .button-primary {
-	background: #2271b1;
-	border-color: #2271b1;
-	color: #fff;
-}
-
-.wpb-emp-preview-actions .button-primary:hover {
-	background: #135e96;
-	border-color: #135e96;
-}
-
-.wpb-emp-preview-actions .button-primary:disabled {
-	background: #a7aaad;
-	border-color: #a7aaad;
-	cursor: not-allowed;
-}
-
-.wpb-emp-preview-actions .button-link {
-	color: #50575e;
-	text-decoration: none;
-}
-
-.wpb-emp-preview-actions .button-link:hover {
-	color: #2271b1;
-}
-
 /* Per-endpoint rate limit overrides */
 .route-rate-limit-toggle {
 	background: none;
 	border: none;
 	padding: 0;
 	cursor: pointer;
-	color: #838485;
+	color: #999;
 	width: 40px;
 	height: 40px;
 	line-height: 1;
@@ -1041,14 +907,26 @@ button[disabled] {
 	transition: color 0.2s ease;
 }
 
-.route-rate-limit-toggle:hover,
+.route-rate-limit-toggle[disabled] svg,
+.route-preview[disabled] svg {
+	opacity: 0.6;
+}
+
+.route-preview[disabled] {
+	cursor: not-allowed;
+}
+
+.route-rate-limit-toggle svg path,
+.route-preview svg path {
+	fill: #999;
+}
+
 .route-rate-limit-toggle.has-override {
 	color: #2271b1;
 }
 
 .route-rate-limit-toggle:disabled {
 	cursor: not-allowed;
-	opacity: 0.4;
 }
 
 .route-rate-limit-toggle:disabled:hover {
@@ -1080,7 +958,8 @@ button[disabled] {
 	color: #fff;
 	font-size: 10px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	padding: 8px 16px;
+	line-height: 16px;
+	padding: 6px 10px;
 	border-radius: 3px;
 	white-space: nowrap;
 	z-index: 100000;
@@ -1136,4 +1015,348 @@ button[disabled] {
 .rate-limit-field-group span {
 	font-size: 12px;
 	color: #50575e;
+}
+
+/* Locked toggle for dynamic (Pro-gated) routes */
+.route-toggle-locked {
+	position: relative;
+	display: inline-flex;
+	cursor: not-allowed;
+}
+
+.route-toggle-locked label {
+	cursor: not-allowed;
+}
+
+.toggle-switch--locked,
+.rest-api-route input[type="checkbox"]:checked + .toggle-switch--locked {
+	background-color: #999;
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.route-toggle-locked::before,
+.route-toggle-locked::after {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+.route-toggle-locked::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% + 11px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1d2327;
+	color: #fff;
+	font-size: 10px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	line-height: 16px;
+	padding: 6px 10px;
+	border-radius: 3px;
+	white-space: nowrap;
+	z-index: 100000;
+}
+
+.route-toggle-locked::after {
+	content: "";
+	position: absolute;
+	bottom: calc(100% + 1px);
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+	z-index: 100000;
+}
+
+.route-toggle-locked:hover::before,
+.route-toggle-locked:hover::after {
+	opacity: 1;
+}
+
+/* Pro-locked filter control group */
+.wpbyem-filter-pro {
+	opacity: 0.55;
+	cursor: not-allowed;
+	position: relative;
+}
+
+.wpbyem-filter-pro select {
+	pointer-events: none;
+}
+
+.wpbyem-filter-pro::before,
+.wpbyem-filter-pro::after {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+.wpbyem-filter-pro::before {
+	content: attr(data-tooltip);
+	position: absolute;
+	bottom: calc(100% + 8px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1d2327;
+	color: #fff;
+	font-size: 10px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	line-height: 16px;
+	padding: 6px 10px;
+	border-radius: 3px;
+	white-space: nowrap;
+	z-index: 100000;
+}
+
+.wpbyem-filter-pro::after {
+	content: "";
+	position: absolute;
+	bottom: calc(100% + 2px);
+	left: 50%;
+	transform: translateX(-50%);
+	border: 5px solid transparent;
+	border-top-color: #1d2327;
+	z-index: 100000;
+}
+
+.wpbyem-filter-pro:hover::before,
+.wpbyem-filter-pro:hover::after {
+	opacity: 1;
+}
+
+/* Pro upgrade banner */
+.wpbyem-upgrade-banner {
+	color: #fff;
+	margin: 0;
+	background: linear-gradient(135deg, #03142D, #02557C);
+}
+.wpbyem-upgrade-banner__wrap {
+	margin: 0 auto;
+	max-width: 1024px;
+}
+.wpbyem-upgrade-banner__grid {
+	display: grid;
+	grid-template-columns: 30% 70%;
+	gap: 40px;
+	padding: 64px 0;
+}
+
+.wpbyem-upgrade-value-prop {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.wpbyem-upgrade-banner__heading {
+	color: #fff;
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 32px;
+	margin: 0 0 16px;
+}
+
+.wpbyem-upgrade-banner__desc {
+	font-size: 16px;
+	margin: 0 0 24px;
+}
+
+.wpbyem-upgrade-banner__ctas {
+	display: flex;
+	gap: 16px;
+	justify-content: start;
+}
+
+.wpbyem-upgrade-banner__ctas .button:first-child {
+	border-color: #fff;
+	color: #fff;
+}
+
+.wpbyem-upgrade-banner__ctas .button:last-child {
+	background-color: #4F46E5;
+	border-color: #4F46E5;
+	color: #fff;
+}
+
+.wpbyem-upgrade-features {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.wpbyem-upgrade-banner__features {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+.wpbyem-upgrade-banner__features li {
+	font-size: 16px;
+	line-height: 24px;
+	margin-bottom: 16px;
+	padding: 0 0 0 32px;
+	position: relative;
+}
+.wpbyem-upgrade-banner__features li:last-child {
+	margin-bottom: 0;
+}
+
+.wpbyem-upgrade-banner__features li::before {
+	background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%23e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/></svg>');
+	background-size: 100%;
+	content: '';
+	height: 24px;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 24px;
+}
+
+.wpbyem-upgrade-banner__footer {
+	border-top: 1px solid rgba(255,255,255,.25);
+	padding: 16px 0;
+}
+
+.wpbyem-upgrade-banner__footer p {
+	color: rgba(255, 255, 255, .5);
+	font-size: 14px;
+	margin: 0;
+}
+
+.wpbyem-upgrade-banner__footer a {
+	color: rgba(255, 255, 255, .5);
+	text-decoration: underline;
+}
+
+.wpbyem-upgrade-banner__footer a:hover {
+	color: #fff;
+}
+
+/* -------------------------------------------------- *
+ * Endpoint preview modal
+ * -------------------------------------------------- */
+
+.wpb-emp-preview-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wpb-emp-preview-modal {
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+	max-width: 680px;
+	width: 90%;
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	max-height: 80vh;
+}
+
+.wpb-emp-preview-title {
+	display: flex;
+	align-items: center;
+	font-size: 16px;
+	font-weight: 600;
+	color: #1d2327;
+	margin: 0;
+}
+
+.wpb-emp-preview-title .mr-3 {
+	margin-right: 8px;
+	display: flex;
+	align-items: center;
+}
+
+.wpb-emp-preview-route {
+	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+	font-size: 13px;
+	color: #50575e;
+	background: #f6f7f7;
+	border: 1px solid #c3c4c7;
+	border-radius: 3px;
+	padding: 10px 12px;
+	word-break: break-all;
+}
+
+.wpb-emp-preview-response-wrap {
+	overflow-y: auto;
+	max-height: 360px;
+	border: 1px solid #c3c4c7;
+	border-radius: 3px;
+}
+
+.wpb-emp-preview-response {
+	font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+	font-size: 12px;
+	line-height: 1.6;
+	color: #1d2327;
+	background: #f6f7f7;
+	padding: 12px;
+	margin: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.wpb-emp-preview-response--error {
+	color: #d63638;
+	background: #fcf0f1;
+}
+
+.wpb-emp-preview-loading {
+	font-size: 13px;
+	color: #50575e;
+	padding: 12px;
+	margin: 0;
+}
+
+.wpb-emp-preview-error {
+	font-size: 13px;
+	color: #d63638;
+	padding: 12px;
+	margin: 0;
+}
+
+.wpb-emp-preview-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 4px;
+}
+
+.wpb-emp-preview-actions .button-primary {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+}
+
+.wpb-emp-preview-actions .button-primary:hover {
+	background: #135e96;
+	border-color: #135e96;
+}
+
+.wpb-emp-preview-actions .button-primary:disabled {
+	background: #a7aaad;
+	border-color: #a7aaad;
+	cursor: not-allowed;
+}
+
+.wpb-emp-preview-actions .button-link {
+	color: #50575e;
+	text-decoration: none;
+}
+
+.wpb-emp-preview-actions .button-link:hover {
+	color: #2271b1;
 }

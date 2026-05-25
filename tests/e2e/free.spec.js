@@ -171,26 +171,4 @@ test.describe('Endpoint Manager — Free', () => {
     }
   });
 
-  // ---------------------------------------------------------------------------
-  // TEST: Sidebar links
-  // ---------------------------------------------------------------------------
-  test('sidebar links point to the correct URLs and open in a new tab', async ({ page }) => {
-    const upgradeLink = page.locator('.wpbuoy-upgrade-widget a.button-primary');
-    const faqLink     = page.locator('.wpbuoy-support-widget a').filter({ hasText: 'FAQ' });
-    const docsLink    = page.locator('.wpbuoy-support-widget a').filter({ hasText: 'Documentation' });
-    const supportLink = page.locator('.wpbuoy-support-widget a').filter({ hasText: 'Support' });
-
-    await expect(upgradeLink).toHaveAttribute('href', 'https://wpbuoy.com/product/endpoint-manager/');
-    await expect(upgradeLink).toHaveAttribute('target', '_blank');
-
-    await expect(faqLink).toHaveAttribute('href', 'https://wpbuoy.com/product/endpoint-manager/#faqs');
-    await expect(faqLink).toHaveAttribute('target', '_blank');
-
-    await expect(docsLink).toHaveAttribute('href', 'https://wpbuoy.com/endpoint-manager/documentation/');
-    await expect(docsLink).toHaveAttribute('target', '_blank');
-
-    await expect(supportLink).toHaveAttribute('href', 'https://wpbuoy.com/my-account/support/');
-    await expect(supportLink).toHaveAttribute('target', '_blank');
-  });
-
 });

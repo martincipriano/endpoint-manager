@@ -15,7 +15,7 @@ if ( ! defined( 'WPINC' ) ) {
 	<form action="options.php" method="post" id="wpbyem-form">
 		<?php
 		settings_fields( 'wpbyem' );
-		do_settings_sections( 'wpbyem' );
+		wpbyem()->render_endpoints_field();
 		?>
 
 		<hr>
