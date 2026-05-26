@@ -94,6 +94,7 @@
 
     /**
      * Show a confirmation dialog when endpoints are being newly disabled.
+     * Warn the user if they try to navigate away with unsaved changes.
      */
     function initSaveConfirmation() {
         const form = document.getElementById('wpbyem-form');
@@ -103,6 +104,31 @@
         const initialBlocked = new Set();
         form.querySelectorAll('input[name="wpbyem_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
             initialBlocked.add(cb.value);
+        });
+
+        /**
+         * Check whether the current checkbox state differs from the initial state.
+         */
+        function hasUnsavedChanges() {
+            const currentBlocked = new Set();
+            form.querySelectorAll('input[name="wpbyem_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
+                currentBlocked.add(cb.value);
+            });
+
+            if (currentBlocked.size !== initialBlocked.size) return true;
+
+            for (var value of currentBlocked) {
+                if (!initialBlocked.has(value)) return true;
+            }
+
+            return false;
+        }
+
+        // Warn before navigating away with unsaved changes.
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges()) {
+                e.preventDefault();
+            }
         });
 
         form.addEventListener('submit', function(e) {
