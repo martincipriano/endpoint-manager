@@ -109,6 +109,11 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 
 == Changelog ==
 
+= 2.0.1 =
+* Fixed: unsaved-changes warning no longer triggers when saving the form
+* Fixed: upgrade banner primary CTA button background
+* Updated: readme short description trimmed to meet WP.org 150-character limit
+
 = 2.0.0 =
 * Added: HTTP method badges on endpoint rows
 * Added: security logs page with IP, endpoint, status, and user agent tracking
