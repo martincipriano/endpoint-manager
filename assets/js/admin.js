@@ -125,13 +125,15 @@
         }
 
         // Warn before navigating away with unsaved changes.
+        let isSubmitting = false;
         window.addEventListener('beforeunload', function(e) {
-            if (hasUnsavedChanges()) {
+            if (!isSubmitting && hasUnsavedChanges()) {
                 e.preventDefault();
             }
         });
 
         form.addEventListener('submit', function(e) {
+            isSubmitting = true;
             let newlyDisabled = 0;
             form.querySelectorAll('input[name="wpbyem_blocked_endpoints_encoded[]"]:checked').forEach(function(cb) {
                 if (!initialBlocked.has(cb.value)) {
@@ -142,6 +144,7 @@
             if (newlyDisabled === 0) return;
 
             if (!window.confirm('You are attempting to block ' + newlyDisabled + ' endpoint' + (newlyDisabled === 1 ? '' : 's') + ' which might affect functions that depend on them. You can re-enable them at any time. Save changes?')) {
+                isSubmitting = false;
                 e.preventDefault();
             }
         });

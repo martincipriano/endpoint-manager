@@ -1169,6 +1169,7 @@ button[disabled] {
 }
 
 .wpbyem-upgrade-banner__ctas .button:first-child {
+	background: transparent;
 	border-color: #fff;
 	color: #fff;
 }
