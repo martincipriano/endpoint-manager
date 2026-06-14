@@ -162,17 +162,17 @@
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* When checked (disabled), move toggle to right */
-.rest-api-route input[type="checkbox"]:checked + .toggle-switch::before {
+/* When unchecked (enabled), move knob to right */
+.rest-api-route input[type="checkbox"]:not(:checked) + .toggle-switch::before {
 	transform: translateX(25.5px);
 }
 
-/* Toggle Labels - Always visible in the available space */
+/* Toggle Labels */
 .toggle-switch::after {
 	content: 'ON';
 	position: absolute;
 	top: 50%;
-	right: 6px; /* Position in right area when green/enabled */
+	right: 6px;
 	transform: translateY(-50%);
 	color: white;
 	font-size: 8.5px;
@@ -183,10 +183,18 @@
 	z-index: 1;
 }
 
+/* Unchecked (enabled): knob right, ON label left */
+.rest-api-route input[type="checkbox"]:not(:checked) + .toggle-switch::after {
+	content: 'ON';
+	left: 6px;
+	right: auto;
+}
+
+/* Checked (disabled): knob left, OFF label right */
 .rest-api-route input[type="checkbox"]:checked + .toggle-switch::after {
 	content: 'OFF';
-	left: 6px; /* Position in left area when red/disabled */
-	right: auto;
+	right: 6px;
+	left: auto;
 }
 
 .route-path {
