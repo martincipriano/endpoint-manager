@@ -381,6 +381,30 @@ class Wpbyem_Endpoint_Manager {
 			'wpbyem',
 			'wpbyem_main'
 		);
+
+		// Admin Bypass — stored in the same option as Pro for seamless upgrade path.
+		register_setting(
+			'wpbyem-settings',
+			'wpbyem_rate_limit_settings',
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( $this, 'sanitize_admin_bypass_settings' ),
+				'default'           => array(),
+			)
+		);
+	}
+
+	/**
+	 * Sanitize admin bypass settings.
+	 * Only touches exclude_admins_endpoints — preserves any Pro keys already in the option.
+	 *
+	 * @param array $input Raw input.
+	 * @return array
+	 */
+	public function sanitize_admin_bypass_settings( $input ) {
+		$existing                              = get_option( 'wpbyem_rate_limit_settings', array() );
+		$existing['exclude_admins_endpoints']  = ! empty( $input['exclude_admins_endpoints'] );
+		return $existing;
 	}
 
 	/**
@@ -631,6 +655,16 @@ class Wpbyem_Endpoint_Manager {
 			return $result;
 		}
 
+		// When "Exclude admins from blocked endpoints" is on (default), admins bypass enforcement.
+		$settings          = get_option( 'wpbyem_rate_limit_settings', array() );
+		$exclude_endpoints = ! isset( $settings['exclude_admins_endpoints'] ) || ! empty( $settings['exclude_admins_endpoints'] );
+		if ( $exclude_endpoints ) {
+			$user_id = wp_validate_auth_cookie( '', 'logged_in' ) ?: get_current_user_id();
+			if ( $user_id && user_can( $user_id, 'manage_options' ) ) {
+				return $result;
+			}
+		}
+
 		$blocked_endpoints = get_option( 'wpbyem_blocked_endpoints', array() );
 		$current_route = $request->get_route();
 		$current_route = rtrim( $current_route, '/' );
@@ -717,22 +751,20 @@ class Wpbyem_Endpoint_Manager {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		wpbyem_get_plugin_part(
-			'admin/upgrade',
-			'banner',
-			array(
-				'heading'     => __( 'Fine-tune how your REST API handles threats', 'wpbuoy-endpoint-manager' ),
-				'description' => __( 'Set rate limits, configure auto-blocking thresholds, manage your IP allowlist, and control exactly what blocked endpoints return.', 'wpbuoy-endpoint-manager' ),
-				'features' => array(
-					__('Block any REST API endpoint with a configurable response code and message', 'wpbuoy-endpoint-manager'),
-					__('Rate limiting — global and per-endpoint request thresholds', 'wpbuoy-endpoint-manager'),
-					__('IP Block List — manual blocks, auto-block, and allowlist', 'wpbuoy-endpoint-manager'),
-					__('Endpoint preview — inspect live API responses in an inline modal', 'wpbuoy-endpoint-manager'),
-					__('Intuitive admin UI — namespace accordion, live search, and multi-criteria filters', 'wpbuoy-endpoint-manager'),
-				),
-				'cta_url'  => 'https://wpbuoy.com/product/endpoint-manager/#pricing',
-			)
-		);
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- set by WP options.php after its own nonce-verified save
+		if ( isset( $_GET['settings-updated'] ) ) {
+			add_settings_error(
+				'wpbyem_settings_messages',
+				'wpbyem_settings_message',
+				__( 'Settings Saved', 'wpbuoy-endpoint-manager' ),
+				'updated'
+			);
+		}
+
+		settings_errors( 'wpbyem_settings_messages' );
+
+		wpbyem_get_plugin_part( 'admin/page', 'settings' );
 	}
 
 	/**
