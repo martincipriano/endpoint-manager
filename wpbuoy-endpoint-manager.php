@@ -420,8 +420,9 @@ class Wpbyem_Endpoint_Manager {
 
 		$sanitized = array();
 		foreach ( $input as $endpoint ) {
-			$endpoint = sanitize_text_field( $endpoint );
-			if ( ! empty( $endpoint ) ) {
+			$endpoint = trim( (string) $endpoint );
+			// Allowlist characters valid in REST route patterns, including regex named-group syntax (<>).
+			if ( ! empty( $endpoint ) && preg_match( '#^[a-zA-Z0-9/_\-\.\(\)\?\<\>\[\]\+\*\^\$\{\}\|\\\\: ]+$#', $endpoint ) ) {
 				$sanitized[] = $endpoint;
 			}
 		}
@@ -507,7 +508,7 @@ class Wpbyem_Endpoint_Manager {
 					'is_dynamic'        => $this->is_regex_route( $route ),
 					'is_restricted'     => $is_restricted,
 					'restricted_source' => $restricted_source,
-					'preview_url'       => rest_url( $route ),
+					'preview_url'       => $this->is_regex_route( $route ) ? $this->get_dynamic_preview_url( $route ) : rest_url( $route ),
 					'methods'           => $methods,
 				);
 			}
@@ -591,6 +592,17 @@ class Wpbyem_Endpoint_Manager {
 		}
 
 		return '#^' . implode( '', $parts ) . '$#';
+	}
+
+	/**
+	 * Build a basic preview URL for a dynamic route by substituting capture groups with a default value.
+	 *
+	 * @param string $route WordPress REST route pattern.
+	 * @return string Resolved REST URL suitable for a browser preview.
+	 */
+	private function get_dynamic_preview_url( $route ) {
+		$resolved = preg_replace( '/\(\?P<[^>]+>[^)]+\)/', '1', $route );
+		return rest_url( $resolved );
 	}
 
 	/**
