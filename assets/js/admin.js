@@ -727,7 +727,7 @@
         if (wpbyemData.excludeAdminsEndpoints) {
             var adminNote = document.createElement('p');
             adminNote.className = 'wpb-emp-preview-admin-note';
-            adminNote.innerHTML = '<strong>Admins bypass blocked endpoints by default.</strong> Responses here may not reflect what visitors see. Adjust in <a href="' + wpbyemData.settingsUrl + '">Settings</a>.';
+            adminNote.innerHTML = '<strong>Admins bypass blocked endpoints by default.</strong> Responses here may not reflect what visitors see. Disable it in <a href="' + wpbyemData.settingsUrl + '">Settings</a> when testing.';
             modal.appendChild(adminNote);
         }
 
