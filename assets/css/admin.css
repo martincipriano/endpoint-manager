@@ -1346,12 +1346,15 @@ button[disabled] {
 	text-decoration: underline;
 }
 
+.wpb-emp-preview-instruction {
+	margin: 0;
+}
+
 .wpb-emp-preview-actions {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
 	gap: 8px;
-	margin-top: 4px;
 }
 
 .wpb-emp-preview-actions .button-primary {
