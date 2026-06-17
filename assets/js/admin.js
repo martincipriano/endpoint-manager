@@ -15,6 +15,7 @@
         initFilters();
         initLogsPage();
         initPreviewModal();
+        initDynamicPreviewModal();
     });
 
     /**
@@ -569,12 +570,130 @@
      */
     function initPreviewModal() {
         document.addEventListener('click', function(e) {
-            var btn = e.target.closest('.route-preview:not([disabled])');
+            var btn = e.target.closest('.route-preview:not(.route-preview--dynamic):not([disabled])');
             if (!btn) return;
             e.preventDefault();
             var url = btn.getAttribute('data-preview-url');
             if (url) showResponseModal(url);
         });
+    }
+
+    function initDynamicPreviewModal() {
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.route-preview--dynamic:not([disabled])');
+            if (!btn) return;
+            e.preventDefault();
+            var urlTemplate = btn.getAttribute('data-preview-url');
+            var params = JSON.parse(btn.getAttribute('data-preview-params') || '{}');
+            showPreviewModal(urlTemplate, params);
+        });
+    }
+
+    function showPreviewModal(urlTemplate, params) {
+        closePreviewModal();
+
+        var overlay = document.createElement('div');
+        overlay.className = 'wpb-emp-preview-overlay';
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) closePreviewModal();
+        });
+
+        var modal = document.createElement('div');
+        modal.className = 'wpb-emp-preview-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Preview Endpoint');
+
+        var title = document.createElement('h3');
+        title.className = 'wpb-emp-preview-title';
+        title.innerHTML = '<span class="mr-3"><svg width="26px" height="18px" viewBox="0 0 26 18" xmlns="http://www.w3.org/2000/svg"><path d="M16.5906419,12.7121786 C17.5744077,11.6923929 18.0662907,10.4540357 18.0662907,8.99710714 C18.0662907,7.54017857 17.5734758,6.30278571 16.5878459,5.28492857 C15.6022161,4.26707143 14.4053354,3.75814286 12.997204,3.75814286 C11.5890726,3.75814286 10.393124,4.26803571 9.40935812,5.28782143 C8.42559225,6.30760714 7.93370932,7.54596429 7.93370932,9.00289286 C7.93370932,10.4598214 8.42652424,11.6972143 9.41215409,12.7150714 C10.3977839,13.7329286 11.5946646,14.2418571 13.002796,14.2418571 C14.4109274,14.2418571 15.606876,13.7319643 16.5906419,12.7121786 Z M10.6234288,11.4589286 C9.97103666,10.7839286 9.64484061,9.96428571 9.64484061,9 C9.64484061,8.03571429 9.97103666,7.21607143 10.6234288,6.54107143 C11.2758209,5.86607143 12.0680113,5.52857143 13,5.52857143 C13.9319887,5.52857143 14.7241791,5.86607143 15.3765712,6.54107143 C16.0289633,7.21607143 16.3551594,8.03571429 16.3551594,9 C16.3551594,9.96428571 16.0289633,10.7839286 15.3765712,11.4589286 C14.7241791,12.1339286 13.9319887,12.4714286 13,12.4714286 C12.0680113,12.4714286 11.2758209,12.1339286 10.6234288,11.4589286 Z M5.19055585,15.5532857 C2.84070162,13.9223571 1.11051634,11.7379286 0,9 C1.11051634,6.26207143 2.84008029,4.07764286 5.18869187,2.44671429 C7.53751055,0.815571429 10.1407622,0 12.9984467,0 C15.8559241,0 18.4595899,0.815571429 20.8094442,2.44671429 C23.1592984,4.07764286 24.8894837,6.26207143 26,9 C24.8894837,11.7379286 23.1599197,13.9223571 20.8113081,15.5532857 C18.4624894,17.1844286 15.8592378,18 13.0015533,18 C10.1440759,18 7.54041008,17.1844286 5.19055585,15.5532857 Z M19.4462553,14.1589286 C21.4034316,12.8839286 22.8997913,11.1642857 23.9353343,9 C22.8997913,6.83571429 21.4034316,5.11607143 19.4462553,3.84107143 C17.489079,2.56607143 15.3403272,1.92857143 13,1.92857143 C10.6596728,1.92857143 8.510921,2.56607142 6.55374468,3.84107143 C4.59656837,5.11607143 3.1002087,6.83571429 2.06466568,9 C3.1002087,11.1642857 4.59656837,12.8839286 6.55374468,14.1589286 C8.510921,15.4339286 10.6596728,16.0714286 13,16.0714286 C15.3403272,16.0714286 17.489079,15.4339286 19.4462553,14.1589286 Z" fill="currentColor" fill-rule="nonzero"/></svg></span><span>Preview Endpoint</span>';
+        modal.appendChild(title);
+
+        var instruction = document.createElement('p');
+        instruction.className = 'wpb-emp-preview-instruction';
+        instruction.textContent = 'Fill in the parameters to preview this endpoint. Replace default values with real IDs or slugs for your site.';
+        modal.appendChild(instruction);
+
+        var routeRow = document.createElement('div');
+        routeRow.className = 'wpb-emp-preview-route';
+
+        var restPath = urlTemplate.replace(/^https?:\/\/[^/]+\/wp-json/, '/wp-json');
+        var parts = restPath.split(/__([a-zA-Z_]+)__/);
+        var inputs = {};
+
+        for (var i = 0; i < parts.length; i++) {
+            if (i % 2 === 0) {
+                var seg = document.createElement('span');
+                seg.className = 'wpb-emp-preview-segment';
+                seg.textContent = parts[i];
+                routeRow.appendChild(seg);
+            } else {
+                var paramName = parts[i];
+                var defaultVal = String(params[paramName] || '1');
+                var input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'wpb-emp-preview-input';
+                input.value = defaultVal;
+                input.setAttribute('data-param', paramName);
+                input.setAttribute('placeholder', paramName);
+                input.size = Math.max(defaultVal.length + 2, 4);
+                inputs[paramName] = input;
+                routeRow.appendChild(input);
+            }
+        }
+        modal.appendChild(routeRow);
+
+        var actions = document.createElement('div');
+        actions.className = 'wpb-emp-preview-actions';
+
+        var cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'button';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', closePreviewModal);
+
+        var previewBtn = document.createElement('button');
+        previewBtn.type = 'button';
+        previewBtn.className = 'button button-primary';
+        previewBtn.textContent = 'Preview';
+        previewBtn.addEventListener('click', function() {
+            openPreviewUrl(urlTemplate, inputs);
+        });
+
+        actions.appendChild(cancelBtn);
+        actions.appendChild(previewBtn);
+        modal.appendChild(actions);
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        trapFocus(modal);
+
+        var firstInput = modal.querySelector('.wpb-emp-preview-input');
+        if (firstInput) firstInput.select();
+
+        modal.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                openPreviewUrl(urlTemplate, inputs);
+            } else if (e.key === 'Escape') {
+                closePreviewModal();
+            }
+        });
+    }
+
+    function openPreviewUrl(urlTemplate, inputs) {
+        var url = urlTemplate;
+        var valid = true;
+        Object.keys(inputs).forEach(function(name) {
+            var val = inputs[name].value.trim();
+            if (!val) {
+                valid = false;
+                inputs[name].focus();
+            }
+            url = url.replace('__' + name + '__', encodeURIComponent(val));
+        });
+        if (valid) showResponseModal(url);
     }
 
     /**

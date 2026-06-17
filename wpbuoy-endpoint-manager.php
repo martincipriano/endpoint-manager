@@ -509,6 +509,7 @@ class Wpbyem_Endpoint_Manager {
 					'is_restricted'     => $is_restricted,
 					'restricted_source' => $restricted_source,
 					'preview_url'       => $this->is_regex_route( $route ) ? $this->get_dynamic_preview_url( $route ) : rest_url( $route ),
+					'preview_params'    => $this->is_regex_route( $route ) ? $this->get_dynamic_preview_params( $route ) : array(),
 					'methods'           => $methods,
 				);
 			}
@@ -601,8 +602,29 @@ class Wpbyem_Endpoint_Manager {
 	 * @return string Resolved REST URL suitable for a browser preview.
 	 */
 	private function get_dynamic_preview_url( $route ) {
-		$resolved = preg_replace( '/\(\?P<[^>]+>[^)]+\)/', '1', $route );
+		$resolved = preg_replace_callback(
+			'/\(\?P<([^>]+)>[^)]+\)/',
+			function( $matches ) {
+				return '__' . $matches[1] . '__';
+			},
+			$route
+		);
 		return rest_url( $resolved );
+	}
+
+	/**
+	 * Extract named capture group params from a dynamic route for the preview modal.
+	 *
+	 * @param string $route WordPress REST route pattern.
+	 * @return array Associative array of param name => default value.
+	 */
+	private function get_dynamic_preview_params( $route ) {
+		preg_match_all( '/\(\?P<([^>]+)>[^)]+\)/', $route, $matches );
+		$params = array();
+		foreach ( $matches[1] as $name ) {
+			$params[ $name ] = '1';
+		}
+		return $params;
 	}
 
 	/**
