@@ -109,6 +109,16 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 
 == Changelog ==
 
+= 2.1.0 =
+* Added: dynamic route blocking with regex support in the free version
+* Added: interactive parameter input modal for dynamic endpoint preview
+* Added: admin bypass note in the preview modal linking to Settings
+* Added: real available ID resolution for dynamic endpoint preview
+* Fixed: regex named groups preserved correctly when saving blocked endpoints
+* Fixed: corrupted stored patterns (missing backslash in \d) repaired at runtime
+* Fixed: route label HTML escaping in search highlighting
+* Fixed: admin bypass note styling — color, margin, and placement
+
 = 2.0.1 =
 * Fixed: unsaved-changes warning no longer triggers when saving the form
 * Fixed: upgrade banner primary CTA button background
