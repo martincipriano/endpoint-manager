@@ -197,6 +197,14 @@ class Wpbyem_Endpoint_Manager {
 			WPBYEM_VERSION,
 			true
 		);
+
+		wp_localize_script(
+			'wpbyem-admin',
+			'wpbyemData',
+			array(
+				'settingsUrl' => esc_url( admin_url( 'admin.php?page=wpbyem-settings' ) ),
+			)
+		);
 	}
 
 	/**

@@ -745,6 +745,11 @@
 
         modal.appendChild(responseWrap);
 
+        var adminNote = document.createElement('p');
+        adminNote.className = 'wpb-emp-preview-admin-note';
+        adminNote.innerHTML = 'Admins bypass blocked endpoints by default — responses here may not reflect what visitors see. Adjust in <a href="' + wpbyemData.settingsUrl + '">Settings</a>.';
+        modal.appendChild(adminNote);
+
         // Actions
         var actions = document.createElement('div');
         actions.className = 'wpb-emp-preview-actions';
