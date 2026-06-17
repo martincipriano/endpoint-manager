@@ -624,9 +624,74 @@ class Wpbyem_Endpoint_Manager {
 		preg_match_all( '/\(\?P<([^>]+)>[^)]+\)/', $route, $matches );
 		$params = array();
 		foreach ( $matches[1] as $name ) {
-			$params[ $name ] = '1';
+			$params[ $name ] = 'id' === $name ? (string) $this->resolve_route_id( $route ) : '1';
 		}
 		return $params;
+	}
+
+	/**
+	 * Resolve a real available ID for a dynamic REST route by inspecting post types, taxonomies, users, and comments.
+	 *
+	 * @param string $route WordPress REST route pattern.
+	 * @return int Resolved ID, or 1 as fallback.
+	 */
+	private function resolve_route_id( $route ) {
+		$path     = preg_replace( '/\(\?P<[^>]+>[^)]+\).*/', '', $route );
+		$path     = rtrim( $path, '/' );
+		$parts    = explode( '/', trim( $path, '/' ) );
+		$resource = end( $parts );
+
+		// Post types with a known REST base.
+		$post_types = get_post_types( array( 'show_in_rest' => true ), 'objects' );
+		foreach ( $post_types as $pt ) {
+			$rest_base = $pt->rest_base ?: $pt->name;
+			if ( $rest_base === $resource ) {
+				$posts = get_posts( array(
+					'post_type'      => $pt->name,
+					'posts_per_page' => 1,
+					'post_status'    => 'publish',
+					'fields'         => 'ids',
+				) );
+				if ( ! empty( $posts ) ) {
+					return (int) $posts[0];
+				}
+			}
+		}
+
+		// Taxonomies.
+		$taxonomies = get_taxonomies( array( 'show_in_rest' => true ), 'objects' );
+		foreach ( $taxonomies as $tax ) {
+			$rest_base = $tax->rest_base ?: $tax->name;
+			if ( $rest_base === $resource ) {
+				$terms = get_terms( array(
+					'taxonomy'   => $tax->name,
+					'number'     => 1,
+					'hide_empty' => false,
+					'fields'     => 'ids',
+				) );
+				if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+					return (int) $terms[0];
+				}
+			}
+		}
+
+		// Users.
+		if ( 'users' === $resource ) {
+			$users = get_users( array( 'number' => 1, 'fields' => 'ID' ) );
+			if ( ! empty( $users ) ) {
+				return (int) $users[0];
+			}
+		}
+
+		// Comments.
+		if ( 'comments' === $resource ) {
+			$comments = get_comments( array( 'number' => 1, 'fields' => 'ids' ) );
+			if ( ! empty( $comments ) ) {
+				return (int) $comments[0];
+			}
+		}
+
+		return 1;
 	}
 
 	/**
@@ -727,6 +792,17 @@ class Wpbyem_Endpoint_Manager {
 		if ( empty( $blocked_endpoints ) ) {
 			return $result;
 		}
+
+		// Repair patterns corrupted by wp_unslash() stripping backslashes before wp_slash() was applied.
+		$blocked_endpoints = array_map( function( $endpoint ) {
+			if ( strpos( $endpoint, '(?P[' ) !== false && strpos( $endpoint, '(?P<' ) === false ) {
+				$endpoint = str_replace( '(?P[', '(?P<id>[', $endpoint );
+			}
+			if ( strpos( $endpoint, '[d]+' ) !== false ) {
+				$endpoint = str_replace( '[d]+', '[\d]+', $endpoint );
+			}
+			return $endpoint;
+		}, $blocked_endpoints );
 
 		foreach ( $blocked_endpoints as $blocked_pattern ) {
 			$blocked_pattern = rtrim( $blocked_pattern, '/' );

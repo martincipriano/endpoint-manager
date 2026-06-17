@@ -420,8 +420,11 @@
         const originalText = element.getAttribute('data-original-text') || element.textContent;
         element.setAttribute('data-original-text', originalText);
 
+        // HTML-escape before setting innerHTML so angle brackets in route patterns
+        // (e.g. (?P<id>[\d]+)) are not parsed as HTML tags.
+        const escaped = originalText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
-        element.innerHTML = originalText.replace(regex, '<mark>$1</mark>');
+        element.innerHTML = escaped.replace(regex, '<mark>$1</mark>');
     }
 
     /**
