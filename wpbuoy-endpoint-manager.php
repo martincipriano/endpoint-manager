@@ -198,11 +198,13 @@ class Wpbyem_Endpoint_Manager {
 			true
 		);
 
+		$rate_settings = get_option( 'wpbyem_rate_limit_settings', array() );
 		wp_localize_script(
 			'wpbyem-admin',
 			'wpbyemData',
 			array(
-				'settingsUrl' => esc_url( admin_url( 'admin.php?page=wpbyem-settings' ) ),
+				'settingsUrl'           => esc_url( admin_url( 'admin.php?page=wpbyem-settings' ) ),
+				'excludeAdminsEndpoints' => ! isset( $rate_settings['exclude_admins_endpoints'] ) || ! empty( $rate_settings['exclude_admins_endpoints'] ),
 			)
 		);
 	}
