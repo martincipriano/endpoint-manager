@@ -3,7 +3,7 @@
  * Plugin Name:       WPBuoy Endpoint Manager
  * Plugin URI:        https://wordpress.org/plugins/wpbuoy-endpoint-manager
  * Description:       Manage and block REST API endpoints to enhance your site's security and performance.
- * Version:           2.0.1
+ * Version:           2.1.0
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            WPBuoy
@@ -91,7 +91,7 @@ if ( in_array( 'endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) g
 /**
  * Current plugin version.
  */
-define( 'WPBYEM_VERSION', '2.0.1' );
+define( 'WPBYEM_VERSION', '2.1.0' );
 
 /**
  * Plugin directory path.
