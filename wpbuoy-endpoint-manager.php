@@ -349,7 +349,9 @@ class Wpbyem_Endpoint_Manager {
 					$decoded_endpoints[] = $decoded;
 				}
 			}
-			$_POST['wpbyem_blocked_endpoints'] = $decoded_endpoints;
+			// wp_slash() re-adds slashes that wp_unslash() in options.php will strip,
+			// preserving literal backslashes in regex patterns (e.g. \d in dynamic routes).
+			$_POST['wpbyem_blocked_endpoints'] = wp_slash( $decoded_endpoints );
 		}
 	}
 
