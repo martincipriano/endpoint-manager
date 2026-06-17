@@ -575,6 +575,25 @@ class Wpbyem_Endpoint_Manager {
 	}
 
 	/**
+	 * Convert a WordPress REST route pattern to a standard PHP regex.
+	 *
+	 * @param string $route WordPress route pattern with named capture groups.
+	 * @return string Compiled regex pattern with delimiters and anchors.
+	 */
+	private function convert_route_to_regex( $route ) {
+		$pattern = preg_replace( '/\(\?P<\w+>/', '(', $route );
+		$parts   = preg_split( '/(\([^)]+\))/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE );
+
+		foreach ( $parts as $i => $part ) {
+			if ( $i % 2 === 0 ) {
+				$parts[ $i ] = preg_quote( $part, '#' );
+			}
+		}
+
+		return '#^' . implode( '', $parts ) . '$#';
+	}
+
+	/**
 	 * Check if a route is blocked by any of the stored patterns.
 	 *
 	 * @param string $route The current route.
@@ -676,8 +695,16 @@ class Wpbyem_Endpoint_Manager {
 		foreach ( $blocked_endpoints as $blocked_pattern ) {
 			$blocked_pattern = rtrim( $blocked_pattern, '/' );
 
-			// Simple string comparison for non-regex routes
-			if ( $current_route === $blocked_pattern ) {
+			$matched = false;
+
+			if ( $this->is_regex_route( $blocked_pattern ) ) {
+				$regex   = $this->convert_route_to_regex( $blocked_pattern );
+				$matched = preg_match( $regex, $current_route ) === 1;
+			} else {
+				$matched = $current_route === $blocked_pattern;
+			}
+
+			if ( $matched ) {
 				$this->log_blocked_request( $current_route );
 				return new WP_Error(
 					'rest_forbidden',

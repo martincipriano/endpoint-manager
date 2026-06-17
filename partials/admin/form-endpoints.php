@@ -99,18 +99,6 @@ if ( ! defined( 'WPINC' ) ) {
 		<?php foreach ( $em_namespace_data['routes'] as $em_route => $em_route_data ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 		<div class="rest-api-route" data-methods="<?php echo esc_attr( implode( ',', $em_route_data['methods'] ) ); ?>" data-type="<?php echo esc_attr( $em_route_data['is_dynamic'] ? 'dynamic' : 'static' ); ?>">
 			<div class="route-row">
-				<?php if ( $em_route_data['is_dynamic'] ) : ?>
-				<span
-					class="route-toggle-locked"
-					data-tooltip="<?php esc_attr_e( 'Dynamic Endpoint Support (Pro)', 'wpbuoy-endpoint-manager' ); ?>"
-					aria-label="<?php esc_attr_e( 'Dynamic Endpoint Support (Pro)', 'wpbuoy-endpoint-manager' ); ?>"
-				>
-					<label>
-						<input type="checkbox" disabled />
-						<span class="toggle-switch toggle-switch--locked"></span>
-					</label>
-				</span>
-				<?php else : ?>
 				<label for="<?php echo esc_attr( $em_route_data['field_id'] ); ?>">
 					<input type="checkbox"
 							id="<?php echo esc_attr( $em_route_data['field_id'] ); ?>"
@@ -119,7 +107,6 @@ if ( ! defined( 'WPINC' ) ) {
 							<?php checked( $em_route_data['is_blocked'] ); ?> />
 					<span class="toggle-switch"></span>
 				</label>
-				<?php endif; ?>
 				<div class="route-info">
 						<span class="route-path"><?php echo esc_html( $em_route ); ?></span>
 						<?php if ( $em_route_data['is_restricted'] ) : ?>
