@@ -10,6 +10,7 @@
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
         initAccordion();
+        initNamespaceBulkToggle();
         initSaveConfirmation();
         initSearch();
         initFilters();
@@ -91,6 +92,47 @@
                 routes.style.overflow = '';
             }, 300);
         }
+    }
+
+    /**
+     * Initialize "Block All / Unblock All" bulk toggle per namespace group.
+     */
+    function initNamespaceBulkToggle() {
+        const buttons = document.querySelectorAll('.namespace-bulk-toggle');
+
+        buttons.forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                // Prevent bubbling to the namespace header's accordion toggle.
+                e.stopPropagation();
+
+                const namespaceEl = button.closest('.rest-api-namespace');
+                if (!namespaceEl) return;
+
+                const checkboxes = namespaceEl.querySelectorAll('input[name="wpbyem_blocked_endpoints_encoded[]"]');
+                if (!checkboxes.length) return;
+
+                const allBlocked = Array.prototype.every.call(checkboxes, function(cb) {
+                    return cb.checked;
+                });
+
+                // If every endpoint is already blocked, unblock all; otherwise block all.
+                checkboxes.forEach(function(cb) {
+                    cb.checked = !allBlocked;
+                });
+
+                updateBulkToggleLabel(button, !allBlocked);
+            });
+        });
+    }
+
+    /**
+     * Update a namespace bulk-toggle button's label and state to match the routes it controls.
+     * @param {Element} button - The .namespace-bulk-toggle button.
+     * @param {boolean} allBlocked - Whether every endpoint in the namespace is now blocked.
+     */
+    function updateBulkToggleLabel(button, allBlocked) {
+        button.setAttribute('data-all-blocked', allBlocked ? '1' : '0');
+        button.textContent = allBlocked ? button.getAttribute('data-label-unblock') : button.getAttribute('data-label-block');
     }
 
     /**
