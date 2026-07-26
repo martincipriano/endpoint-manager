@@ -89,7 +89,10 @@ if ( ! defined( 'WPINC' ) ) {
 				<input type="checkbox"
 					id="<?php echo esc_attr( $em_namespace_toggle_id ); ?>"
 					class="namespace-bulk-toggle"
-					aria-label="<?php echo esc_attr( sprintf( __( 'Block all endpoints in %s', 'wpbuoy-endpoint-manager' ), $em_namespace ) ); ?>"
+					aria-label="<?php
+					/* translators: %s: REST API namespace, e.g. wp/v2 */
+					echo esc_attr( sprintf( __( 'Block all endpoints in %s', 'wpbuoy-endpoint-manager' ), $em_namespace ) );
+					?>"
 					<?php checked( $em_namespace_all_blocked ); ?> />
 				<span class="toggle-switch"></span>
 			</label>
