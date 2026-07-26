@@ -109,6 +109,11 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 
 == Changelog ==
 
+= 2.2.0 =
+* Added: namespace bulk-toggle switch to block or unblock every endpoint in a namespace at once
+* Added: visual indent and tree connector lines to group endpoints under their namespace
+* Updated: admin bypass note copy made more actionable
+
 = 2.1.0 =
 * Added: dynamic route blocking with regex support in the free version
 * Added: interactive parameter input modal for dynamic endpoint preview
