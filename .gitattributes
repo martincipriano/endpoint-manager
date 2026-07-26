@@ -1,0 +1,14 @@
+.distignore export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.idea/ export-ignore
+.vscode/ export-ignore
+CHANGELOG.md export-ignore
+node_modules/ export-ignore
+package.json export-ignore
+package-lock.json export-ignore
+playwright.config.js export-ignore
+playwright-report/ export-ignore
+readme.md export-ignore
+test-results/ export-ignore
+tests/ export-ignore
