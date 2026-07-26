@@ -59,25 +59,39 @@
 	white-space: nowrap;
 }
 
-/* Namespace Bulk Toggle */
-.namespace-bulk-toggle {
-	background: none;
-	border: none;
-	padding: 0;
-	font-size: 12px;
-	font-weight: 500;
-	color: #646970; /* WordPress gray text */
-	text-decoration: underline;
+/* Namespace Bulk Toggle (switch) */
+.namespace-bulk-toggle-label {
+	display: inline-flex;
+	align-items: center;
 	cursor: pointer;
-	white-space: nowrap;
+	flex-shrink: 0;
 }
 
-.namespace-bulk-toggle:hover,
-.namespace-bulk-toggle:focus {
-	color: #2271b1; /* WordPress link blue */
+.namespace-bulk-toggle-label input[type="checkbox"] {
+	display: none;
 }
 
-.namespace-bulk-toggle:focus {
+.namespace-bulk-toggle-label input[type="checkbox"]:checked + .toggle-switch {
+	background: #d63638; /* WordPress notification red = Blocked */
+}
+
+.namespace-bulk-toggle-label input[type="checkbox"]:not(:checked) + .toggle-switch::before {
+	transform: translateX(25.5px);
+}
+
+.namespace-bulk-toggle-label input[type="checkbox"]:not(:checked) + .toggle-switch::after {
+	content: 'ON';
+	left: 6px;
+	right: auto;
+}
+
+.namespace-bulk-toggle-label input[type="checkbox"]:checked + .toggle-switch::after {
+	content: 'OFF';
+	right: 6px;
+	left: auto;
+}
+
+.namespace-bulk-toggle-label input[type="checkbox"]:focus-visible + .toggle-switch {
 	outline: 2px solid #2271b1; /* WordPress link blue */
 	outline-offset: 2px;
 }
@@ -123,13 +137,42 @@
 
 .rest-api-routes {
 	transition: all 0.3s ease;
+	position: relative;
 }
 
 .rest-api-route {
 	display: flex;
 	flex-direction: column;
-	padding: .25rem .75rem;
+	padding: .25rem .75rem .25rem 2rem;
 	border-bottom: 1px solid #f0f0f1; /* WordPress light gray */
+	position: relative;
+}
+
+/* Tree connector: vertical trunk down the indent gutter, with a horizontal
+   tick branching into each row. The last row's trunk stops halfway so it
+   reads as an L instead of continuing past the final branch. */
+.rest-api-route::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 1rem;
+	width: 1px;
+	height: 100%;
+	background: #c3c4c7; /* WordPress border gray */
+}
+
+.rest-api-route:last-child::before {
+	height: 50%;
+}
+
+.rest-api-route::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 1rem;
+	width: 1rem;
+	height: 1px;
+	background: #c3c4c7; /* WordPress border gray */
 }
 
 .rest-api-route:last-child {
@@ -356,7 +399,7 @@
 	}
 
 	.rest-api-route {
-		padding: 15px 0;
+		padding: 15px 0 15px 1.5rem;
 	}
 
 	.route-info {

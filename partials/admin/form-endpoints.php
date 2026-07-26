@@ -80,17 +80,20 @@ if ( ! defined( 'WPINC' ) ) {
 <div class="rest-api-namespace">
 	<div class="namespace-header" data-namespace="<?php echo esc_attr( $em_namespace ); ?>">
 		<div class="namespace-title">
-			<h3><?php echo esc_html( $em_namespace ); ?></h3>
 			<?php
 			$em_namespace_total       = count( $em_namespace_data['routes'] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 			$em_namespace_all_blocked = $em_namespace_total > 0 && $em_namespace_data['disabled_count'] === $em_namespace_total; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+			$em_namespace_toggle_id   = 'namespace-bulk-toggle-' . sanitize_html_class( $em_namespace ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 			?>
-			<button type="button" class="namespace-bulk-toggle"
-				data-all-blocked="<?php echo esc_attr( $em_namespace_all_blocked ? '1' : '0' ); ?>"
-				data-label-block="<?php esc_attr_e( 'Block All', 'wpbuoy-endpoint-manager' ); ?>"
-				data-label-unblock="<?php esc_attr_e( 'Unblock All', 'wpbuoy-endpoint-manager' ); ?>">
-				<?php echo esc_html( $em_namespace_all_blocked ? __( 'Unblock All', 'wpbuoy-endpoint-manager' ) : __( 'Block All', 'wpbuoy-endpoint-manager' ) ); ?>
-			</button>
+			<label class="namespace-bulk-toggle-label" for="<?php echo esc_attr( $em_namespace_toggle_id ); ?>">
+				<input type="checkbox"
+					id="<?php echo esc_attr( $em_namespace_toggle_id ); ?>"
+					class="namespace-bulk-toggle"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Block all endpoints in %s', 'wpbuoy-endpoint-manager' ), $em_namespace ) ); ?>"
+					<?php checked( $em_namespace_all_blocked ); ?> />
+				<span class="toggle-switch"></span>
+			</label>
+			<h3><?php echo esc_html( $em_namespace ); ?></h3>
 			<?php if ( $em_namespace_data['disabled_count'] > 0 ) : ?>
 				<span class="disabled-count">
 					<?php

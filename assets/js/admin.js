@@ -95,44 +95,39 @@
     }
 
     /**
-     * Initialize "Block All / Unblock All" bulk toggle per namespace group.
+     * Initialize the namespace bulk-toggle switch: blocks/unblocks every endpoint
+     * in a namespace, and stays in sync when individual endpoints are toggled.
      */
     function initNamespaceBulkToggle() {
-        const buttons = document.querySelectorAll('.namespace-bulk-toggle');
+        document.querySelectorAll('.rest-api-namespace').forEach(function(namespaceEl) {
+            const namespaceCheckbox = namespaceEl.querySelector('.namespace-bulk-toggle');
+            const label = namespaceEl.querySelector('.namespace-bulk-toggle-label');
+            const routeCheckboxes = namespaceEl.querySelectorAll('input[name="wpbyem_blocked_endpoints_encoded[]"]');
+            if (!namespaceCheckbox || !routeCheckboxes.length) return;
 
-        buttons.forEach(function(button) {
-            button.addEventListener('click', function(e) {
-                // Prevent bubbling to the namespace header's accordion toggle.
-                e.stopPropagation();
-
-                const namespaceEl = button.closest('.rest-api-namespace');
-                if (!namespaceEl) return;
-
-                const checkboxes = namespaceEl.querySelectorAll('input[name="wpbyem_blocked_endpoints_encoded[]"]');
-                if (!checkboxes.length) return;
-
-                const allBlocked = Array.prototype.every.call(checkboxes, function(cb) {
-                    return cb.checked;
+            // Prevent clicks on the switch from bubbling to the namespace header's accordion toggle.
+            if (label) {
+                label.addEventListener('click', function(e) {
+                    e.stopPropagation();
                 });
+            }
 
-                // If every endpoint is already blocked, unblock all; otherwise block all.
-                checkboxes.forEach(function(cb) {
-                    cb.checked = !allBlocked;
+            // Namespace switch → cascades to every endpoint in the namespace.
+            namespaceCheckbox.addEventListener('change', function() {
+                routeCheckboxes.forEach(function(cb) {
+                    cb.checked = namespaceCheckbox.checked;
                 });
+            });
 
-                updateBulkToggleLabel(button, !allBlocked);
+            // Any endpoint → namespace switch reflects whether all endpoints are blocked.
+            routeCheckboxes.forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    namespaceCheckbox.checked = Array.prototype.every.call(routeCheckboxes, function(routeCheckbox) {
+                        return routeCheckbox.checked;
+                    });
+                });
             });
         });
-    }
-
-    /**
-     * Update a namespace bulk-toggle button's label and state to match the routes it controls.
-     * @param {Element} button - The .namespace-bulk-toggle button.
-     * @param {boolean} allBlocked - Whether every endpoint in the namespace is now blocked.
-     */
-    function updateBulkToggleLabel(button, allBlocked) {
-        button.setAttribute('data-all-blocked', allBlocked ? '1' : '0');
-        button.textContent = allBlocked ? button.getAttribute('data-label-unblock') : button.getAttribute('data-label-block');
     }
 
     /**
