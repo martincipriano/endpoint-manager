@@ -109,6 +109,12 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 
 == Changelog ==
 
+= 2.3.1 =
+* Fixed: bulk-blocking a namespace could leave some endpoints enabled — route patterns containing %, @, or " (e.g. core's global-styles routes) were silently dropped during save
+* Changed: Import Configuration now opens a file picker and uploads immediately on file selection, instead of a separate submit step
+* Changed: Export section labeling simplified
+* Fixed: Save Changes button now stays visible at the bottom of the screen when a namespace is expanded, instead of requiring a long scroll
+
 = 2.3.0 =
 * Added: Export/Import Configuration tab — export blocked endpoints and settings as JSON, import with route validation and a skip-count summary
 * Added: automatic log cleanup now runs via WP-Cron in Free (previously manual clear only); retention configurable 7-90 days
