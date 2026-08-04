@@ -646,8 +646,21 @@ class Wpbyem_Endpoint_Manager {
 		$sanitized = array();
 		foreach ( $input as $endpoint ) {
 			$endpoint = trim( (string) $endpoint );
-			// Allowlist characters valid in REST route patterns, including regex named-group syntax (<>).
-			if ( ! empty( $endpoint ) && preg_match( '#^[a-zA-Z0-9/_\-\.\(\)\?\<\>\[\]\+\*\^\$\{\}\|\\\\: ]+$#', $endpoint ) ) {
+
+			if ( '' === $endpoint || strlen( $endpoint ) > 500 ) {
+				continue;
+			}
+
+			// Validate the pattern compiles as a regex rather than allowlisting characters —
+			// REST route patterns can legitimately contain almost any printable character
+			// (e.g. core's global-styles routes use %, @, and " inside character classes).
+			$test_pattern = '#^' . $endpoint . '$#';
+			$old_limit    = ini_get( 'pcre.backtrack_limit' );
+			ini_set( 'pcre.backtrack_limit', '1000' ); // phpcs:ignore WordPress.PHP.IniSet.Risky
+			$valid = @preg_match( $test_pattern, '' ) !== false;
+			ini_set( 'pcre.backtrack_limit', $old_limit ); // phpcs:ignore WordPress.PHP.IniSet.Risky
+
+			if ( $valid ) {
 				$sanitized[] = $endpoint;
 			}
 		}

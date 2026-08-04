@@ -67,13 +67,13 @@ $log_retention     = isset( $settings['log_retention_days'] ) ? (int) $settings[
 
 	<div id="wpbyem-tab-export-import" class="wpbyem-tab-panel" role="tabpanel" hidden>
 		<h2><?php esc_html_e( 'Export Configuration', 'wpbuoy-endpoint-manager' ); ?></h2>
-		<p><?php esc_html_e( 'Choose what to include, then download as a JSON file.', 'wpbuoy-endpoint-manager' ); ?></p>
+		<p><?php esc_html_e( 'What to export', 'wpbuoy-endpoint-manager' ); ?></p>
 		<form action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" method="get">
 			<input type="hidden" name="page" value="wpbyem-settings">
 			<input type="hidden" name="action" value="export_config">
 			<?php wp_nonce_field( 'wpbyem_export_config', '_wpnonce', false ); ?>
 			<fieldset>
-				<legend><?php esc_html_e( 'What to export', 'wpbuoy-endpoint-manager' ); ?></legend>
+				<legend class="screen-reader-text"><?php esc_html_e( 'What to export', 'wpbuoy-endpoint-manager' ); ?></legend>
 				<p>
 					<label>
 						<input type="checkbox" name="sections[]" value="endpoints" checked>
@@ -96,9 +96,10 @@ $log_retention     = isset( $settings['log_retention_days'] ) ? (int) $settings[
 		<p><?php esc_html_e( 'Upload a previously exported JSON file. This replaces the Blocked Endpoints and Settings on this site with the contents of the file — intended for moving configuration from one WordPress install to another.', 'wpbuoy-endpoint-manager' ); ?></p>
 		<form action="<?php echo esc_url( admin_url( 'admin.php?page=wpbyem-settings' ) ); ?>" method="post" enctype="multipart/form-data">
 			<?php wp_nonce_field( 'wpbyem_import_config', 'wpbyem_import_nonce' ); ?>
-			<p><input type="file" name="wpbyem_import_file" accept="application/json" required></p>
+			<input type="hidden" name="wpbyem_import_submit" value="1">
+			<input type="file" id="wpbyem-import-file" class="wpbyem-import-file" name="wpbyem_import_file" accept="application/json" required>
 			<p class="wpbyem-eim-submit">
-				<button type="submit" class="button button-primary" name="wpbyem_import_submit" value="1">
+				<button type="button" class="button button-primary" id="wpbyem-import-trigger">
 					<?php esc_html_e( 'Import Configuration', 'wpbuoy-endpoint-manager' ); ?>
 				</button>
 			</p>

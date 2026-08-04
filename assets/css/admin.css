@@ -418,7 +418,11 @@
 /* Settings page specific styles */
 
 .wpbyem-footer {
+	position: sticky;
+	bottom: 0;
+	z-index: 20;
 	padding: 16px 0;
+	background: #f0f0f1; /* WordPress admin content background */
 }
 .wpbyem-footer .submit {
 	margin: 0;
@@ -1514,4 +1518,8 @@ button[disabled] {
 
 #wpbyem-tab-export-import .wpbyem-eim-submit {
 	margin: 0;
+}
+
+.wpbyem-import-file {
+	display: none;
 }

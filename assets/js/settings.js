@@ -9,6 +9,7 @@
 
 	document.addEventListener('DOMContentLoaded', function () {
 		initTabs();
+		initImportUpload();
 	});
 
 	function initTabs() {
@@ -36,6 +37,27 @@
 				var panel = document.getElementById('wpbyem-tab-' + target);
 				if (panel) panel.hidden = false;
 			});
+		});
+	}
+
+	/**
+	 * The import file input is hidden — clicking the visible "Import Configuration"
+	 * button opens the file picker, and choosing a file submits the form immediately.
+	 */
+	function initImportUpload() {
+		var trigger    = document.getElementById('wpbyem-import-trigger');
+		var fileInput  = document.getElementById('wpbyem-import-file');
+
+		if (!trigger || !fileInput) return;
+
+		trigger.addEventListener('click', function () {
+			fileInput.click();
+		});
+
+		fileInput.addEventListener('change', function () {
+			if (fileInput.files.length) {
+				fileInput.form.submit();
+			}
 		});
 	}
 })();
