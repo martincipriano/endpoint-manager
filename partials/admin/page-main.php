@@ -18,8 +18,6 @@ if ( ! defined( 'WPINC' ) ) {
 		wpbyem()->render_endpoints_field();
 		?>
 
-		<hr>
-
 		<div class="wpbyem-footer">
 			<?php submit_button( __( 'Save Changes', 'wpbuoy-endpoint-manager' ), 'primary', 'submit', true ); ?>
 		</div>

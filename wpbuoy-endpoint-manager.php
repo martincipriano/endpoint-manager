@@ -21,18 +21,10 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Block activation when Pro is already active; create logs table.
+// Create logs table on activation.
 register_activation_hook(
 	__FILE__,
 	function () {
-		if ( defined( 'WPBYEM_PRO' ) || in_array( 'endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
-			wp_die(
-				esc_html__( 'WPBuoy Endpoint Manager cannot be activated while the Pro version is active.', 'wpbuoy-endpoint-manager' ),
-				esc_html__( 'Plugin Activation Error', 'wpbuoy-endpoint-manager' ),
-				array( 'back_link' => true )
-			);
-		}
-
 		global $wpdb;
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		$charset_collate = $wpdb->get_charset_collate();
@@ -50,41 +42,8 @@ register_activation_hook(
 	}
 );
 
-// If Pro is active, go dormant — Pro handles everything.
-if ( defined( 'WPBYEM_PRO' ) ) {
-	add_action(
-		'admin_init',
-		function () {
-			deactivate_plugins( plugin_basename( __FILE__ ) );
-		}
-	);
-	add_action(
-		'admin_notices',
-		function () {
-			echo '<div class="notice notice-warning is-dismissible"><p>' .
-				esc_html__( 'WPBuoy Endpoint Manager (free) has been automatically deactivated because the Pro version is active.', 'wpbuoy-endpoint-manager' ) .
-			'</p></div>';
-		}
-	);
-	return;
-}
-
-// Safety net: deactivate free if pro is in the active plugins list.
-if ( in_array( 'endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
-	add_action(
-		'admin_init',
-		function () {
-			deactivate_plugins( plugin_basename( __FILE__ ) );
-		}
-	);
-	add_action(
-		'admin_notices',
-		function () {
-			echo '<div class="notice notice-warning is-dismissible"><p>' .
-				esc_html__( 'WPBuoy Endpoint Manager (free) has been automatically deactivated because the Pro version is active.', 'wpbuoy-endpoint-manager' ) .
-			'</p></div>';
-		}
-	);
+// If Pro is active, stay dormant — Pro handles everything.
+if ( defined( 'WPBYEM_PRO' ) || in_array( 'wpbuoy-endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php', (array) get_option( 'active_plugins', array() ), true ) ) {
 	return;
 }
 
@@ -163,7 +122,54 @@ class Wpbyem_Endpoint_Manager {
 		add_action( 'admin_init', array( $this, 'handle_encoded_form_submission' ), 5 );
 		add_action( 'admin_init', array( $this, 'handle_clear_logs' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_init', array( $this, 'maybe_export_config' ) );
+		add_action( 'admin_init', array( $this, 'maybe_import_config' ) );
+		add_action( 'admin_notices', array( $this, 'maybe_show_import_notice' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
+
+		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
+
+		// Schedule log cleanup.
+		add_action( 'wp', array( $this, 'schedule_log_cleanup' ) );
+		add_action( 'wpbyem_cleanup_logs', array( $this, 'cleanup_old_logs' ) );
+	}
+
+	/**
+	 * Plugin deactivation handler.
+	 */
+	public function plugin_deactivation() {
+		wp_clear_scheduled_hook( 'wpbyem_cleanup_logs' );
+	}
+
+	/**
+	 * Schedule log cleanup if not already scheduled.
+	 */
+	public function schedule_log_cleanup() {
+		if ( ! wp_next_scheduled( 'wpbyem_cleanup_logs' ) ) {
+			wp_schedule_event( time(), 'daily', 'wpbyem_cleanup_logs' );
+		}
+	}
+
+	/**
+	 * Delete logs older than the configured retention period.
+	 */
+	public function cleanup_old_logs() {
+		global $wpdb;
+
+		$settings       = get_option( 'wpbyem_rate_limit_settings', array() );
+		$retention_days = isset( $settings['log_retention_days'] ) ? (int) $settings['log_retention_days'] : 30;
+		if ( ! in_array( $retention_days, array( 7, 14, 30, 60, 90 ), true ) ) {
+			$retention_days = 30;
+		}
+
+		$table    = $wpdb->prefix . 'wpbyem_logs';
+		$cutoff   = gmdate( 'Y-m-d H:i:s', strtotime( "-{$retention_days} days" ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $table is a prefixed table name, never user input
+		$wpdb->query( $wpdb->prepare(
+			"DELETE FROM $table WHERE blocked_at < %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$cutoff
+		) );
 	}
 
 	/**
@@ -199,14 +205,25 @@ class Wpbyem_Endpoint_Manager {
 		);
 
 		$rate_settings = get_option( 'wpbyem_rate_limit_settings', array() );
+		$exclude_roles = isset( $rate_settings['exclude_roles_endpoints'] ) ? (array) $rate_settings['exclude_roles_endpoints'] : array( 'administrator' );
 		wp_localize_script(
 			'wpbyem-admin',
 			'wpbyemData',
 			array(
-				'settingsUrl'           => esc_url( admin_url( 'admin.php?page=wpbyem-settings' ) ),
-				'excludeAdminsEndpoints' => ! isset( $rate_settings['exclude_admins_endpoints'] ) || ! empty( $rate_settings['exclude_admins_endpoints'] ),
+				'settingsUrl'            => esc_url( admin_url( 'admin.php?page=wpbyem-settings' ) ),
+				'excludeAdminsEndpoints' => $this->user_has_bypass_role( $exclude_roles ),
 			)
 		);
+
+		if ( 'endpoints_page_wpbyem-settings' === $hook ) {
+			wp_enqueue_script(
+				'wpbyem-settings',
+				plugin_dir_url( __FILE__ ) . 'assets/js/settings.js',
+				array(),
+				WPBYEM_VERSION,
+				true
+			);
+		}
 	}
 
 	/**
@@ -366,6 +383,173 @@ class Wpbyem_Endpoint_Manager {
 	}
 
 	/**
+	 * Handle configuration export request, before any HTML is output.
+	 */
+	public function maybe_export_config() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- verified below
+		if ( ! isset( $_GET['page'] ) || 'wpbyem-settings' !== $_GET['page'] || ! isset( $_GET['action'] ) || 'export_config' !== $_GET['action'] ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpbyem_export_config' ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'wpbuoy-endpoint-manager' ) );
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to do this.', 'wpbuoy-endpoint-manager' ) );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above
+		$sections = isset( $_GET['sections'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_GET['sections'] ) ) : array( 'endpoints', 'settings' );
+		$sections = array_intersect( $sections, array( 'endpoints', 'settings' ) );
+		if ( empty( $sections ) ) {
+			$sections = array( 'endpoints', 'settings' );
+		}
+
+		$settings = get_option( 'wpbyem_rate_limit_settings', array() );
+
+		$export = array(
+			'schema_version' => 1,
+			'generated_at'   => gmdate( 'c' ),
+			'site_url'       => home_url(),
+		);
+
+		if ( in_array( 'endpoints', $sections, true ) ) {
+			$export['blocked_endpoints'] = array_values( get_option( 'wpbyem_blocked_endpoints', array() ) );
+		}
+
+		if ( in_array( 'settings', $sections, true ) ) {
+			$export['settings'] = array(
+				'exclude_roles_endpoints' => isset( $settings['exclude_roles_endpoints'] ) ? array_values( (array) $settings['exclude_roles_endpoints'] ) : array(),
+				'log_retention_days'      => isset( $settings['log_retention_days'] ) ? (int) $settings['log_retention_days'] : 30,
+			);
+		}
+
+		nocache_headers();
+		header( 'Content-Type: application/json; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="wpbyem-config-' . gmdate( 'Y-m-d' ) . '.json"' );
+		echo wp_json_encode( $export, JSON_PRETTY_PRINT );
+		exit;
+	}
+
+	/**
+	 * Handle configuration import upload.
+	 */
+	public function maybe_import_config() {
+		if ( ! isset( $_POST['wpbyem_import_submit'] ) ) {
+			return;
+		}
+
+		if ( ! isset( $_POST['wpbyem_import_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wpbyem_import_nonce'] ) ), 'wpbyem_import_config' ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'wpbuoy-endpoint-manager' ) );
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to do this.', 'wpbuoy-endpoint-manager' ) );
+		}
+
+		$redirect = admin_url( 'admin.php?page=wpbyem-settings' );
+
+		if ( empty( $_FILES['wpbyem_import_file']['tmp_name'] ) || UPLOAD_ERR_OK !== $_FILES['wpbyem_import_file']['error'] ) {
+			$this->set_import_notice( __( 'Import failed: no file was uploaded, or the upload failed.', 'wpbuoy-endpoint-manager' ), 'error' );
+			wp_safe_redirect( $redirect );
+			exit;
+		}
+
+		$tmp_name = $_FILES['wpbyem_import_file']['tmp_name'];
+		if ( ! is_uploaded_file( $tmp_name ) || filesize( $tmp_name ) > 2 * MB_IN_BYTES ) {
+			$this->set_import_notice( __( 'Import failed: invalid or oversized upload.', 'wpbuoy-endpoint-manager' ), 'error' );
+			wp_safe_redirect( $redirect );
+			exit;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_get_contents -- reading a validated PHP upload tmp file, not a remote/user-supplied path
+		$data = json_decode( file_get_contents( $tmp_name ), true );
+
+		if ( ! is_array( $data ) || ! isset( $data['schema_version'] ) ) {
+			$this->set_import_notice( __( 'Import failed: file is not a recognized WPBuoy Endpoint Manager export.', 'wpbuoy-endpoint-manager' ), 'error' );
+			wp_safe_redirect( $redirect );
+			exit;
+		}
+
+		$imported_count = 0;
+		$skipped_count  = 0;
+
+		if ( isset( $data['blocked_endpoints'] ) && is_array( $data['blocked_endpoints'] ) ) {
+			$known_routes = array();
+			foreach ( $this->get_rest_routes() as $routes ) {
+				$known_routes = array_merge( $known_routes, array_keys( $routes ) );
+			}
+
+			$candidates = $this->sanitize_endpoints( $data['blocked_endpoints'] );
+			$valid      = array_values( array_intersect( $candidates, $known_routes ) );
+			$imported_count = count( $valid );
+			$skipped_count  = count( $data['blocked_endpoints'] ) - $imported_count;
+
+			update_option( 'wpbyem_blocked_endpoints', $valid );
+		}
+
+		if ( isset( $data['settings'] ) && is_array( $data['settings'] ) ) {
+			$valid_roles = array_keys( wp_roles()->roles );
+
+			$new_settings = array(
+				'exclude_roles_endpoints' => isset( $data['settings']['exclude_roles_endpoints'] ) && is_array( $data['settings']['exclude_roles_endpoints'] )
+					? array_values( array_intersect( $data['settings']['exclude_roles_endpoints'], $valid_roles ) )
+					: array(),
+			);
+
+			$retention = isset( $data['settings']['log_retention_days'] ) ? (int) $data['settings']['log_retention_days'] : null;
+			$new_settings['log_retention_days'] = in_array( $retention, array( 7, 14, 30, 60, 90 ), true ) ? $retention : 30;
+
+			// Bypass the registered sanitize_option filter — it expects raw settings-form
+			// input (e.g. an 'exclude_admins_endpoints' checkbox key), not this already-built shape.
+			remove_filter( 'sanitize_option_wpbyem_rate_limit_settings', array( $this, 'sanitize_admin_bypass_settings' ) );
+			update_option( 'wpbyem_rate_limit_settings', $new_settings );
+		}
+
+		$message = sprintf(
+			/* translators: 1: number of endpoints imported, 2: number skipped */
+			__( 'Import complete. %1$d blocked endpoint(s) imported, %2$d skipped (not found on this site).', 'wpbuoy-endpoint-manager' ),
+			$imported_count,
+			$skipped_count
+		);
+		$this->set_import_notice( $message, 'updated' );
+
+		wp_safe_redirect( $redirect );
+		exit;
+	}
+
+	/**
+	 * Store a one-time admin notice to display after an import redirect.
+	 *
+	 * @param string $message Notice text.
+	 * @param string $type    'updated' or 'error'.
+	 */
+	private function set_import_notice( $message, $type ) {
+		set_transient( 'wpbyem_import_notice_' . get_current_user_id(), array(
+			'message' => $message,
+			'type'    => $type,
+		), MINUTE_IN_SECONDS );
+	}
+
+	/**
+	 * Display the one-time import notice, if any.
+	 */
+	public function maybe_show_import_notice() {
+		$key    = 'wpbyem_import_notice_' . get_current_user_id();
+		$notice = get_transient( $key );
+		if ( ! $notice ) {
+			return;
+		}
+		delete_transient( $key );
+		printf(
+			'<div class="notice %1$s is-dismissible"><p>%2$s</p></div>',
+			'error' === $notice['type'] ? 'notice-error' : 'notice-success',
+			esc_html( $notice['message'] )
+		);
+	}
+
+	/**
 	 * Register plugin settings.
 	 */
 	public function register_settings() {
@@ -407,16 +591,45 @@ class Wpbyem_Endpoint_Manager {
 	}
 
 	/**
-	 * Sanitize admin bypass settings.
-	 * Only touches exclude_admins_endpoints — preserves any Pro keys already in the option.
+	 * Sanitize admin bypass and log retention settings.
+	 * Only touches exclude_roles_endpoints and log_retention_days — preserves any Pro keys already in the option.
 	 *
 	 * @param array $input Raw input.
 	 * @return array
 	 */
 	public function sanitize_admin_bypass_settings( $input ) {
-		$existing                              = get_option( 'wpbyem_rate_limit_settings', array() );
-		$existing['exclude_admins_endpoints']  = ! empty( $input['exclude_admins_endpoints'] );
+		$existing                            = get_option( 'wpbyem_rate_limit_settings', array() );
+		$existing['exclude_roles_endpoints'] = ! empty( $input['exclude_admins_endpoints'] ) ? array( 'administrator' ) : array();
+		unset( $existing['exclude_admins_endpoints'] );
+
+		$retention_days                 = isset( $input['log_retention_days'] ) ? (int) $input['log_retention_days'] : 30;
+		$existing['log_retention_days'] = in_array( $retention_days, array( 7, 14, 30, 60, 90 ), true ) ? $retention_days : 30;
+
 		return $existing;
+	}
+
+	/**
+	 * Check whether the current user holds any of the given excluded roles.
+	 *
+	 * wp_validate_auth_cookie() reads the cookie directly so browser-based REST
+	 * requests without a nonce are still recognised as the logged-in user.
+	 *
+	 * @param array $excluded_roles Role slugs excluded from the rule being checked.
+	 * @return bool
+	 */
+	private function user_has_bypass_role( $excluded_roles ) {
+		if ( empty( $excluded_roles ) ) {
+			return false;
+		}
+		$user_id = wp_validate_auth_cookie( '', 'logged_in' ) ?: get_current_user_id();
+		if ( ! $user_id ) {
+			return false;
+		}
+		$user = get_userdata( $user_id );
+		if ( ! $user ) {
+			return false;
+		}
+		return (bool) array_intersect( $excluded_roles, (array) $user->roles );
 	}
 
 	/**
@@ -785,14 +998,11 @@ class Wpbyem_Endpoint_Manager {
 			return $result;
 		}
 
-		// When "Exclude admins from blocked endpoints" is on (default), admins bypass enforcement.
-		$settings          = get_option( 'wpbyem_rate_limit_settings', array() );
-		$exclude_endpoints = ! isset( $settings['exclude_admins_endpoints'] ) || ! empty( $settings['exclude_admins_endpoints'] );
-		if ( $exclude_endpoints ) {
-			$user_id = wp_validate_auth_cookie( '', 'logged_in' ) ?: get_current_user_id();
-			if ( $user_id && user_can( $user_id, 'manage_options' ) ) {
-				return $result;
-			}
+		// Selected roles bypass endpoint blocking entirely.
+		$settings      = get_option( 'wpbyem_rate_limit_settings', array() );
+		$exclude_roles = isset( $settings['exclude_roles_endpoints'] ) ? (array) $settings['exclude_roles_endpoints'] : array( 'administrator' );
+		if ( $this->user_has_bypass_role( $exclude_roles ) ) {
+			return $result;
 		}
 
 		$blocked_endpoints = get_option( 'wpbyem_blocked_endpoints', array() );

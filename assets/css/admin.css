@@ -1201,29 +1201,31 @@ button[disabled] {
 }
 
 /* Pro upgrade banner */
-.wpbyem-upgrade-banner {
+.wpby-upgrade-banner {
 	color: #fff;
 	margin: 0;
+	margin-top: 16px;
+	padding: 0 16px;
 	background: linear-gradient(135deg, #03142D, #02557C);
 }
-.wpbyem-upgrade-banner__wrap {
+.wpby-upgrade-banner__wrap {
 	margin: 0 auto;
 	max-width: 1024px;
 }
-.wpbyem-upgrade-banner__grid {
+.wpby-upgrade-banner__grid {
 	display: grid;
-	grid-template-columns: 30% 70%;
+	grid-template-columns: 3fr 7fr;
 	gap: 40px;
 	padding: 64px 0;
 }
 
-.wpbyem-upgrade-value-prop {
+.wpby-upgrade-value-prop {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 }
 
-.wpbyem-upgrade-banner__heading {
+.wpby-upgrade-banner__heading {
 	color: #fff;
 	font-size: 24px;
 	font-weight: 600;
@@ -1231,53 +1233,53 @@ button[disabled] {
 	margin: 0 0 16px;
 }
 
-.wpbyem-upgrade-banner__desc {
+.wpby-upgrade-banner__desc {
 	font-size: 16px;
 	margin: 0 0 24px;
 }
 
-.wpbyem-upgrade-banner__ctas {
+.wpby-upgrade-banner__ctas {
 	display: flex;
 	gap: 16px;
 	justify-content: start;
 }
 
-.wpbyem-upgrade-banner__ctas .button:first-child {
+.wpby-upgrade-banner__ctas .button:first-child {
 	background: transparent;
 	border-color: #fff;
 	color: #fff;
 }
 
-.wpbyem-upgrade-banner__ctas .button:last-child {
+.wpby-upgrade-banner__ctas .button:last-child {
 	background-color: #4F46E5;
 	border-color: #4F46E5;
 	color: #fff;
 }
 
-.wpbyem-upgrade-features {
+.wpby-upgrade-features {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 }
 
-.wpbyem-upgrade-banner__features {
+.wpby-upgrade-banner__features {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	text-align: left;
 }
-.wpbyem-upgrade-banner__features li {
+.wpby-upgrade-banner__features li {
 	font-size: 16px;
 	line-height: 24px;
 	margin-bottom: 16px;
 	padding: 0 0 0 32px;
 	position: relative;
 }
-.wpbyem-upgrade-banner__features li:last-child {
+.wpby-upgrade-banner__features li:last-child {
 	margin-bottom: 0;
 }
 
-.wpbyem-upgrade-banner__features li::before {
+.wpby-upgrade-banner__features li::before {
 	background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="%23e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/></svg>');
 	background-size: 100%;
 	content: '';
@@ -1288,23 +1290,23 @@ button[disabled] {
 	width: 24px;
 }
 
-.wpbyem-upgrade-banner__footer {
+.wpby-upgrade-banner__footer {
 	border-top: 1px solid rgba(255,255,255,.25);
 	padding: 16px 0;
 }
 
-.wpbyem-upgrade-banner__footer p {
+.wpby-upgrade-banner__footer p {
 	color: rgba(255, 255, 255, .5);
 	font-size: 14px;
 	margin: 0;
 }
 
-.wpbyem-upgrade-banner__footer a {
+.wpby-upgrade-banner__footer a {
 	color: rgba(255, 255, 255, .5);
 	text-decoration: underline;
 }
 
-.wpbyem-upgrade-banner__footer a:hover {
+.wpby-upgrade-banner__footer a:hover {
 	color: #fff;
 }
 
@@ -1450,4 +1452,66 @@ button[disabled] {
 
 .wpb-emp-preview-actions .button-link:hover {
 	color: #2271b1;
+}
+
+/* Settings page tabs */
+.wpbyem-settings-tabs {
+	border-bottom: 1px solid #c3c4c7;
+	display: flex;
+	gap: 0;
+	margin: 12px 0 0;
+	padding: 0;
+}
+
+.wpbyem-tab-button {
+	background: none;
+	border: 1px solid transparent;
+	border-bottom: none;
+	border-radius: 3px 3px 0 0;
+	color: #50575e;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 500;
+	margin-bottom: -1px;
+	padding: 15px 20px;
+	transition: color 0.15s ease;
+}
+
+.wpbyem-tab-button:hover {
+	color: #1d2327;
+}
+
+.wpbyem-tab-button:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+}
+
+.wpbyem-tab-button.active {
+	background: #fafafa;
+	border-color: #c3c4c7;
+	border-bottom-color: #fafafa;
+	color: #1d2327;
+}
+
+.wpbyem-tab-panel {
+	background: #fafafa;
+	border-bottom: 1px solid #c3c4c7;
+	border-left: 1px solid #c3c4c7;
+	border-right: 1px solid #c3c4c7;
+	padding: 20px;
+}
+
+/* Export/Import tab */
+#wpbyem-tab-export-import hr {
+	margin: 24px 0;
+}
+
+#wpbyem-tab-export-import fieldset p {
+	margin-top: 0;
+	margin-bottom: 16px;
+}
+
+#wpbyem-tab-export-import .wpbyem-eim-submit {
+	margin: 0;
 }
