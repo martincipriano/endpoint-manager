@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 2.3.0\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 2.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-04T07:02:20+00:00\n"
+"POT-Creation-Date: 2026-08-04T09:20:35+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
@@ -31,7 +31,7 @@ msgstr ""
 
 #. Author of the plugin
 #: wpbuoy-endpoint-manager.php
-#: partials/admin/page-settings.php:132
+#: partials/admin/page-settings.php:133
 #: partials/admin/upgrade-banner.php:57
 msgid "WPBuoy"
 msgstr ""
@@ -287,9 +287,6 @@ msgid "Export Configuration"
 msgstr ""
 
 #: partials/admin/page-settings.php:70
-msgid "Choose what to include, then download as a JSON file."
-msgstr ""
-
 #: partials/admin/page-settings.php:76
 msgid "What to export"
 msgstr ""
@@ -307,7 +304,7 @@ msgid "Export Configuration (JSON)"
 msgstr ""
 
 #: partials/admin/page-settings.php:95
-#: partials/admin/page-settings.php:102
+#: partials/admin/page-settings.php:103
 msgid "Import Configuration"
 msgstr ""
 
@@ -315,45 +312,45 @@ msgstr ""
 msgid "Upload a previously exported JSON file. This replaces the Blocked Endpoints and Settings on this site with the contents of the file — intended for moving configuration from one WordPress install to another."
 msgstr ""
 
-#: partials/admin/page-settings.php:112
+#: partials/admin/page-settings.php:113
 msgid "Fine-tune how your REST API handles threats"
 msgstr ""
 
-#: partials/admin/page-settings.php:113
+#: partials/admin/page-settings.php:114
 msgid "Set rate limits, configure auto-blocking thresholds, manage your IP allowlist, and control exactly what blocked endpoints return."
 msgstr ""
 
-#: partials/admin/page-settings.php:115
+#: partials/admin/page-settings.php:116
 msgid "Learn More"
 msgstr ""
 
-#: partials/admin/page-settings.php:116
+#: partials/admin/page-settings.php:117
 #: partials/admin/upgrade-banner.php:42
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: partials/admin/page-settings.php:121
-#: wpbuoy-endpoint-manager.php:1066
+#: partials/admin/page-settings.php:122
+#: wpbuoy-endpoint-manager.php:1079
 msgid "Block any REST API endpoint with a configurable response code and message"
 msgstr ""
 
-#: partials/admin/page-settings.php:122
-#: wpbuoy-endpoint-manager.php:1067
+#: partials/admin/page-settings.php:123
+#: wpbuoy-endpoint-manager.php:1080
 msgid "Rate limiting — global and per-endpoint request thresholds"
 msgstr ""
 
-#: partials/admin/page-settings.php:123
-#: wpbuoy-endpoint-manager.php:1068
+#: partials/admin/page-settings.php:124
+#: wpbuoy-endpoint-manager.php:1081
 msgid "IP Block List — manual blocks, auto-block, and allowlist"
 msgstr ""
 
-#: partials/admin/page-settings.php:124
-#: wpbuoy-endpoint-manager.php:1069
+#: partials/admin/page-settings.php:125
+#: wpbuoy-endpoint-manager.php:1082
 msgid "Endpoint preview — inspect live API responses in an inline modal"
 msgstr ""
 
-#: partials/admin/page-settings.php:125
-#: wpbuoy-endpoint-manager.php:1070
+#: partials/admin/page-settings.php:126
+#: wpbuoy-endpoint-manager.php:1083
 msgid "Intuitive admin UI — namespace accordion, live search, and multi-criteria filters"
 msgstr ""
 
@@ -551,19 +548,19 @@ msgstr ""
 msgid "Manage Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:671
-#: wpbuoy-endpoint-manager.php:1119
+#: wpbuoy-endpoint-manager.php:684
+#: wpbuoy-endpoint-manager.php:1132
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1043
+#: wpbuoy-endpoint-manager.php:1056
 msgid "This REST API endpoint has been disabled."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1063
+#: wpbuoy-endpoint-manager.php:1076
 msgid "Keep your REST API protected with IP blocking"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1064
+#: wpbuoy-endpoint-manager.php:1077
 msgid "Block malicious IPs, auto-block repeat offenders, and maintain an allowlist for trusted sources — all from one place."
 msgstr ""
