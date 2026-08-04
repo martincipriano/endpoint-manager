@@ -109,6 +109,12 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 
 == Changelog ==
 
+= 2.3.0 =
+* Added: Export/Import Configuration tab — export blocked endpoints and settings as JSON, import with route validation and a skip-count summary
+* Added: automatic log cleanup now runs via WP-Cron in Free (previously manual clear only); retention configurable 7-90 days
+* Changed: Admin Bypass generalized to a role-based bypass list (previously administrator-only)
+* Fixed: dormant-mode Pro-detection now checks the correct Pro plugin path
+
 = 2.2.0 =
 * Added: namespace bulk-toggle switch to block or unblock every endpoint in a namespace at once
 * Added: visual indent and tree connector lines to group endpoints under their namespace
