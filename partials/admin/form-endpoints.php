@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 			</div>
 		</div>
 
-		<div class="control-group">
+		<div class="control-group" data-filter-key="status">
 			<label for="status-filter"><?php esc_html_e( 'Status', 'wpbuoy-endpoint-manager' ); ?></label>
 			<select id="status-filter" class="rest-api-filter-select">
 				<option value="all"><?php esc_html_e( 'Show All', 'wpbuoy-endpoint-manager' ); ?></option>
@@ -34,7 +34,7 @@ if ( ! defined( 'WPINC' ) ) {
 			</select>
 		</div>
 
-		<div class="control-group">
+		<div class="control-group" data-filter-key="type">
 			<label for="type-filter"><?php esc_html_e( 'Type', 'wpbuoy-endpoint-manager' ); ?></label>
 			<select id="type-filter" class="rest-api-filter-select">
 				<option value="all"><?php esc_html_e( 'All Types', 'wpbuoy-endpoint-manager' ); ?></option>
@@ -43,7 +43,7 @@ if ( ! defined( 'WPINC' ) ) {
 			</select>
 		</div>
 
-		<div class="control-group">
+		<div class="control-group" data-filter-key="method">
 			<label for="method-filter"><?php esc_html_e( 'Method', 'wpbuoy-endpoint-manager' ); ?></label>
 			<select id="method-filter" class="rest-api-filter-select">
 				<option value="all"><?php esc_html_e( 'All Methods', 'wpbuoy-endpoint-manager' ); ?></option>
@@ -53,13 +53,22 @@ if ( ! defined( 'WPINC' ) ) {
 			</select>
 		</div>
 
-		<div class="control-group">
+		<div class="control-group" data-filter-key="namespace">
 			<label for="namespace-filter"><?php esc_html_e( 'Namespace', 'wpbuoy-endpoint-manager' ); ?></label>
 			<select id="namespace-filter" class="rest-api-filter-select">
 				<option value="all"><?php esc_html_e( 'All Namespaces', 'wpbuoy-endpoint-manager' ); ?></option>
 				<?php foreach ( $namespaces as $em_namespace_option ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 					<option value="<?php echo esc_attr( $em_namespace_option ); ?>"><?php echo esc_html( $em_namespace_option ); ?></option>
 				<?php endforeach; ?>
+			</select>
+		</div>
+
+		<div class="control-group" data-filter-key="restricted" style="display:none">
+			<label for="restricted-filter"><?php esc_html_e( 'Restricted', 'wpbuoy-endpoint-manager' ); ?></label>
+			<select id="restricted-filter" class="rest-api-filter-select">
+				<option value="all"><?php esc_html_e( 'All Endpoints', 'wpbuoy-endpoint-manager' ); ?></option>
+				<option value="restricted"><?php esc_html_e( 'Restricted Only', 'wpbuoy-endpoint-manager' ); ?></option>
+				<option value="unrestricted"><?php esc_html_e( 'Not Restricted', 'wpbuoy-endpoint-manager' ); ?></option>
 			</select>
 		</div>
 
@@ -146,6 +155,9 @@ if ( ! defined( 'WPINC' ) ) {
 							<?php endforeach; ?>
 						</span>
 					</div>
+				<button type="button" class="route-stats-toggle" disabled data-tooltip="<?php esc_attr_e( 'Activity (Pro)', 'wpbuoy-endpoint-manager' ); ?>" aria-label="<?php esc_attr_e( 'Activity (Pro)', 'wpbuoy-endpoint-manager' ); ?>">
+					<svg width="24px" height="24px" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M80-600v-160q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v160h-80v-160H160v160H80Zm80 360q-33 0-56.5-23.5T80-320v-200h80v200h640v-200h80v200q0 33-23.5 56.5T800-240H160ZM40-120v-80h880v80H40Zm440-420ZM80-520v-80h240q11 0 21 6t15 16l47 93 123-215q5-9 14-14.5t20-5.5q11 0 21 5.5t15 16.5l49 98h235v80H620q-11 0-21-5.5T584-542l-26-53-123 215q-5 10-15 15t-21 5q-11 0-20.5-6T364-382l-69-138H80Z" fill="currentColor" fill-rule="nonzero"/></svg>
+				</button>
 				<button type="button" class="route-rate-limit-toggle" disabled data-tooltip="<?php esc_attr_e( 'Rate Limit (Pro)', 'wpbuoy-endpoint-manager' ); ?>" aria-label="<?php esc_attr_e( 'Rate Limit (Pro)', 'wpbuoy-endpoint-manager' ); ?>">
 					<svg width="24px" height="19px" viewBox="0 0 24 19" xmlns="http://www.w3.org/2000/svg"><path d="M11.9692485,14.3792 C12.6759596,14.3564 13.1945723,14.1006389 13.5250866,13.6119167 L20.3796792,3.65401667 L10.42541,10.5035167 C9.93005958,10.8349611 9.66249037,11.3444778 9.62270235,12.0320667 C9.58312484,12.7198667 9.78753845,13.2887056 10.2359432,13.7385833 C10.6845584,14.18825 11.2623269,14.4017889 11.9692485,14.3792 Z M11.9995632,0 C13.2012037,0 14.3270574,0.157911111 15.3771245,0.473733333 C16.427402,0.789555556 17.4415756,1.26740556 18.4196453,1.90728333 L16.6389733,3.06185 C15.9200521,2.67868333 15.174816,2.38925 14.4032652,2.19355 C13.6315038,1.99785 12.8302698,1.9 11.9995632,1.9 C9.19966511,1.9 6.81554138,2.88694444 4.84719197,4.86083333 C2.87884257,6.83472222 1.89466787,9.22555556 1.89466787,12.0333333 C1.89466787,12.92 2.0157161,13.7961111 2.25781255,14.6616667 C2.499909,15.5272222 2.84200181,16.34 3.28409098,17.1 L20.7150354,17.1 C21.1992283,16.2977778 21.5518471,15.4638889 21.7728916,14.5983333 C21.9939362,13.7327778 22.1044585,12.8355556 22.1044585,11.9066667 C22.1044585,11.1466667 22.0109882,10.3773778 21.8240477,9.5988 C21.6368966,8.82001111 21.3481703,8.0807 20.9578687,7.38086667 L22.1091952,5.59518333 C22.7327514,6.61991667 23.2004186,7.64507222 23.5121967,8.67065 C23.8237643,9.69622778 23.9860742,10.7619167 23.9991264,11.8677167 C24.011968,13.0142611 23.8832359,14.0977889 23.6129299,15.1183 C23.3424135,16.1390222 22.9351651,17.1373667 22.3911849,18.1133333 C22.2242436,18.3877778 21.9894101,18.6041667 21.6866842,18.7625 C21.3837479,18.9208333 21.059865,19 20.7150354,19 L3.28409098,19 C2.94726114,19 2.62948323,18.9188278 2.33075726,18.7564833 C2.03203129,18.5939278 1.7910927,18.3632889 1.60794147,18.0645667 C1.12543272,17.2201222 0.736815284,16.2993611 0.44208917,15.3022833 C0.147363057,14.3052056 0,13.2155556 0,12.0333333 C0,10.3786444 0.313357014,8.82254444 0.940071043,7.36503333 C1.56678507,5.90752222 2.42138554,4.63188333 3.50387245,3.53811667 C4.58656988,2.44435 5.85978669,1.58122222 7.32352288,0.948733333 C8.78746959,0.316244444 10.3461497,0 11.9995632,0 Z" fill="currentColor" fill-rule="nonzero"/></svg>
 				</button>

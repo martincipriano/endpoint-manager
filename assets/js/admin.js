@@ -14,7 +14,7 @@
         initSaveConfirmation();
         initSearch();
         initFilters();
-        initLogsPage();
+        initFilterVisibility();
         initPreviewModal();
         initDynamicPreviewModal();
     });
@@ -253,11 +253,12 @@
         const methodFilter = document.getElementById('method-filter');
         const typeFilter = document.getElementById('type-filter');
         const namespaceFilter = document.getElementById('namespace-filter');
+        const restrictedFilter = document.getElementById('restricted-filter');
         const clearFiltersButton = document.getElementById('clear-filters');
 
         if (!statusFilter || !namespaceFilter) return;
 
-        [statusFilter, methodFilter, typeFilter, namespaceFilter].forEach(function(filter) {
+        [statusFilter, methodFilter, typeFilter, namespaceFilter, restrictedFilter].forEach(function(filter) {
             if (filter) {
                 filter.addEventListener('change', function() {
                     applyFilters();
@@ -271,6 +272,7 @@
             if (methodFilter) methodFilter.value = 'all';
             if (typeFilter) typeFilter.value = 'all';
             namespaceFilter.value = 'all';
+            if (restrictedFilter) restrictedFilter.value = 'all';
             applyFilters();
             updateClearFiltersButton();
         });
@@ -285,6 +287,7 @@
         const statusFilter = document.getElementById('status-filter');
         const methodFilter = document.getElementById('method-filter');
         const namespaceFilter = document.getElementById('namespace-filter');
+        const restrictedFilter = document.getElementById('restricted-filter');
         const clearFiltersButton = document.getElementById('clear-filters');
         const controlsRow = document.querySelector('.rest-api-controls-row');
 
@@ -292,7 +295,8 @@
         const hasActiveFilters = statusFilter.value !== 'all' ||
                                  (methodFilter && methodFilter.value !== 'all') ||
                                  (typeFilter && typeFilter.value !== 'all') ||
-                                 namespaceFilter.value !== 'all';
+                                 namespaceFilter.value !== 'all' ||
+                                 (restrictedFilter && restrictedFilter.value !== 'all');
 
         if (clearFiltersButton) {
             clearFiltersButton.style.display = hasActiveFilters ? 'block' : 'none';
@@ -308,6 +312,32 @@
     }
 
     /**
+     * Initialize the "Filters" checkboxes in Screen Options (see
+     * render_endpoints_filter_screen_settings() in the main plugin file).
+     * The actual toggle mechanics live in filter-visibility.js, shared with
+     * the Logs page equivalent (logs.js) — this just supplies the
+     * page-specific storage key, control ids, and refresh callback.
+     */
+    function initFilterVisibility() {
+        if (!window.wpbyemInitFilterVisibility) return;
+
+        window.wpbyemInitFilterVisibility({
+            storageKey: 'wpbyem_endpoints_visible_filters',
+            idMap: {
+                status: 'status-filter',
+                type: 'type-filter',
+                method: 'method-filter',
+                namespace: 'namespace-filter',
+                restricted: 'restricted-filter'
+            },
+            onChange: function() {
+                applyFilters();
+                updateClearFiltersButton();
+            }
+        });
+    }
+
+    /**
      * Apply all active filters
      */
     function applyFilters() {
@@ -317,6 +347,7 @@
         const statusFilter = document.getElementById('status-filter');
         const methodFilter = document.getElementById('method-filter');
         const namespaceFilter = document.getElementById('namespace-filter');
+        const restrictedFilter = document.getElementById('restricted-filter');
 
         const typeFilter = document.getElementById('type-filter');
         const filters = {
@@ -324,7 +355,8 @@
             status: statusFilter ? statusFilter.value : 'all',
             method: methodFilter ? methodFilter.value : 'all',
             type: typeFilter ? typeFilter.value : 'all',
-            namespace: namespaceFilter ? namespaceFilter.value : 'all'
+            namespace: namespaceFilter ? namespaceFilter.value : 'all',
+            restricted: restrictedFilter ? restrictedFilter.value : 'all'
         };
 
         performFiltering(filters);
@@ -362,6 +394,7 @@
                 const pathText = routePath.textContent.toLowerCase();
                 const methodsText = (route.getAttribute('data-methods') || '').toLowerCase();
                 const isEnabled = checkbox ? !checkbox.checked : true;
+                const isRestricted = !!route.querySelector('.route-restricted');
 
                 let matches = true;
 
@@ -388,6 +421,11 @@
                     if (routeType !== filters.type) matches = false;
                 }
 
+                if (filters.restricted !== 'all') {
+                    if (filters.restricted === 'restricted' && !isRestricted) matches = false;
+                    if (filters.restricted === 'unrestricted' && isRestricted) matches = false;
+                }
+
                 if (matches) {
                     route.style.display = 'flex';
                     namespaceMatches++;
@@ -407,7 +445,7 @@
                 namespace.style.display = 'block';
                 visibleNamespaces++;
 
-                if (filters.search || filters.status !== 'all' || filters.method !== 'all' || filters.type !== 'all') {
+                if (filters.search || filters.status !== 'all' || filters.method !== 'all' || filters.type !== 'all' || filters.restricted !== 'all') {
                     const header = namespace.querySelector('.namespace-header');
                     const routesContainer = namespace.querySelector('.rest-api-routes');
                     if (header && routesContainer && !header.classList.contains('expanded')) {
@@ -428,7 +466,7 @@
             totalMatches += namespaceMatches;
         });
 
-        const hasActiveFilters = filters.search || filters.status !== 'all' || filters.method !== 'all' || filters.type !== 'all' || filters.namespace !== 'all';
+        const hasActiveFilters = filters.search || filters.status !== 'all' || filters.method !== 'all' || filters.type !== 'all' || filters.namespace !== 'all' || filters.restricted !== 'all';
 
         if (hasActiveFilters) {
             resultsInfo.style.display = 'block';
@@ -485,124 +523,6 @@
      */
     function escapeRegex(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    /**
-     * Initialize logs page filtering
-     */
-    function initLogsPage() {
-        if (!document.getElementById('logs-search')) return;
-
-        var searchInput    = document.getElementById('logs-search');
-        var clearSearch    = document.getElementById('logs-search-clear');
-        var ipFilter       = document.getElementById('logs-ip-filter');
-        var endpointFilter = document.getElementById('logs-endpoint-filter');
-        var dateFrom       = document.getElementById('logs-date-from');
-        var dateTo         = document.getElementById('logs-date-to');
-        var clearFilters   = document.getElementById('logs-clear-filters');
-
-        var searchTimeout;
-
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            clearSearch.style.display = this.value ? 'flex' : 'none';
-            searchTimeout = setTimeout(applyLogsFilters, 300);
-        });
-
-        clearSearch.addEventListener('click', function() {
-            searchInput.value = '';
-            clearSearch.style.display = 'none';
-            applyLogsFilters();
-            searchInput.focus();
-        });
-
-        [ipFilter, endpointFilter, dateFrom, dateTo].forEach(function(el) {
-            if (el) el.addEventListener('change', applyLogsFilters);
-        });
-
-        clearFilters.addEventListener('click', function() {
-            searchInput.value = '';
-            clearSearch.style.display = 'none';
-            if (ipFilter) ipFilter.value = 'all';
-            if (endpointFilter) endpointFilter.value = 'all';
-            if (dateFrom) dateFrom.value = '';
-            if (dateTo) dateTo.value = '';
-            applyLogsFilters();
-        });
-    }
-
-    /**
-     * Apply all active logs filters
-     */
-    function applyLogsFilters() {
-        var searchInput    = document.getElementById('logs-search');
-        var ipFilter       = document.getElementById('logs-ip-filter');
-        var endpointFilter = document.getElementById('logs-endpoint-filter');
-        var dateFrom       = document.getElementById('logs-date-from');
-        var dateTo         = document.getElementById('logs-date-to');
-        var resultsInfo    = document.querySelector('.search-results-info');
-        var resultsCount   = document.querySelector('.search-results-count');
-
-        var search   = searchInput ? searchInput.value.trim().toLowerCase() : '';
-        var ip       = ipFilter ? ipFilter.value : 'all';
-        var endpoint = endpointFilter ? endpointFilter.value : 'all';
-        var from     = dateFrom ? dateFrom.value : '';
-        var to       = dateTo ? dateTo.value : '';
-
-        var rows    = document.querySelectorAll('.wpbuoy-em-logs-table tbody tr[data-timestamp]');
-        var matches = 0;
-
-        rows.forEach(function(row) {
-            var cells       = row.querySelectorAll('td');
-            var rowIp       = cells[1] ? cells[1].textContent.trim() : '';
-            var rowEndpoint = cells[2] ? cells[2].textContent.trim() : '';
-            var rowAgent    = cells[4] ? cells[4].textContent.trim() : '';
-            var timestamp   = row.getAttribute('data-timestamp') || '';
-            var rowDate     = timestamp.substring(0, 10);
-
-            var visible = true;
-
-            if (search) {
-                visible = rowIp.toLowerCase().indexOf(search) !== -1 ||
-                          rowEndpoint.toLowerCase().indexOf(search) !== -1 ||
-                          rowAgent.toLowerCase().indexOf(search) !== -1;
-            }
-
-            if (visible && ip !== 'all') {
-                visible = rowIp === ip;
-            }
-
-            if (visible && endpoint !== 'all') {
-                visible = rowEndpoint === endpoint;
-            }
-
-            if (visible && from) {
-                visible = rowDate >= from;
-            }
-
-            if (visible && to) {
-                visible = rowDate <= to;
-            }
-
-            row.style.display = visible ? '' : 'none';
-            if (visible) matches++;
-        });
-
-        var hasFilters = search || ip !== 'all' || endpoint !== 'all' || from || to;
-
-        if (resultsInfo) {
-            resultsInfo.style.display = hasFilters ? 'block' : 'none';
-        }
-
-        if (resultsCount && hasFilters) {
-            if (matches === 0) {
-                resultsCount.textContent = 'No logs found';
-                resultsCount.className = 'search-results-count no-results';
-            } else {
-                resultsCount.textContent = 'Found ' + matches + ' ' + (matches === 1 ? 'entry' : 'entries');
-                resultsCount.className = 'search-results-count has-results';
-            }
-        }
     }
 
     /**

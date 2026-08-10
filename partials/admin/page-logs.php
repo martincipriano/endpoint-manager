@@ -3,12 +3,19 @@
  * Security Logs admin page.
  *
  * @package WPBuoy_Endpoint_Manager
- * @var array  $logs             Log entries (up to 500, most recent first).
- * @var int    $total            Total number of log entries in the database.
- * @var bool   $cleared          Whether logs were just cleared.
- * @var array  $unique_ips       Unique IP addresses from log set.
- * @var array  $unique_endpoints Unique endpoints from log set.
- * @var string $logs_page_url    Base URL for the logs admin page.
+ * @var array   $logs               Log rows for the current page.
+ * @var int     $total              Total number of log entries in the database.
+ * @var int     $filtered_count     Total logs matching active filters.
+ * @var int     $per_page           Logs per page.
+ * @var int     $paged              Current page number.
+ * @var int     $total_pages        Total number of pages.
+ * @var array   $unique_ips         Unique IP addresses from current log set.
+ * @var array   $unique_endpoints   Unique endpoints from current log set.
+ * @var array   $hidden_columns     Column keys the user has hidden via Screen Options.
+ * @var bool    $has_active_filters Whether any filter is currently active.
+ * @var bool    $cleared            Whether logs were just cleared.
+ * @var array   $filters            Normalized active filter values (see get_logs_filters_from_request()).
+ * @var string  $logs_page_url      Base URL for the logs admin page.
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -24,50 +31,49 @@ if ( ! defined( 'WPINC' ) ) {
 		</div>
 	<?php endif; ?>
 
-	<?php if ( ! empty( $logs ) ) : ?>
+	<?php if ( $total > 0 ) : ?>
 		<div class="rest-api-controls-container">
 			<div class="rest-api-controls-row">
 				<div class="control-group">
 					<label for="logs-search"><?php esc_html_e( 'Search', 'wpbuoy-endpoint-manager' ); ?></label>
 					<div class="rest-api-search-input-wrapper">
-						<input type="text" id="logs-search" class="rest-api-search" placeholder="<?php esc_attr_e( 'Search IP, endpoint, user agent...', 'wpbuoy-endpoint-manager' ); ?>">
+						<input type="text" id="logs-search" class="rest-api-search" placeholder="<?php esc_attr_e( 'Search IP, endpoint, user agent...', 'wpbuoy-endpoint-manager' ); ?>" value="<?php echo esc_attr( $filters['search'] ); ?>">
 						<button type="button" id="logs-search-clear" class="rest-api-search-clear" aria-label="<?php esc_attr_e( 'Clear search', 'wpbuoy-endpoint-manager' ); ?>"></button>
 					</div>
 				</div>
 
-				<div class="control-group">
+				<div class="control-group" data-filter-key="ip">
 					<label for="logs-ip-filter"><?php esc_html_e( 'IP Address', 'wpbuoy-endpoint-manager' ); ?></label>
 					<select id="logs-ip-filter" class="rest-api-filter-select">
 						<option value="all"><?php esc_html_e( 'All IPs', 'wpbuoy-endpoint-manager' ); ?></option>
 						<?php foreach ( $unique_ips as $ip ) : ?>
-							<option value="<?php echo esc_attr( $ip ); ?>"><?php echo esc_html( $ip ); ?></option>
+							<option value="<?php echo esc_attr( $ip ); ?>" <?php selected( $filters['ip'], $ip ); ?>><?php echo esc_html( $ip ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</div>
 
-				<div class="control-group">
+				<div class="control-group" data-filter-key="endpoint">
 					<label for="logs-endpoint-filter"><?php esc_html_e( 'Endpoint', 'wpbuoy-endpoint-manager' ); ?></label>
 					<select id="logs-endpoint-filter" class="rest-api-filter-select">
 						<option value="all"><?php esc_html_e( 'All Endpoints', 'wpbuoy-endpoint-manager' ); ?></option>
 						<?php foreach ( $unique_endpoints as $endpoint ) : ?>
-							<option value="<?php echo esc_attr( $endpoint ); ?>"><?php echo esc_html( $endpoint ); ?></option>
+							<option value="<?php echo esc_attr( $endpoint ); ?>" <?php selected( $filters['endpoint'], $endpoint ); ?>><?php echo esc_html( $endpoint ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</div>
 
-				<div class="control-group">
+				<div class="control-group" data-filter-key="date" style="display:none">
 					<label for="logs-date-from"><?php esc_html_e( 'From', 'wpbuoy-endpoint-manager' ); ?></label>
-					<input type="date" id="logs-date-from" class="rest-api-filter-date">
+					<input type="date" id="logs-date-from" class="rest-api-filter-date" value="<?php echo esc_attr( $filters['date_from'] ); ?>">
 				</div>
 
-				<div class="control-group">
+				<div class="control-group" data-filter-key="date" style="display:none">
 					<label for="logs-date-to"><?php esc_html_e( 'To', 'wpbuoy-endpoint-manager' ); ?></label>
-					<input type="date" id="logs-date-to" class="rest-api-filter-date">
+					<input type="date" id="logs-date-to" class="rest-api-filter-date" value="<?php echo esc_attr( $filters['date_to'] ); ?>">
 				</div>
 
 				<div class="control-group">
-					<label>&nbsp;</label>
-					<button type="button" id="logs-clear-filters" class="rest-api-clear-filters">
+					<button type="button" id="logs-clear-filters" class="rest-api-clear-filters" data-clear-url="<?php echo esc_url( $logs_page_url ); ?>">
 						<?php esc_html_e( 'Clear Filters', 'wpbuoy-endpoint-manager' ); ?>
 					</button>
 				</div>
@@ -79,58 +85,47 @@ if ( ! defined( 'WPINC' ) ) {
 		</div>
 	<?php endif; ?>
 
+	<?php
+	$wpbyem_col = function ( $key ) use ( $hidden_columns ) {
+		return in_array( $key, $hidden_columns, true ) ? ' hidden' : '';
+	};
+	?>
 	<table class="wp-list-table widefat fixed striped wpbuoy-em-logs-table">
 		<thead>
 			<tr>
-				<th scope="col" class="manage-column column-time"><?php esc_html_e( 'Time', 'wpbuoy-endpoint-manager' ); ?></th>
-				<th scope="col" class="manage-column column-ip_address"><?php esc_html_e( 'IP Address', 'wpbuoy-endpoint-manager' ); ?></th>
-				<th scope="col" class="manage-column column-endpoint"><?php esc_html_e( 'Endpoint', 'wpbuoy-endpoint-manager' ); ?></th>
-				<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'wpbuoy-endpoint-manager' ); ?></th>
-				<th scope="col" class="manage-column column-user_agent"><?php esc_html_e( 'User Agent', 'wpbuoy-endpoint-manager' ); ?></th>
-				<th scope="col" class="manage-column column-actions" style="width: 90px;"><?php esc_html_e( 'Action', 'wpbuoy-endpoint-manager' ); ?></th>
+				<th scope="col" class="manage-column column-time<?php echo esc_attr( $wpbyem_col( 'time' ) ); ?>"><?php esc_html_e( 'Time', 'wpbuoy-endpoint-manager' ); ?></th>
+				<th scope="col" class="manage-column column-ip_address<?php echo esc_attr( $wpbyem_col( 'ip_address' ) ); ?>"><?php esc_html_e( 'IP Address', 'wpbuoy-endpoint-manager' ); ?></th>
+				<th scope="col" class="manage-column column-endpoint<?php echo esc_attr( $wpbyem_col( 'endpoint' ) ); ?>"><?php esc_html_e( 'Endpoint', 'wpbuoy-endpoint-manager' ); ?></th>
+				<th scope="col" class="manage-column column-status<?php echo esc_attr( $wpbyem_col( 'status' ) ); ?>"><?php esc_html_e( 'Response Code', 'wpbuoy-endpoint-manager' ); ?></th>
+				<th scope="col" class="manage-column column-user_agent<?php echo esc_attr( $wpbyem_col( 'user_agent' ) ); ?>"><?php esc_html_e( 'User Agent', 'wpbuoy-endpoint-manager' ); ?></th>
+				<th scope="col" class="manage-column column-actions<?php echo esc_attr( $wpbyem_col( 'actions' ) ); ?>" style="width: 90px;"><?php esc_html_e( 'Action', 'wpbuoy-endpoint-manager' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
-			<?php if ( empty( $logs ) ) : ?>
-				<tr>
-					<td colspan="6" style="color: #72777c; font-style: italic;">
-						<?php esc_html_e( 'No blocked requests logged yet.', 'wpbuoy-endpoint-manager' ); ?>
-					</td>
-				</tr>
-			<?php endif; ?>
-			<?php foreach ( $logs as $log ) : ?>
-				<tr data-timestamp="<?php echo esc_attr( $log['blocked_at'] ); ?>">
-					<td class="column-time"><?php echo esc_html( human_time_diff( strtotime( $log['blocked_at'] ), time() ) . ' ago' ); ?></td>
-					<td class="column-ip_address"><?php echo esc_html( $log['ip_address'] ); ?></td>
-					<td class="column-endpoint"><?php echo esc_html( $log['endpoint'] ); ?></td>
-					<td class="column-status">
-						<span class="log-reason log-reason--403" data-tooltip="<?php esc_attr_e( 'Blocked', 'wpbuoy-endpoint-manager' ); ?>">
-							403
-						</span>
-					</td>
-					<td class="log-user-agent column-user_agent"><?php echo esc_html( $log['user_agent'] ); ?></td>
-					<td class="log-actions column-actions">
-						<button type="button" class="button button-small" disabled
-							data-tooltip="<?php esc_attr_e( 'IP Blocking (Pro)', 'wpbuoy-endpoint-manager' ); ?>">
-							<?php esc_html_e( 'Block', 'wpbuoy-endpoint-manager' ); ?>
-						</button>
-					</td>
-				</tr>
-			<?php endforeach; ?>
+			<?php
+			wpbyem_get_plugin_part( 'admin/logs-table-rows', compact(
+				'logs',
+				'hidden_columns',
+				'logs_page_url',
+				'has_active_filters'
+			) );
+			?>
 		</tbody>
 	</table>
 
-	<?php if ( ! empty( $logs ) ) : ?>
+	<?php if ( $total > 0 ) : ?>
 		<div class="wpbuoy-em-logs-actions">
 
 			<div class="wpbuoy-em-logs-actions-left">
-				<span class="wpbuoy-em-logs-total">
-					<?php echo esc_html( sprintf(
-						/* translators: %d: total number of blocked requests */
-						__( 'Total blocked requests: %d', 'wpbuoy-endpoint-manager' ),
-						$total
-					) ); ?>
-				</span>
+				<?php
+				wpbyem_get_plugin_part( 'admin/logs-summary-pagination', compact(
+					'total',
+					'paged',
+					'total_pages',
+					'logs_page_url',
+					'filters'
+				) );
+				?>
 			</div>
 
 			<div class="wpbuoy-em-logs-actions-right">

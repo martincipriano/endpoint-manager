@@ -690,8 +690,45 @@ mark {
 	color: #50575e;
 }
 
+.wpbuoy-em-pagination {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.wpbuoy-em-pagination .button {
+	width: 40px;
+	min-width: 28px;
+	padding: 0 6px;
+	text-align: center;
+	line-height: 26px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wpbuoy-em-pagination .button svg {
+	width: 16px;
+	height: 16px;
+}
+
+.wpbuoy-em-page-info {
+	font-size: 13px;
+	color: #50575e;
+	padding: 0 4px;
+}
+
 .wpbuoy-em-logs-table {
 	margin-bottom: 12px;
+}
+
+/* Dims the table while an AJAX search/filter/pagination request
+   (fetchLogs() in logs.js) is in flight, and blocks interaction with the
+   stale rows so a second click can't fire before the first request lands. */
+.wpbuoy-em-logs-table.is-loading {
+	opacity: 0.5;
+	pointer-events: none;
+	transition: opacity 0.15s ease-in-out;
 }
 
 .wpbuoy-em-logs-table td {
@@ -724,13 +761,13 @@ mark {
 	white-space: nowrap;
 }
 
-.log-reason--403 {
-	background: #DC3232;
+.log-reason--success {
+	background: #00A32A;
 	color: #fff;
 }
 
-.log-reason--429 {
-	background: #DBA617;
+.log-reason--error {
+	background: #DC3232;
 	color: #fff;
 }
 
@@ -969,7 +1006,8 @@ button[disabled] {
 }
 
 /* Per-endpoint rate limit overrides */
-.route-rate-limit-toggle {
+.route-rate-limit-toggle,
+.route-stats-toggle {
 	background: none;
 	border: none;
 	padding: 0;
@@ -986,6 +1024,7 @@ button[disabled] {
 }
 
 .route-rate-limit-toggle[disabled] svg,
+.route-stats-toggle[disabled] svg,
 .route-preview[disabled] svg {
 	opacity: 0.6;
 }
@@ -995,6 +1034,7 @@ button[disabled] {
 }
 
 .route-rate-limit-toggle svg path,
+.route-stats-toggle svg path,
 .route-preview svg path {
 	fill: #999;
 }
@@ -1003,21 +1043,26 @@ button[disabled] {
 	color: #2271b1;
 }
 
-.route-rate-limit-toggle:disabled {
+.route-rate-limit-toggle:disabled,
+.route-stats-toggle:disabled {
 	cursor: not-allowed;
 }
 
-.route-rate-limit-toggle:disabled:hover {
+.route-rate-limit-toggle:disabled:hover,
+.route-stats-toggle:disabled:hover {
 	color: #838485;
 }
 
 .route-rate-limit-toggle,
+.route-stats-toggle,
 .route-preview {
 	position: relative;
 }
 
 .route-rate-limit-toggle::before,
 .route-rate-limit-toggle::after,
+.route-stats-toggle::before,
+.route-stats-toggle::after,
 .route-preview::before,
 .route-preview::after {
 	opacity: 0;
@@ -1026,6 +1071,7 @@ button[disabled] {
 }
 
 .route-rate-limit-toggle::before,
+.route-stats-toggle::before,
 .route-preview::before {
 	content: attr(data-tooltip);
 	position: absolute;
@@ -1044,6 +1090,7 @@ button[disabled] {
 }
 
 .route-rate-limit-toggle::after,
+.route-stats-toggle::after,
 .route-preview::after {
 	content: "";
 	position: absolute;
@@ -1057,6 +1104,8 @@ button[disabled] {
 
 .route-rate-limit-toggle:hover::before,
 .route-rate-limit-toggle:hover::after,
+.route-stats-toggle:hover::before,
+.route-stats-toggle:hover::after,
 .route-preview:hover::before,
 .route-preview:hover::after {
 	opacity: 1;

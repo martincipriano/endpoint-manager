@@ -82,6 +82,15 @@ class Wpbyem_Endpoint_Manager {
 	protected $admin_hooks = array();
 
 	/**
+	 * Logs page hook suffix, populated in add_admin_menu() — used by
+	 * default_hidden_logs_columns() to scope its column-hiding to the Logs
+	 * screen specifically.
+	 *
+	 * @var string
+	 */
+	protected $logs_hook = '';
+
+	/**
 	 * Main Wpbyem_Endpoint_Manager Instance.
 	 *
 	 * Ensures only one instance of Wpbyem_Endpoint_Manager is loaded or can be loaded.
@@ -126,6 +135,8 @@ class Wpbyem_Endpoint_Manager {
 		add_action( 'admin_init', array( $this, 'maybe_import_config' ) );
 		add_action( 'admin_notices', array( $this, 'maybe_show_import_notice' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
+		add_action( 'wp_ajax_wpbyem_search_logs', array( $this, 'ajax_search_logs' ) );
+		add_filter( 'set_screen_option_wpbyem_logs_per_page', array( $this, 'save_logs_per_page_option' ), 10, 3 );
 
 		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
 
@@ -196,10 +207,23 @@ class Wpbyem_Endpoint_Manager {
 			WPBYEM_VERSION
 		);
 
+		// The "Filters" visibility-toggle logic is shared between the
+		// Endpoints and Logs pages (see filter-visibility.js) — register it
+		// once as a dependency for whichever page-specific script needs it.
+		if ( in_array( $hook, array( 'toplevel_page_wpbyem', 'endpoints_page_wpbyem-logs' ), true ) ) {
+			wp_enqueue_script(
+				'wpbyem-filter-visibility',
+				plugin_dir_url( __FILE__ ) . 'assets/js/filter-visibility.js',
+				array(),
+				WPBYEM_VERSION,
+				true
+			);
+		}
+
 		wp_enqueue_script(
 			'wpbyem-admin',
 			plugin_dir_url( __FILE__ ) . 'assets/js/admin.js',
-			array(),
+			'toplevel_page_wpbyem' === $hook ? array( 'wpbyem-filter-visibility' ) : array(),
 			WPBYEM_VERSION,
 			true
 		);
@@ -224,6 +248,22 @@ class Wpbyem_Endpoint_Manager {
 				true
 			);
 		}
+
+		if ( 'endpoints_page_wpbyem-logs' === $hook ) {
+			wp_enqueue_script(
+				'wpbyem-logs',
+				plugin_dir_url( __FILE__ ) . 'assets/js/logs.js',
+				array( 'wpbyem-filter-visibility' ),
+				WPBYEM_VERSION,
+				true
+			);
+
+			wp_localize_script( 'wpbyem-logs', 'wpbyemLogs', array(
+				'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+				'nonce'       => wp_create_nonce( 'wpbyem_logs_nonce' ),
+				'logsPageUrl' => admin_url( 'admin.php?page=wpbyem-logs' ),
+			) );
+		}
 	}
 
 	/**
@@ -241,6 +281,7 @@ class Wpbyem_Endpoint_Manager {
 		);
 		$this->admin_hooks[] = $hook;
 		add_action( "load-{$hook}", array( $this, 'add_help_tabs' ) );
+		add_action( "load-{$hook}", array( $this, 'setup_endpoints_screen_options' ) );
 
 		$block_list_hook     = add_submenu_page(
 			'wpbyem',
@@ -262,7 +303,9 @@ class Wpbyem_Endpoint_Manager {
 			array( $this, 'render_logs_page' )
 		);
 		$this->admin_hooks[] = $logs_hook;
+		$this->logs_hook     = $logs_hook;
 		add_action( "load-{$logs_hook}", array( $this, 'add_help_tabs' ) );
+		add_action( "load-{$logs_hook}", array( $this, 'setup_logs_screen_options' ) );
 
 		$settings_hook       = add_submenu_page(
 			'wpbyem',
@@ -1095,25 +1138,478 @@ class Wpbyem_Endpoint_Manager {
 			return;
 		}
 
-		global $wpdb;
-		$table = $wpdb->prefix . 'wpbyem_logs';
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table" );
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$logs = $wpdb->get_results( "SELECT * FROM $table ORDER BY blocked_at DESC LIMIT 500", ARRAY_A );
-
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$cleared          = isset( $_GET['cleared'] ) && '1' === $_GET['cleared'];
-		$unique_ips       = array_values( array_unique( array_column( $logs, 'ip_address' ) ) );
-		$unique_endpoints = array_values( array_unique( array_column( $logs, 'endpoint' ) ) );
-		$logs_page_url    = admin_url( 'admin.php?page=wpbyem-logs' );
+		$cleared = isset( $_GET['cleared'] ) && '1' === $_GET['cleared'];
+
+		$filters = $this->get_logs_filters_from_request( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only filter values, no data modification
+		$paged   = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		$view_data     = $this->prepare_logs_view_data( $filters, $paged );
+		$logs_page_url = admin_url( 'admin.php?page=wpbyem-logs' );
+
+		wpbyem_get_plugin_part( 'admin/page', 'logs', array_merge(
+			$view_data,
+			compact( 'cleared', 'filters', 'logs_page_url' )
+		) );
+	}
+
+	/**
+	 * Compute everything the Logs table view needs — the filtered/paginated
+	 * row set plus every summary figure and dropdown option list around it
+	 * — from a normalized filters array and a page number. Shared by the
+	 * initial page load (render_logs_page(), filters from $_GET) and the
+	 * AJAX search handler (ajax_search_logs(), filters from $_POST), so the
+	 * two request paths can never compute this differently.
+	 *
+	 * @param array $filters Normalized filter values, see get_logs_filters_from_request().
+	 * @param int   $paged   Requested page number (clamped to the valid range internally).
+	 * @return array {
+	 *     @type array $logs               Log rows for the current page.
+	 *     @type int   $total              Total rows, unfiltered.
+	 *     @type int   $filtered_count     Total rows matching $filters.
+	 *     @type int   $per_page
+	 *     @type int   $paged              Clamped current page.
+	 *     @type int   $total_pages
+	 *     @type array $unique_ips         Dropdown options — derived from the current page's rows,
+	 *                                     same scoping the old client-only-filtering version had.
+	 *     @type array $unique_endpoints
+	 *     @type array $hidden_columns
+	 *     @type bool  $has_active_filters
+	 * }
+	 */
+	private function prepare_logs_view_data( array $filters, $paged ) {
+		$per_page     = (int) get_user_option( 'wpbyem_logs_per_page' );
+		$per_page     = $per_page > 0 ? $per_page : 15;
+		$where_clause = $this->build_logs_where_clause( $filters );
+
+		$total          = $this->get_total_logs_count();
+		$filtered_count = $this->get_total_logs_count( $where_clause );
+		$total_pages    = max( 1, (int) ceil( $filtered_count / $per_page ) );
+		$paged          = max( 1, min( $total_pages, absint( $paged ) ) );
+		$offset         = ( $paged - 1 ) * $per_page;
+
+		$logs = $this->get_security_logs( $where_clause, $per_page, $offset );
+
+		$unique_ips       = array_values( array_unique( wp_list_pluck( $logs, 'ip_address' ) ) );
+		$unique_endpoints = array_values( array_unique( wp_list_pluck( $logs, 'endpoint' ) ) );
 
 		sort( $unique_ips );
 		sort( $unique_endpoints );
 
-		wpbyem_get_plugin_part( 'admin/page', 'logs', compact( 'logs', 'total', 'cleared', 'unique_ips', 'unique_endpoints', 'logs_page_url' ) );
+		return array(
+			'logs'             => $logs,
+			'total'            => $total,
+			'filtered_count'   => $filtered_count,
+			'per_page'         => $per_page,
+			'paged'            => $paged,
+			'total_pages'      => $total_pages,
+			'unique_ips'       => $unique_ips,
+			'unique_endpoints' => $unique_endpoints,
+			// A screen-id string, not get_current_screen() — this runs from
+			// the AJAX handler too, where there's no "current screen" the
+			// normal admin-page way; get_hidden_columns() accepts a string
+			// and builds the WP_Screen itself either way.
+			'hidden_columns'   => get_hidden_columns( 'endpoints_page_wpbyem-logs' ),
+			// Picks the empty-state copy in logs-table-rows.php ("No entries
+			// match your filters." vs. "No blocked requests logged yet.") —
+			// derived from $filters itself so callers can't drift on what
+			// "active" means.
+			'has_active_filters' => ! empty( array_filter( $filters ) ),
+		);
+	}
+
+	/**
+	 * Normalize raw filter values from either $_GET (initial page load,
+	 * bookmarked/shared URLs) or $_POST (AJAX search) into one shape, so
+	 * build_logs_where_clause() and prepare_logs_view_data() don't care
+	 * which request the values came from. 'all' (the select elements' own
+	 * "no filter" sentinel) and '' are both treated as unset.
+	 *
+	 * @param array $source $_GET or $_POST.
+	 * @return array Filters: search, ip, endpoint, date_from, date_to.
+	 */
+	private function get_logs_filters_from_request( array $source ) {
+		$get = function ( $key ) use ( $source ) {
+			if ( ! isset( $source[ $key ] ) ) {
+				return '';
+			}
+			$value = sanitize_text_field( wp_unslash( $source[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter values, sourced from either a nonce-checked AJAX POST or a display-only GET link, no data modification either way
+			return 'all' === $value ? '' : $value;
+		};
+
+		return array(
+			'search'    => $get( 'filter_search' ),
+			'ip'        => $get( 'filter_ip' ),
+			'endpoint'  => $get( 'filter_endpoint' ),
+			'date_from' => $get( 'filter_date_from' ),
+			'date_to'   => $get( 'filter_date_to' ),
+		);
+	}
+
+	/**
+	 * Build a WHERE clause from a normalized filter-values array (see
+	 * get_logs_filters_from_request()). Covers every filter the controls
+	 * row exposes — search, IP, endpoint, date range.
+	 *
+	 * @param array $filters Normalized filter values.
+	 * @return string SQL WHERE clause (empty string if no filters active).
+	 */
+	private function build_logs_where_clause( array $filters ) {
+		global $wpdb;
+
+		$where_parts = array();
+
+		if ( ! empty( $filters['ip'] ) ) {
+			$where_parts[] = $wpdb->prepare( 'ip_address = %s', $filters['ip'] );
+		}
+
+		if ( ! empty( $filters['endpoint'] ) ) {
+			$where_parts[] = $wpdb->prepare( 'endpoint = %s', $filters['endpoint'] );
+		}
+
+		if ( ! empty( $filters['date_from'] ) && $this->is_valid_log_date( $filters['date_from'] ) ) {
+			$where_parts[] = $wpdb->prepare( 'blocked_at >= %s', $filters['date_from'] . ' 00:00:00' );
+		}
+
+		if ( ! empty( $filters['date_to'] ) && $this->is_valid_log_date( $filters['date_to'] ) ) {
+			$where_parts[] = $wpdb->prepare( 'blocked_at <= %s', $filters['date_to'] . ' 23:59:59' );
+		}
+
+		// Free-text search — OR'd across every column a keyword could
+		// plausibly be hunting through, ANDed with the exact-match filters
+		// above.
+		if ( ! empty( $filters['search'] ) ) {
+			$like          = '%' . $wpdb->esc_like( $filters['search'] ) . '%';
+			$where_parts[] = $wpdb->prepare(
+				'(ip_address LIKE %s OR endpoint LIKE %s OR user_agent LIKE %s)',
+				$like,
+				$like,
+				$like
+			);
+		}
+
+		return ! empty( $where_parts ) ? 'WHERE ' . implode( ' AND ', $where_parts ) : '';
+	}
+
+	/**
+	 * Validate a Y-m-d date string before it goes into a date-range filter
+	 * — reject malformed input rather than pass it to blocked_at >= '...'
+	 * and let MySQL's own (surprisingly permissive) date coercion decide
+	 * what it means.
+	 *
+	 * @param string $date
+	 * @return bool
+	 */
+	private function is_valid_log_date( $date ) {
+		$parsed = \DateTime::createFromFormat( 'Y-m-d', $date );
+		return $parsed && $parsed->format( 'Y-m-d' ) === $date;
+	}
+
+	/**
+	 * Get a page of security log rows.
+	 *
+	 * @param string $where_clause SQL WHERE clause from build_logs_where_clause().
+	 * @param int    $limit
+	 * @param int    $offset
+	 * @return array
+	 */
+	private function get_security_logs( $where_clause, $limit = 15, $offset = 0 ) {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'wpbyem_logs';
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table_name is a prefixed table name, never user input; $where_clause is built via $wpdb->prepare()
+		$sql = "SELECT * FROM $table_name $where_clause ORDER BY blocked_at DESC LIMIT %d OFFSET %d";
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- custom table, $sql built safely above
+		return $wpdb->get_results( $wpdb->prepare( $sql, $limit, $offset ) );
+	}
+
+	/**
+	 * Get total log count, optionally scoped to a WHERE clause.
+	 *
+	 * @param string $where_clause SQL WHERE clause from build_logs_where_clause() (empty string for the true unfiltered total).
+	 * @return int
+	 */
+	private function get_total_logs_count( $where_clause = '' ) {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'wpbyem_logs';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table_name is a prefixed table name, never user input; $where_clause built via $wpdb->prepare()
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM $table_name $where_clause" );
+	}
+
+	/**
+	 * Screen Options setup for the Logs page — registers Columns and appends
+	 * a custom "Filters" + hand-built "Pagination" fieldset after it, mirroring
+	 * core's own rendering order (Columns, then per-page, then anything else
+	 * the 'screen_settings' filter adds). Registering per_page the normal way
+	 * via add_screen_option() would put it between Columns and Filters with no
+	 * way to reorder it, so render_logs_pagination_fieldset() builds an
+	 * equivalent fieldset by hand instead. The save side is unaffected either
+	 * way: set_screen_options() keys off the submitted `wp_screen_options[option]`
+	 * field name matching the registered set_screen_option_{$option} filter
+	 * (save_logs_per_page_option(), hooked in init_hooks()) — it doesn't care
+	 * whether add_screen_option() was ever called. What add_screen_option()
+	 * would normally do besides rendering is force the Apply button to show —
+	 * replicated explicitly below.
+	 */
+	public function setup_logs_screen_options() {
+		add_filter( 'screen_options_show_submit', '__return_true' );
+
+		register_column_headers( get_current_screen(), array(
+			'time'       => __( 'Time', 'wpbuoy-endpoint-manager' ),
+			'ip_address' => __( 'IP Address', 'wpbuoy-endpoint-manager' ),
+			'endpoint'   => __( 'Endpoint', 'wpbuoy-endpoint-manager' ),
+			'status'     => __( 'Response Code', 'wpbuoy-endpoint-manager' ), // Column key stays 'status' — only the label changed — so no one's saved Screen Options break.
+			'user_agent' => __( 'User Agent', 'wpbuoy-endpoint-manager' ),
+			'actions'    => __( 'Actions', 'wpbuoy-endpoint-manager' ),
+		) );
+
+		// Custom "Filters" section alongside the native "Columns" one above —
+		// only registered while this page is loading (via the load-{hook}
+		// action), so it never appears on any other admin screen.
+		add_filter( 'screen_settings', array( $this, 'render_logs_filter_screen_settings' ) );
+
+		// Relabel the "Screen Options" button to "Columns & Filters" now that
+		// it also controls filter visibility, not just columns. Core hardcodes
+		// this string with no dedicated filter around it (_e('Screen Options')
+		// in class-wp-screen.php) — gettext is the general translation-filter
+		// mechanism that string still routes through, so it's the correct hook
+		// even though it's not purpose-built for this button. Scoped to this
+		// page's load only, so it doesn't relabel every other admin screen's
+		// Screen Options button too.
+		add_filter( 'gettext', array( $this, 'relabel_screen_options_button' ), 10, 3 );
+
+		// Default User Agent to hidden — a drill-into-one-row detail, not
+		// needed for a quick scan. Only applies until a user customizes their
+		// own column visibility (get_hidden_columns()'s $use_defaults), so
+		// this never overrides an existing preference.
+		add_filter( 'default_hidden_columns', array( $this, 'default_hidden_logs_columns' ), 10, 2 );
+	}
+
+	/**
+	 * default_hidden_columns callback — see setup_logs_screen_options().
+	 *
+	 * @param string[]   $hidden Array of column IDs hidden by default.
+	 * @param \WP_Screen $screen WP_Screen object of the current screen.
+	 * @return string[]
+	 */
+	public function default_hidden_logs_columns( $hidden, $screen ) {
+		if ( $this->logs_hook === $screen->id ) {
+			$hidden[] = 'user_agent';
+		}
+
+		return $hidden;
+	}
+
+	/**
+	 * gettext callback — see setup_logs_screen_options() for why this exists.
+	 *
+	 * @param string $translation Translated text.
+	 * @param string $text        Original (untranslated) text.
+	 * @param string $domain      Text domain.
+	 * @return string
+	 */
+	public function relabel_screen_options_button( $translation, $text, $domain ) {
+		if ( 'default' === $domain && 'Screen Options' === $text ) {
+			return __( 'Columns & Filters', 'wpbuoy-endpoint-manager' );
+		}
+
+		return $translation;
+	}
+
+	/**
+	 * screen_settings filter callback — appends a "Filters" fieldset (one
+	 * checkbox per filter key, toggling that filter's visibility in the
+	 * controls row) plus the hand-built "Pagination" fieldset. Actual
+	 * show/hide behavior driven by these checkboxes lives in filter-visibility.js.
+	 *
+	 * @param string $screen_settings Existing screen settings HTML.
+	 * @return string
+	 */
+	public function render_logs_filter_screen_settings( $screen_settings ) {
+		$filters = array(
+			'ip'       => __( 'IP Address', 'wpbuoy-endpoint-manager' ),
+			'endpoint' => __( 'Endpoint', 'wpbuoy-endpoint-manager' ),
+			'date'     => __( 'Date Range', 'wpbuoy-endpoint-manager' ),
+		);
+		$default_visible = array( 'ip', 'endpoint' );
+
+		return $screen_settings
+			. $this->render_filter_visibility_fieldset( $filters, $default_visible )
+			. $this->render_logs_pagination_fieldset();
+	}
+
+	/**
+	 * Render a "Filters" fieldset for the Screen Options panel — one checkbox
+	 * per filter key, toggling that filter's visibility in the controls row.
+	 *
+	 * @param array $filters         Map of filter key => label.
+	 * @param array $default_visible Filter keys visible by default.
+	 * @return string Fieldset HTML.
+	 */
+	private function render_filter_visibility_fieldset( array $filters, array $default_visible ) {
+		ob_start();
+		?>
+		<fieldset class="metabox-prefs wpbyem-filter-visibility-prefs">
+			<legend><?php esc_html_e( 'Filters', 'wpbuoy-endpoint-manager' ); ?></legend>
+			<?php foreach ( $filters as $key => $label ) : ?>
+				<label>
+					<input type="checkbox"
+					       class="wpbyem-filter-visibility-toggle"
+					       data-filter-key="<?php echo esc_attr( $key ); ?>"
+					       <?php checked( in_array( $key, $default_visible, true ) ); ?> />
+					<?php echo esc_html( $label ); ?>
+				</label>
+			<?php endforeach; ?>
+		</fieldset>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Hand-built equivalent of WP_Screen::render_per_page_options() — same
+	 * markup, input names, and default-value logic, but called from here
+	 * instead of via add_screen_option('per_page', ...) so it renders after
+	 * "Filters" instead of before it. See setup_logs_screen_options() for why.
+	 *
+	 * @return string Fieldset HTML.
+	 */
+	private function render_logs_pagination_fieldset() {
+		$option   = 'wpbyem_logs_per_page';
+		$per_page = (int) get_user_option( $option );
+		if ( $per_page < 1 ) {
+			$per_page = 15;
+		}
+
+		ob_start();
+		?>
+		<fieldset class="screen-options">
+			<legend><?php esc_html_e( 'Pagination', 'wpbuoy-endpoint-manager' ); ?></legend>
+			<label for="<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Logs per page', 'wpbuoy-endpoint-manager' ); ?></label>
+			<input type="number" step="1" min="1" max="999" class="screen-per-page small-text"
+			       name="wp_screen_options[value]"
+			       id="<?php echo esc_attr( $option ); ?>"
+			       value="<?php echo esc_attr( $per_page ); ?>" />
+			<input type="hidden" name="wp_screen_options[option]" value="<?php echo esc_attr( $option ); ?>" />
+		</fieldset>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Save the logs per-page screen option.
+	 *
+	 * @param mixed  $status Default status.
+	 * @param string $option Option name.
+	 * @param int    $value  New value.
+	 * @return int
+	 */
+	public function save_logs_per_page_option( $status, $option, $value ) {
+		return absint( $value );
+	}
+
+	/**
+	 * AJAX handler — search/filter/paginate the Logs table without a full
+	 * page reload. Reuses prepare_logs_view_data() — the exact same query and
+	 * row-set computation the initial page load uses — and renders the same
+	 * two partials (logs-table-rows.php, logs-summary-pagination.php) to HTML
+	 * strings via wpbyem_return_plugin_part(), so the AJAX-swapped markup can
+	 * never drift from what a fresh page load would have produced for the
+	 * same filters.
+	 */
+	public function ajax_search_logs() {
+		check_ajax_referer( 'wpbyem_logs_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Unauthorized.', 'wpbuoy-endpoint-manager' ) ) );
+		}
+
+		$filters = $this->get_logs_filters_from_request( $_POST );
+		$paged   = isset( $_POST['paged'] ) ? absint( $_POST['paged'] ) : 1;
+
+		$view_data     = $this->prepare_logs_view_data( $filters, $paged );
+		$logs_page_url = admin_url( 'admin.php?page=wpbyem-logs' );
+
+		$rows_html = wpbyem_return_plugin_part( 'admin/logs-table-rows', array_merge(
+			$view_data,
+			array( 'logs_page_url' => $logs_page_url )
+		) );
+
+		$summary_html = wpbyem_return_plugin_part( 'admin/logs-summary-pagination', array_merge(
+			$view_data,
+			array(
+				'logs_page_url' => $logs_page_url,
+				'filters'       => $filters,
+			)
+		) );
+
+		wp_send_json_success( array(
+			'rows_html'          => $rows_html,
+			'summary_html'       => $summary_html,
+			'filtered_count'     => $view_data['filtered_count'],
+			'has_active_filters' => $view_data['has_active_filters'],
+		) );
+	}
+
+	/**
+	 * Register Screen Options for the Endpoints page — currently just the
+	 * custom "Filters" visibility fieldset. See setup_logs_screen_options()
+	 * for the sibling implementation on the Logs page; unlike that page,
+	 * Endpoints has no columns or per-page option, so the fieldset is the
+	 * only reason the Screen Options tab appears here at all.
+	 */
+	public function setup_endpoints_screen_options() {
+		add_filter( 'screen_settings', array( $this, 'render_endpoints_filter_screen_settings' ) );
+
+		// Relabel "Screen Options" to "Filters" — this page's panel holds
+		// only the filter-visibility fieldset, no columns, so "Columns &
+		// Filters" (the Logs page label) would be misleading here. Scoped
+		// to this page's load only, via the load-{hook} action.
+		add_filter( 'gettext', array( $this, 'relabel_endpoints_screen_options_button' ), 10, 3 );
+	}
+
+	/**
+	 * gettext callback — see setup_endpoints_screen_options() for why this exists.
+	 *
+	 * @param string $translation Translated text.
+	 * @param string $text        Original (untranslated) text.
+	 * @param string $domain      Text domain.
+	 * @return string
+	 */
+	public function relabel_endpoints_screen_options_button( $translation, $text, $domain ) {
+		if ( 'default' === $domain && 'Screen Options' === $text ) {
+			return __( 'Filters', 'wpbuoy-endpoint-manager' );
+		}
+
+		return $translation;
+	}
+
+	/**
+	 * Add a "Filters" fieldset to the Screen Options panel on the Endpoints
+	 * page, letting users pick which filters show in the controls row.
+	 * Status/Type/Method/Namespace are visible by default (existing
+	 * behavior, unchanged); Restricted starts hidden since it's a new
+	 * addition. Like the Logs page equivalent, this is a per-browser
+	 * localStorage preference (see filter-visibility.js), not persisted
+	 * server-side.
+	 *
+	 * @param string $screen_settings Existing screen settings HTML.
+	 * @return string
+	 */
+	public function render_endpoints_filter_screen_settings( $screen_settings ) {
+		$filters = array(
+			'status'     => __( 'Status', 'wpbuoy-endpoint-manager' ),
+			'type'       => __( 'Type', 'wpbuoy-endpoint-manager' ),
+			'method'     => __( 'Method', 'wpbuoy-endpoint-manager' ),
+			'namespace'  => __( 'Namespace', 'wpbuoy-endpoint-manager' ),
+			'restricted' => __( 'Restricted', 'wpbuoy-endpoint-manager' ),
+		);
+		$default_visible = array( 'status', 'type', 'method', 'namespace' );
+
+		return $screen_settings . $this->render_filter_visibility_fieldset( $filters, $default_visible );
 	}
 
 	/**
