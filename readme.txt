@@ -109,6 +109,13 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 
 == Changelog ==
 
+= 2.4.0 =
+* Added: Logs page now searches, filters, and paginates instantly via AJAX, replacing the old load-up-to-500-rows-then-filter-client-side approach
+* Added: Columns & Filters panel on the Logs page — choose which columns and filters are visible
+* Added: Filters panel on the Endpoints page — choose which filters are visible, plus a new Restricted filter
+* Changed: Logs "Status" column renamed to "Response Code" for clarity
+* Added: "Activity (Pro)" icon on the Endpoints list, previewing Pro's activity-tracking feature
+
 = 2.3.1 =
 * Fixed: bulk-blocking a namespace could leave some endpoints enabled — route patterns containing %, @, or " (e.g. core's global-styles routes) were silently dropped during save
 * Changed: Import Configuration now opens a file picker and uploads immediately on file selection, instead of a separate submit step
