@@ -894,6 +894,26 @@ class Wpbyem_Endpoint_Manager {
 	}
 
 	/**
+	 * Whether the current dispatch is a real HTTP REST request.
+	 *
+	 * rest_pre_dispatch also fires for internal rest_do_request() calls made by
+	 * core, WooCommerce, and other plugins during a normal page render. Those
+	 * have already passed WordPress's own auth and must not be blocked, logged,
+	 * or counted — otherwise browsing the site burns the visitor's quota and the
+	 * site can block its own IP. Prefer wp_is_serving_rest_request() (WP 6.5+),
+	 * fall back to the REST_REQUEST constant, which core defines only in
+	 * WP_REST_Server::serve_request() and never in rest_do_request().
+	 *
+	 * @return bool True for an external HTTP REST request, false for an internal dispatch.
+	 */
+	private function is_external_rest_request() {
+		if ( function_exists( 'wp_is_serving_rest_request' ) ) {
+			return wp_is_serving_rest_request();
+		}
+		return defined( 'REST_REQUEST' ) && REST_REQUEST;
+	}
+
+	/**
 	 * Build a basic preview URL for a dynamic route by substituting capture groups with a default value.
 	 *
 	 * @param string $route WordPress REST route pattern.
@@ -1068,6 +1088,11 @@ class Wpbyem_Endpoint_Manager {
 	public function maybe_block_rest_endpoint( $result, $server, $request ) {
 		// If there's already an error, return it
 		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		// Never enforce against WordPress's own internal REST calls (F-03).
+		if ( ! $this->is_external_rest_request() ) {
 			return $result;
 		}
 
