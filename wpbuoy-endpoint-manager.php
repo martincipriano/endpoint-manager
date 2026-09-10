@@ -873,7 +873,24 @@ class Wpbyem_Endpoint_Manager {
 			}
 		}
 
-		return '#^' . implode( '', $parts ) . '$#';
+		// The 'i' flag mirrors WP_REST_Server::dispatch(), which matches routes
+		// case-insensitively — without it a blocked endpoint is reachable by
+		// changing the case of a single character.
+		return '#^' . implode( '', $parts ) . '$#i';
+	}
+
+	/**
+	 * Compare two REST route strings case-insensitively.
+	 *
+	 * Core dispatches REST routes case-insensitively, so a static block must too —
+	 * otherwise /wp/v2/Users bypasses a block on /wp/v2/users.
+	 *
+	 * @param string $a First route.
+	 * @param string $b Second route.
+	 * @return bool True if the routes are equal ignoring case.
+	 */
+	private function routes_equal( $a, $b ) {
+		return 0 === strcasecmp( $a, $b );
 	}
 
 	/**
@@ -983,7 +1000,7 @@ class Wpbyem_Endpoint_Manager {
 	private function is_route_blocked( $route, $patterns ) {
 		foreach ( $patterns as $pattern ) {
 			// Exact match
-			if ( $route === $pattern ) {
+			if ( $this->routes_equal( $route, $pattern ) ) {
 				return true;
 			}
 		}
@@ -1089,7 +1106,7 @@ class Wpbyem_Endpoint_Manager {
 				$regex   = $this->convert_route_to_regex( $blocked_pattern );
 				$matched = preg_match( $regex, $current_route ) === 1;
 			} else {
-				$matched = $current_route === $blocked_pattern;
+				$matched = $this->routes_equal( $current_route, $blocked_pattern );
 			}
 
 			if ( $matched ) {
