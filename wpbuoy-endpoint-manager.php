@@ -136,6 +136,14 @@ class Wpbyem_Endpoint_Manager {
 		add_action( 'admin_notices', array( $this, 'maybe_show_import_notice' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
 		add_action( 'wp_ajax_wpbyem_search_logs', array( $this, 'ajax_search_logs' ) );
+		// Registered unconditionally (not just from setup_logs_screen_options()'s
+		// load-{$logs_hook} hook) because get_hidden_columns() is also called
+		// from ajax_search_logs() on admin-ajax.php, where load-{hook} never
+		// fires — leaving User Agent un-hidden and the AJAX-rendered rows
+		// carrying an extra cell that doesn't line up with the visible headers
+		// (F-15). The callback itself is scoped to this screen's hook, so
+		// registering it here has no effect on any other admin screen.
+		add_filter( 'default_hidden_columns', array( $this, 'default_hidden_logs_columns' ), 10, 2 );
 		add_filter( 'set_screen_option_wpbyem_logs_per_page', array( $this, 'save_logs_per_page_option' ), 10, 3 );
 
 		register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
@@ -1428,7 +1436,9 @@ class Wpbyem_Endpoint_Manager {
 		// needed for a quick scan. Only applies until a user customizes their
 		// own column visibility (get_hidden_columns()'s $use_defaults), so
 		// this never overrides an existing preference.
-		add_filter( 'default_hidden_columns', array( $this, 'default_hidden_logs_columns' ), 10, 2 );
+		// Registered unconditionally in init_hooks() (F-15), not here — this
+		// method only runs via load-{$logs_hook}, which never fires for the
+		// ajax_search_logs() request that also needs it.
 	}
 
 	/**
@@ -1439,7 +1449,16 @@ class Wpbyem_Endpoint_Manager {
 	 * @return string[]
 	 */
 	public function default_hidden_logs_columns( $hidden, $screen ) {
-		if ( $this->logs_hook === $screen->id ) {
+		// Hardcoded rather than compared against $this->logs_hook (F-15): that
+		// property is only populated when add_admin_menu() actually runs,
+		// which admin_menu never does during an admin-ajax.php request — the
+		// exact request this filter also needs to fire correctly for. The
+		// literal is get_plugin_page_hookname( 'wpbyem-logs', 'wpbyem' )'s real
+		// output (verified by actually running add_admin_menu() and reading
+		// $this->logs_hook back — calling get_plugin_page_hookname() directly
+		// outside a real admin_menu firing returns the wrong value, since it
+		// depends on the global $admin_page_hooks that add_menu_page() populates).
+		if ( 'endpoints_page_wpbyem-logs' === $screen->id ) {
 			$hidden[] = 'user_agent';
 		}
 
