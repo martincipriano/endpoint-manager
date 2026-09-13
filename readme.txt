@@ -2,9 +2,9 @@
 Contributors: martincipriano
 Tags: rest api, rest api security, disable rest api, endpoint manager, api security
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,12 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 7. Built-in contextual help with links to the knowledge base, FAQs, and support.
 
 == Changelog ==
+
+= 2.4.1 =
+* Fixed: a blocked endpoint could be reached by changing the case of a single character in the URL (e.g. /wp/v2/Users instead of /wp/v2/users)
+* Fixed: blocking an endpoint could also block WordPress's own internal use of it (e.g. the block editor), breaking admin functionality with no indication this plugin was the cause
+* Fixed: after searching or filtering on the Logs page, the User Agent column could reappear even when hidden via Screen Options, misaligning the table
+* Fixed: uninstalling the plugin left rate-limit/role-bypass settings and a per-user Logs preference behind instead of fully cleaning up
 
 = 2.4.0 =
 * Added: Logs page now searches, filters, and paginates instantly via AJAX, replacing the old load-up-to-500-rows-then-filter-client-side approach
