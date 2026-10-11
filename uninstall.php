@@ -21,6 +21,7 @@ function wpbyem_uninstall_site() {
 	global $wpdb;
 	delete_option( 'wpbyem_blocked_endpoints' );
 	delete_option( 'wpbyem_rate_limit_settings' );
+	delete_option( 'wpbyem_db_version' );
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpbyem_logs" );

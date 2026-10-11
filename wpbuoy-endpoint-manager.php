@@ -36,9 +36,15 @@ register_activation_hook(
 			user_agent text NOT NULL,
 			blocked_at datetime NOT NULL,
 			PRIMARY KEY  (id),
-			KEY blocked_at (blocked_at)
+			KEY blocked_at (blocked_at),
+			KEY endpoint (endpoint(191))
 		) $charset_collate;";
 		dbDelta( $sql );
+
+		// Pro shares this option with a higher value; never lower it.
+		if ( version_compare( (string) get_option( 'wpbyem_db_version', '0' ), '1.1', '<' ) ) {
+			update_option( 'wpbyem_db_version', '1.1' );
+		}
 	}
 );
 
@@ -131,6 +137,8 @@ class Wpbyem_Endpoint_Manager {
 		add_action( 'admin_init', array( $this, 'handle_encoded_form_submission' ), 5 );
 		add_action( 'admin_init', array( $this, 'handle_clear_logs' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_init', array( $this, 'maybe_upgrade_schema' ) );
+		add_action( 'added_option', array( $this, 'maybe_disable_option_autoload' ) );
 		add_action( 'admin_init', array( $this, 'maybe_export_config' ) );
 		add_action( 'admin_init', array( $this, 'maybe_import_config' ) );
 		add_action( 'admin_notices', array( $this, 'maybe_show_import_notice' ) );
@@ -151,6 +159,72 @@ class Wpbyem_Endpoint_Manager {
 		// Schedule log cleanup.
 		add_action( 'wp', array( $this, 'schedule_log_cleanup' ) );
 		add_action( 'wpbyem_cleanup_logs', array( $this, 'cleanup_old_logs' ) );
+	}
+
+	/**
+	 * Bring the logs table up to date on plugin updates.
+	 *
+	 * The table is created by the activation hook, which doesn't run when the
+	 * plugin is updated in place — so the endpoint index (F-28: filtering the
+	 * Logs screen by endpoint full-scanned the table) is added here, gated on a
+	 * stored schema version.
+	 */
+	public function maybe_upgrade_schema() {
+		if ( version_compare( (string) get_option( 'wpbyem_db_version', '1.0' ), '1.1', '>=' ) ) {
+			return;
+		}
+
+		global $wpdb;
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$table = $wpdb->prefix . 'wpbyem_logs';
+		$sql   = "CREATE TABLE $table (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			endpoint varchar(255) NOT NULL,
+			ip_address varchar(45) NOT NULL DEFAULT '',
+			user_agent text NOT NULL,
+			blocked_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY blocked_at (blocked_at),
+			KEY endpoint (endpoint(191))
+		) {$wpdb->get_charset_collate()};";
+		dbDelta( $sql );
+
+		// The block list is only needed while handling a REST request — keep it
+		// out of the autoloaded set (F-28).
+		$this->disable_option_autoload( 'wpbyem_blocked_endpoints' );
+
+		update_option( 'wpbyem_db_version', '1.1' );
+	}
+
+	/**
+	 * Keep a newly created block list out of the autoloaded options (F-28).
+	 *
+	 * @param string $option Name of the option that was just added.
+	 */
+	public function maybe_disable_option_autoload( $option ) {
+		if ( 'wpbyem_blocked_endpoints' === $option ) {
+			$this->disable_option_autoload( $option );
+		}
+	}
+
+	/**
+	 * Set autoload off for one option.
+	 *
+	 * @param string $option_name Option name.
+	 */
+	private function disable_option_autoload( $option_name ) {
+		if ( function_exists( 'wp_set_option_autoload' ) ) {
+			wp_set_option_autoload( $option_name, false );
+			return;
+		}
+
+		// WordPress < 6.4 has no wp_set_option_autoload().
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->update( $wpdb->options, array( 'autoload' => 'no' ), array( 'option_name' => $option_name ), array( '%s' ), array( '%s' ) );
+		wp_cache_delete( 'alloptions', 'options' );
+		wp_cache_delete( $option_name, 'options' );
 	}
 
 	/**
@@ -695,28 +769,104 @@ class Wpbyem_Endpoint_Manager {
 		}
 
 		$sanitized = array();
+		$rejected  = array();
 		foreach ( $input as $endpoint ) {
 			$endpoint = trim( (string) $endpoint );
 
-			if ( '' === $endpoint || strlen( $endpoint ) > 500 ) {
+			if ( '' === $endpoint ) {
 				continue;
 			}
 
-			// Validate the pattern compiles as a regex rather than allowlisting characters —
-			// REST route patterns can legitimately contain almost any printable character
-			// (e.g. core's global-styles routes use %, @, and " inside character classes).
-			$test_pattern = '#^' . $endpoint . '$#';
-			$old_limit    = ini_get( 'pcre.backtrack_limit' );
-			ini_set( 'pcre.backtrack_limit', '1000' ); // phpcs:ignore WordPress.PHP.IniSet.Risky
-			$valid = @preg_match( $test_pattern, '' ) !== false;
-			ini_set( 'pcre.backtrack_limit', $old_limit ); // phpcs:ignore WordPress.PHP.IniSet.Risky
-
-			if ( $valid ) {
+			if ( null === $this->get_route_pattern_problem( $endpoint ) ) {
 				$sanitized[] = $endpoint;
+			} else {
+				$rejected[] = $endpoint;
 			}
 		}
 
+		$this->report_rejected_patterns( $rejected );
+
 		return $sanitized;
+	}
+
+	/**
+	 * Say why a route pattern can't be stored, or null if it's fine.
+	 *
+	 * Validation must agree with how patterns are used at match time. A pattern
+	 * is only ever compiled as a regex when it contains a (?P<name>…) group
+	 * (is_regex_route()); every other pattern is compared as a literal string.
+	 * Previously anything that merely COMPILED as a regex was accepted, so values
+	 * like ".*" or "/wp/v2/.*" were stored and then never matched anything —
+	 * looking like protection while doing nothing (F-22). A pattern must now be
+	 * either a plain route or one with a named capture group.
+	 *
+	 * @param string $endpoint Candidate pattern.
+	 * @return string|null Reason code ('too_long', 'malformed', 'not_literal', 'catch_all') or null when valid.
+	 */
+	private function get_route_pattern_problem( $endpoint ) {
+		if ( strlen( $endpoint ) > 500 ) {
+			return 'too_long';
+		}
+
+		// Validate the pattern compiles as a regex rather than allowlisting characters —
+		// REST route patterns can legitimately contain almost any printable character
+		// (e.g. core's global-styles routes use %, @, and " inside character classes).
+		$test_pattern = '#^' . $endpoint . '$#';
+		$old_limit    = ini_get( 'pcre.backtrack_limit' );
+		ini_set( 'pcre.backtrack_limit', '1000' ); // phpcs:ignore WordPress.PHP.IniSet.Risky
+		$compiles = @preg_match( $test_pattern, '' ) !== false;
+		ini_set( 'pcre.backtrack_limit', $old_limit ); // phpcs:ignore WordPress.PHP.IniSet.Risky
+
+		if ( ! $compiles ) {
+			return 'malformed';
+		}
+
+		if ( ! $this->is_regex_route( $endpoint ) ) {
+			// A literal route: regex metacharacters mean the author meant a
+			// pattern, but it would only ever be string-compared.
+			return preg_match( '/[*+?\[\](){}|^$\\\\]/', $endpoint ) ? 'not_literal' : null;
+		}
+
+		// Blocking is the destructive setting, so a pattern that would match
+		// essentially every route is refused too.
+		$regex = $this->convert_route_to_regex( rtrim( $endpoint, '/' ) );
+		// @ — the converted form of an exotic pattern may not compile; that's simply "not a catch-all".
+		if ( @preg_match( $regex, '/wp/v2/posts' ) && @preg_match( $regex, '/oembed/1.0/embed' ) && @preg_match( $regex, '/a/b/c/d/e' ) ) {
+			return 'catch_all';
+		}
+
+		return null;
+	}
+
+	/**
+	 * Tell the admin which submitted patterns weren't saved, instead of dropping
+	 * them silently (F-22). No-op outside wp-admin.
+	 *
+	 * @param array $rejected Rejected pattern strings.
+	 */
+	private function report_rejected_patterns( array $rejected ) {
+		if ( empty( $rejected ) || ! function_exists( 'add_settings_error' ) ) {
+			return;
+		}
+
+		$shown = array_map(
+			function ( $pattern ) {
+				return esc_html( strlen( $pattern ) > 60 ? substr( $pattern, 0, 57 ) . '…' : $pattern );
+			},
+			array_slice( $rejected, 0, 5 )
+		);
+
+		add_settings_error(
+			'wpbyem_messages',
+			'wpbyem_rejected_patterns',
+			sprintf(
+				/* translators: 1: number of rejected patterns, 2: comma-separated list of (up to five) patterns */
+				esc_html__( '%1$d pattern(s) were not saved because they are not a valid route: %2$s. Use an exact route, or a route containing a named capture group such as (?P<id>[\d]+). Catch-all patterns that would match every route are refused.', 'wpbuoy-endpoint-manager' ),
+				count( $rejected ),
+				implode( ', ', $shown )
+			),
+			'warning'
+		);
 	}
 
 	/**
@@ -1192,7 +1342,7 @@ class Wpbyem_Endpoint_Manager {
 		$cleared = isset( $_GET['cleared'] ) && '1' === $_GET['cleared'];
 
 		$filters = $this->get_logs_filters_from_request( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only filter values, no data modification
-		$paged   = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$paged   = isset( $_GET['paged'] ) ? $this->sanitize_page_number( $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$view_data     = $this->prepare_logs_view_data( $filters, $paged );
 		$logs_page_url = admin_url( 'admin.php?page=wpbyem-logs' );
@@ -1235,7 +1385,7 @@ class Wpbyem_Endpoint_Manager {
 		$total          = $this->get_total_logs_count();
 		$filtered_count = $this->get_total_logs_count( $where_clause );
 		$total_pages    = max( 1, (int) ceil( $filtered_count / $per_page ) );
-		$paged          = max( 1, min( $total_pages, absint( $paged ) ) );
+		$paged          = max( 1, min( $total_pages, (int) $paged ) );
 		$offset         = ( $paged - 1 ) * $per_page;
 
 		$logs = $this->get_security_logs( $where_clause, $per_page, $offset );
@@ -1318,11 +1468,13 @@ class Wpbyem_Endpoint_Manager {
 		}
 
 		if ( ! empty( $filters['date_from'] ) && $this->is_valid_log_date( $filters['date_from'] ) ) {
-			$where_parts[] = $wpdb->prepare( 'blocked_at >= %s', $filters['date_from'] . ' 00:00:00' );
+			// Dates are entered in the site's timezone but blocked_at is stored in
+			// UTC, so convert the boundaries before comparing (F-14).
+			$where_parts[] = $wpdb->prepare( 'blocked_at >= %s', get_gmt_from_date( $filters['date_from'] . ' 00:00:00' ) );
 		}
 
 		if ( ! empty( $filters['date_to'] ) && $this->is_valid_log_date( $filters['date_to'] ) ) {
-			$where_parts[] = $wpdb->prepare( 'blocked_at <= %s', $filters['date_to'] . ' 23:59:59' );
+			$where_parts[] = $wpdb->prepare( 'blocked_at <= %s', get_gmt_from_date( $filters['date_to'] . ' 23:59:59' ) );
 		}
 
 		// Free-text search — OR'd across every column a keyword could
@@ -1569,7 +1721,27 @@ class Wpbyem_Endpoint_Manager {
 	 * @return int
 	 */
 	public function save_logs_per_page_option( $status, $option, $value ) {
-		return absint( $value );
+		// absint() flips the sign instead of rejecting it (-20 would have been
+		// stored as 20) and imposed no ceiling, so 5000 was stored despite the
+		// field's own max="999". Non-positive/blank falls back to the default 15
+		// (F-25).
+		$value = (int) $value;
+		if ( $value < 1 ) {
+			return 15;
+		}
+		return min( 999, $value );
+	}
+
+	/**
+	 * Parse a requested Logs page number. Anything below 1 — including
+	 * negatives, which absint() would have turned into a positive page — is
+	 * page 1 (F-25).
+	 *
+	 * @param mixed $raw Raw requested page.
+	 * @return int
+	 */
+	private function sanitize_page_number( $raw ) {
+		return max( 1, (int) $raw );
 	}
 
 	/**
@@ -1589,7 +1761,7 @@ class Wpbyem_Endpoint_Manager {
 		}
 
 		$filters = $this->get_logs_filters_from_request( $_POST );
-		$paged   = isset( $_POST['paged'] ) ? absint( $_POST['paged'] ) : 1;
+		$paged   = isset( $_POST['paged'] ) ? $this->sanitize_page_number( $_POST['paged'] ) : 1;
 
 		$view_data     = $this->prepare_logs_view_data( $filters, $paged );
 		$logs_page_url = admin_url( 'admin.php?page=wpbyem-logs' );

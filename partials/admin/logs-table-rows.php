@@ -40,7 +40,11 @@ $wpbyem_col = function ( $key ) use ( $hidden_columns ) {
 <?php endif; ?>
 <?php foreach ( $logs as $log ) : // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 	<tr data-timestamp="<?php echo esc_attr( $log->blocked_at ); ?>">
-		<td class="column-time<?php echo esc_attr( $wpbyem_col( 'time' ) ); ?>"><?php echo esc_html( human_time_diff( strtotime( $log->blocked_at ), time() ) . ' ago' ); ?></td>
+		<td class="column-time<?php echo esc_attr( $wpbyem_col( 'time' ) ); ?>">
+			<?php echo esc_html( human_time_diff( strtotime( $log->blocked_at ), time() ) . ' ago' ); ?>
+			<?php // blocked_at is UTC; show the absolute time in the site's timezone so a log line can be matched against server/firewall logs (F-19). ?>
+			<time class="log-time-absolute" datetime="<?php echo esc_attr( gmdate( 'c', strtotime( $log->blocked_at . ' UTC' ) ) ); ?>"><?php echo esc_html( get_date_from_gmt( $log->blocked_at, 'Y-m-d H:i:s' ) ); ?></time>
+		</td>
 		<td class="column-ip_address<?php echo esc_attr( $wpbyem_col( 'ip_address' ) ); ?>">
 			<a href="<?php echo esc_url( add_query_arg( 'filter_ip', $log->ip_address, $logs_page_url ) ); ?>" data-filter-ip="<?php echo esc_attr( $log->ip_address ); ?>">
 				<?php echo esc_html( $log->ip_address ); ?>
