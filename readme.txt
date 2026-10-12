@@ -4,7 +4,7 @@ Tags: rest api, rest api security, disable rest api, endpoint manager, api secur
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.1
+Stable tag: 2.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,15 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 7. Built-in contextual help with links to the knowledge base, FAQs, and support.
 
 == Changelog ==
+
+= 2.4.2 =
+* Fixed: the Manage Endpoints page was very heavy to load (several MB of HTML on larger sites) because every route repeated the same inline icons — icons are now shared, making the page much lighter
+* Fixed: Logs date-range filtering compared dates in the wrong timezone — it now uses your site's timezone
+* Fixed: the Logs "Time" column now also shows the exact date and time in your site's timezone under the relative time
+* Fixed: the Method filter offered GET but GET was never shown on the endpoint rows — it now appears as a badge like the other methods
+* Fixed: block-list patterns that merely looked like valid expressions but would never match a real route (such as .*) are now rejected with a notice instead of being silently saved
+* Fixed: a negative or blank page number or "items per page" value on the Logs page could produce an empty or unexpected page — values are now clamped to sensible limits
+* Changed: faster Logs filtering on larger sites, via a new database index; the saved endpoint list no longer loads on every page of your site
 
 = 2.4.1 =
 * Fixed: a blocked endpoint could be reached by changing the case of a single character in the URL (e.g. /wp/v2/Users instead of /wp/v2/users)
