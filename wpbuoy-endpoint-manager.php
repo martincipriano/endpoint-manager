@@ -503,8 +503,71 @@ class Wpbyem_Endpoint_Manager {
 			}
 			// wp_slash() re-adds slashes that wp_unslash() in options.php will strip,
 			// preserving literal backslashes in regex patterns (e.g. \d in dynamic routes).
+			// Keep blocks on routes the form couldn't list (see get_unlisted_patterns()).
+			$decoded_endpoints = array_merge( $decoded_endpoints, $this->get_unlisted_patterns( get_option( 'wpbyem_blocked_endpoints', array() ) ) );
 			$_POST['wpbyem_blocked_endpoints'] = wp_slash( $decoded_endpoints );
 		}
+	}
+
+	/**
+	 * Stored route patterns the Manage Endpoints form has no row for.
+	 *
+	 * The form only lists routes registered right now, and saving it replaces
+	 * the whole list with what was submitted — so a block on a route whose
+	 * plugin happened to be inactive was silently dropped by the next save, and
+	 * the route came back unblocked when the plugin did. These patterns are
+	 * carried through the save untouched and listed in a notice instead.
+	 *
+	 * @param array $patterns Stored route patterns.
+	 * @return array Patterns with no matching listed route.
+	 */
+	private function get_unlisted_patterns( $patterns ) {
+		$listed = array();
+		foreach ( $this->get_rest_routes() as $routes ) {
+			$listed = array_merge( $listed, array_keys( $routes ) );
+		}
+
+		$unlisted = array();
+		foreach ( (array) $patterns as $pattern ) {
+			foreach ( $listed as $route ) {
+				if ( $this->routes_equal( $route, $pattern ) ) {
+					continue 2;
+				}
+			}
+			$unlisted[] = $pattern;
+		}
+
+		return $unlisted;
+	}
+
+	/**
+	 * Tell the admin about blocked patterns the form isn't listing, so blocks
+	 * kept by get_unlisted_patterns() don't become invisible.
+	 */
+	private function report_unlisted_blocked_patterns() {
+		$unlisted = $this->get_unlisted_patterns( get_option( 'wpbyem_blocked_endpoints', array() ) );
+		if ( empty( $unlisted ) ) {
+			return;
+		}
+
+		$shown = array_map(
+			function ( $pattern ) {
+				return esc_html( strlen( $pattern ) > 60 ? substr( $pattern, 0, 57 ) . '…' : $pattern );
+			},
+			array_slice( $unlisted, 0, 5 )
+		);
+
+		add_settings_error(
+			'wpbyem_messages',
+			'wpbyem_unlisted_patterns',
+			sprintf(
+				/* translators: 1: number of blocked routes, 2: comma-separated list of (up to five) routes */
+				esc_html__( '%1$d blocked route(s) are not registered on this site right now — for example, because their plugin is inactive — so they are not listed below: %2$s. They are kept, and apply again as soon as the route is registered.', 'wpbuoy-endpoint-manager' ),
+				count( $unlisted ),
+				implode( ', ', $shown )
+			),
+			'info'
+		);
 	}
 
 	/**
@@ -887,6 +950,8 @@ class Wpbyem_Endpoint_Manager {
 				'updated'
 			);
 		}
+
+		$this->report_unlisted_blocked_patterns();
 
 		settings_errors( 'wpbyem_messages' );
 
