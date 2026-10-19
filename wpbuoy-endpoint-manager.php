@@ -1527,11 +1527,11 @@ class Wpbyem_Endpoint_Manager {
 			}
 
 			$plugins_dir = trailingslashit( wp_normalize_path( WP_PLUGIN_DIR ) );
-			if ( str_starts_with( $file, $plugins_dir ) ) {
+			if ( 0 === strpos( $file, $plugins_dir ) ) {
 				$relative     = substr( $file, strlen( $plugins_dir ) );
 				$plugin_folder = strtok( $relative, '/' );
 				foreach ( get_plugins() as $plugin_file => $plugin_data ) {
-					if ( str_starts_with( $plugin_file, $plugin_folder . '/' ) ) {
+					if ( 0 === strpos( $plugin_file, $plugin_folder . '/' ) ) {
 						return $plugin_data['Name'];
 					}
 				}
@@ -1539,10 +1539,13 @@ class Wpbyem_Endpoint_Manager {
 			}
 
 			$themes_dir = trailingslashit( wp_normalize_path( get_theme_root() ) );
-			if ( str_starts_with( $file, $themes_dir ) ) {
+			if ( 0 === strpos( $file, $themes_dir ) ) {
 				return wp_get_theme()->get( 'Name' );
 			}
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
+			// Throwable, not just Exception: an invokable-object permission_callback
+			// makes ReflectionFunction throw a TypeError, which took the whole
+			// Manage Endpoints screen down with it.
 			return null;
 		}
 
