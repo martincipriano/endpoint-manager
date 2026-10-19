@@ -10,6 +10,14 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
+// Every option, table and cron hook below is shared with Endpoint Manager Pro,
+// which takes them over when it's installed. Deleting Free after upgrading is
+// the natural next step, and used to wipe Pro's block list, settings and logs
+// along with it — so leave everything in place while Pro is still installed.
+if ( file_exists( WP_PLUGIN_DIR . '/wpbuoy-endpoint-manager-pro/wpbuoy-endpoint-manager-pro.php' ) ) {
+	return;
+}
+
 /**
  * Clean up all plugin data for a single site.
  *
