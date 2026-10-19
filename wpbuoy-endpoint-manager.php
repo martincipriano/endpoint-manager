@@ -811,7 +811,8 @@ class Wpbyem_Endpoint_Manager {
 		// Validate the pattern compiles as a regex rather than allowlisting characters —
 		// REST route patterns can legitimately contain almost any printable character
 		// (e.g. core's global-styles routes use %, @, and " inside character classes).
-		$test_pattern = '#^' . $endpoint . '$#';
+		// Compiled exactly as it will be matched (convert_route_to_regex()).
+		$test_pattern = $this->convert_route_to_regex( $endpoint );
 		$old_limit    = ini_get( 'pcre.backtrack_limit' );
 		ini_set( 'pcre.backtrack_limit', '1000' ); // phpcs:ignore WordPress.PHP.IniSet.Risky
 		$compiles = @preg_match( $test_pattern, '' ) !== false;
@@ -1016,25 +1017,89 @@ class Wpbyem_Endpoint_Manager {
 	}
 
 	/**
-	 * Convert a WordPress REST route pattern to a standard PHP regex.
+	 * Build the regex a stored route pattern is matched with.
+	 *
+	 * Uses exactly the expression WP_REST_Server::match_request_to_handler()
+	 * builds for the same pattern ('@^' . $route . '$@i'), so a block always
+	 * matches the requests core would dispatch to that route — including the
+	 * case-insensitivity (F-01). Route patterns are already regular expressions.
+	 * The previous approach split the pattern on "(...)" to quote the literal
+	 * parts, which broke on nested groups and escaped parentheses: core's
+	 * plugins, themes, templates, template-parts, global-styles variations and
+	 * icons routes produced a regex that didn't compile, preg_match() returned
+	 * false, and the "blocked" route stayed reachable.
 	 *
 	 * @param string $route WordPress route pattern with named capture groups.
-	 * @return string Compiled regex pattern with delimiters and anchors.
+	 * @return string Regex with delimiters, anchors and the 'i' flag.
 	 */
 	private function convert_route_to_regex( $route ) {
-		$pattern = preg_replace( '/\(\?P<\w+>/', '(', $route );
-		$parts   = preg_split( '/(\([^)]+\))/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE );
+		return '@^' . $route . '$@i';
+	}
 
-		foreach ( $parts as $i => $part ) {
-			if ( $i % 2 === 0 ) {
-				$parts[ $i ] = preg_quote( $part, '#' );
+	/**
+	 * Locate every top-level (?P<name>…) group in a route pattern.
+	 *
+	 * Finds each group's real closing parenthesis — skipping escaped
+	 * characters, character classes and nested groups — rather than stopping
+	 * at the first ")", which cut core's templates/plugins/themes routes short.
+	 *
+	 * @param string $route Route pattern.
+	 * @return array[] Each entry: 'name', 'start' (byte offset), 'length'.
+	 */
+	private function get_route_param_groups( $route ) {
+		$groups = array();
+		$offset = 0;
+		$length = strlen( $route );
+
+		while ( preg_match( '/\(\?P<(\w+)>/', $route, $match, PREG_OFFSET_CAPTURE, $offset ) ) {
+			$start    = $match[0][1];
+			$end      = null;
+			$depth    = 0;
+			$in_class = false;
+
+			for ( $i = $start; $i < $length; $i++ ) {
+				$char = $route[ $i ];
+				if ( '\\' === $char ) {
+					$i++;
+				} elseif ( $in_class ) {
+					$in_class = ( ']' !== $char );
+				} elseif ( '[' === $char ) {
+					$in_class = true;
+				} elseif ( '(' === $char ) {
+					$depth++;
+				} elseif ( ')' === $char && 0 === --$depth ) {
+					$end = $i;
+					break;
+				}
 			}
+
+			if ( null === $end ) {
+				break;
+			}
+
+			$groups[] = array(
+				'name'   => $match[1][0],
+				'start'  => $start,
+				'length' => $end - $start + 1,
+			);
+			$offset   = $end + 1;
 		}
 
-		// The 'i' flag mirrors WP_REST_Server::dispatch(), which matches routes
-		// case-insensitively — without it a blocked endpoint is reachable by
-		// changing the case of a single character.
-		return '#^' . implode( '', $parts ) . '$#i';
+		return $groups;
+	}
+
+	/**
+	 * Replace every (?P<name>…) group in a route pattern.
+	 *
+	 * @param string   $route    Route pattern.
+	 * @param callable $callback Receives the parameter name, returns the replacement.
+	 * @return string
+	 */
+	private function replace_route_params( $route, callable $callback ) {
+		foreach ( array_reverse( $this->get_route_param_groups( $route ) ) as $group ) {
+			$route = substr_replace( $route, $callback( $group['name'] ), $group['start'], $group['length'] );
+		}
+		return $route;
 	}
 
 	/**
@@ -1078,12 +1143,11 @@ class Wpbyem_Endpoint_Manager {
 	 * @return string Resolved REST URL suitable for a browser preview.
 	 */
 	private function get_dynamic_preview_url( $route ) {
-		$resolved = preg_replace_callback(
-			'/\(\?P<([^>]+)>[^)]+\)/',
-			function( $matches ) {
-				return '__' . $matches[1] . '__';
-			},
-			$route
+		$resolved = $this->replace_route_params(
+			$route,
+			function ( $name ) {
+				return '__' . $name . '__';
+			}
 		);
 		return rest_url( $resolved );
 	}
@@ -1095,9 +1159,8 @@ class Wpbyem_Endpoint_Manager {
 	 * @return array Associative array of param name => default value.
 	 */
 	private function get_dynamic_preview_params( $route ) {
-		preg_match_all( '/\(\?P<([^>]+)>[^)]+\)/', $route, $matches );
 		$params = array();
-		foreach ( $matches[1] as $name ) {
+		foreach ( wp_list_pluck( $this->get_route_param_groups( $route ), 'name' ) as $name ) {
 			$params[ $name ] = 'id' === $name ? (string) $this->resolve_route_id( $route ) : '1';
 		}
 		return $params;
@@ -1110,7 +1173,8 @@ class Wpbyem_Endpoint_Manager {
 	 * @return int Resolved ID, or 1 as fallback.
 	 */
 	private function resolve_route_id( $route ) {
-		$path     = preg_replace( '/\(\?P<[^>]+>[^)]+\).*/', '', $route );
+		$groups   = $this->get_route_param_groups( $route );
+		$path     = $groups ? substr( $route, 0, $groups[0]['start'] ) : $route;
 		$path     = rtrim( $path, '/' );
 		$parts    = explode( '/', trim( $path, '/' ) );
 		$resource = end( $parts );
