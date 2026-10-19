@@ -513,19 +513,53 @@
     /**
      * Highlight matching text inside an element.
      *
+     * Wraps matches in <mark> elements built with DOM APIs, one text node at a
+     * time. Log cells hold attacker-supplied values (user agent, endpoint,
+     * payload), so their text must never be re-parsed as HTML: an entity such as
+     * &lt;img onerror=…&gt; renders as literal text, and writing that text back
+     * through innerHTML would execute it. Working on text nodes also leaves the
+     * cell's own markup (the IP/endpoint filter links) intact.
+     *
      * @param {Element} element  Target element.
      * @param {string}  term     Search term.
      */
     function highlightText(element, term) {
         if (!element || !term) return;
-
-        var original = element.getAttribute('data-original-text') || element.textContent;
-        element.setAttribute('data-original-text', original);
-
-        var regex = new RegExp('(' + escapeRegex(term) + ')', 'gi');
-        element.innerHTML = original.replace(regex, '<mark>$1</mark>');
+    
+        removeHighlight(element);
+    
+        var regex = new RegExp(escapeRegex(term), 'gi');
+        var walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        var textNodes = [];
+        while (walker.nextNode()) {
+            textNodes.push(walker.currentNode);
+        }
+    
+        textNodes.forEach(function (node) {
+            var text = node.nodeValue;
+            var fragment = document.createDocumentFragment();
+            var last = 0;
+            var match;
+    
+            regex.lastIndex = 0;
+            while ((match = regex.exec(text)) !== null) {
+                if (match.index > last) {
+                    fragment.appendChild(document.createTextNode(text.slice(last, match.index)));
+                }
+                var mark = document.createElement('mark');
+                mark.textContent = match[0];
+                fragment.appendChild(mark);
+                last = match.index + match[0].length;
+            }
+    
+            if (last === 0) return;
+            if (last < text.length) {
+                fragment.appendChild(document.createTextNode(text.slice(last)));
+            }
+            node.parentNode.replaceChild(fragment, node);
+        });
     }
-
+    
     /**
      * Remove highlighting from an element.
      *
@@ -533,14 +567,13 @@
      */
     function removeHighlight(element) {
         if (!element) return;
-
-        var original = element.getAttribute('data-original-text');
-        if (original) {
-            element.textContent = original;
-            element.removeAttribute('data-original-text');
-        }
+    
+        element.querySelectorAll('mark').forEach(function (mark) {
+            mark.parentNode.replaceChild(document.createTextNode(mark.textContent), mark);
+        });
+        element.normalize();
     }
-
+    
     /**
      * Escape special regex characters.
      *
