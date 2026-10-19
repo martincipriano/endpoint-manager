@@ -97,6 +97,21 @@ class Wpbyem_Endpoint_Manager {
 	protected $logs_hook = '';
 
 	/**
+	 * The WP_REST_Request built from the HTTP request being served — see
+	 * get_dispatch_context().
+	 *
+	 * @var WP_REST_Request|null
+	 */
+	private $primary_request = null;
+
+	/**
+	 * Whether that request's own dispatch has finished.
+	 *
+	 * @var bool
+	 */
+	private $primary_dispatched = false;
+
+	/**
 	 * Main Wpbyem_Endpoint_Manager Instance.
 	 *
 	 * Ensures only one instance of Wpbyem_Endpoint_Manager is loaded or can be loaded.
@@ -143,6 +158,8 @@ class Wpbyem_Endpoint_Manager {
 		add_action( 'admin_init', array( $this, 'maybe_import_config' ) );
 		add_action( 'admin_notices', array( $this, 'maybe_show_import_notice' ) );
 		add_filter( 'rest_pre_dispatch', array( $this, 'maybe_block_rest_endpoint' ), 10, 3 );
+		add_filter( 'rest_allowed_cors_headers', array( $this, 'capture_primary_request' ), 10, 2 );
+		add_filter( 'rest_post_dispatch', array( $this, 'mark_primary_dispatched' ), 999, 3 );
 		add_action( 'wp_ajax_wpbyem_search_logs', array( $this, 'ajax_search_logs' ) );
 		// Registered unconditionally (not just from setup_logs_screen_options()'s
 		// load-{$logs_hook} hook) because get_hidden_columns() is also called
@@ -1202,6 +1219,109 @@ class Wpbyem_Endpoint_Manager {
 	}
 
 	/**
+	 * Remember the WP_REST_Request core built from the HTTP request itself.
+	 *
+	 * rest_allowed_cors_headers is the last filter WP_REST_Server::serve_request()
+	 * runs before dispatching that request, and the first to receive it
+	 * (WP 6.3+). Older versions fall back to "first request dispatched" in
+	 * get_dispatch_context().
+	 *
+	 * @param array                $headers Allowed CORS headers, returned unchanged.
+	 * @param WP_REST_Request|null $request The request being served.
+	 * @return array
+	 */
+	public function capture_primary_request( $headers, $request = null ) {
+		if ( null === $this->primary_request && $request instanceof WP_REST_Request ) {
+			$this->primary_request = $request;
+		}
+		return $headers;
+	}
+
+	/**
+	 * Note when the HTTP request's own dispatch has finished.
+	 *
+	 * Core embeds linked resources (?_embed) only after this, so any dispatch
+	 * that follows is an embed sub-request.
+	 *
+	 * @param mixed            $response Response, returned unchanged.
+	 * @param WP_REST_Server  $server   Server instance.
+	 * @param WP_REST_Request $request  Request that was dispatched.
+	 * @return mixed
+	 */
+	public function mark_primary_dispatched( $response, $server, $request ) {
+		if ( null !== $this->primary_request && $request === $this->primary_request ) {
+			$this->primary_dispatched = true;
+		}
+		return $response;
+	}
+
+	/**
+	 * Classify a dispatch by where it came from.
+	 *
+	 * is_external_rest_request() says whether the PHP process is serving a REST
+	 * request, which stays true for every dispatch the process makes — so it
+	 * can't tell the client's own request from core's ?_embed sub-requests or
+	 * from a route handler calling rest_do_request() internally. Each of those
+	 * was blocked, logged, rate-limited and counted toward auto-block as if the
+	 * client had sent it: one ?_embed request could burn dozens of rate-limit
+	 * hits, and every embedded link to a blocked route counted as a separate
+	 * blocked hit against the visitor's IP.
+	 *
+	 * - 'primary':  the HTTP request itself — full enforcement.
+	 * - 'batch':    a /batch/v1 sub-request; client-supplied — full enforcement.
+	 * - 'embed':    an ?_embed sub-request — still blocked (or a blocked route
+	 *               would leak through _embed), but not logged or counted.
+	 * - 'internal': a dispatch made by PHP — WordPress's own calls during a page
+	 *               render (F-03), or a route handler calling rest_do_request()
+	 *               while serving the request — never enforced.
+	 *
+	 * @param WP_REST_Request $request Request being dispatched.
+	 * @return string One of 'primary', 'batch', 'embed', 'internal'.
+	 */
+	private function get_dispatch_context( $request ) {
+		if ( ! $this->is_external_rest_request() ) {
+			return 'internal';
+		}
+
+		if ( null === $this->primary_request ) {
+			// WP < 6.3 (see capture_primary_request()): the HTTP request is the
+			// first one serve_request() dispatches.
+			$this->primary_request = $request;
+		}
+
+		if ( $request === $this->primary_request ) {
+			return 'primary';
+		}
+
+		if ( $this->primary_dispatched ) {
+			return 'embed';
+		}
+
+		return $this->routes_equal( rtrim( $this->primary_request->get_route(), '/' ), '/batch/v1' ) ? 'batch' : 'internal';
+	}
+
+	/**
+	 * Shape a refusal for the dispatch it answers.
+	 *
+	 * For /batch/v1 sub-requests core runs rest_post_dispatch on whatever
+	 * rest_pre_dispatch returned without converting a WP_Error first (core's
+	 * own errors there go through error_to_response()). Callbacks type-hinted
+	 * to WP_REST_Response — core's connectors settings filter among them —
+	 * then fatal, taking down the whole batch. A batch refusal is returned as
+	 * the equivalent WP_REST_Response instead: same status and body.
+	 *
+	 * @param WP_Error $error   The refusal.
+	 * @param string   $context Dispatch context, see get_dispatch_context().
+	 * @return WP_Error|WP_REST_Response
+	 */
+	private function refuse( $error, $context ) {
+		if ( 'batch' === $context && function_exists( 'rest_convert_error_to_response' ) ) {
+			return rest_convert_error_to_response( $error );
+		}
+		return $error;
+	}
+
+	/**
 	 * Build a basic preview URL for a dynamic route by substituting capture groups with a default value.
 	 *
 	 * @param string $route WordPress REST route pattern.
@@ -1378,8 +1498,10 @@ class Wpbyem_Endpoint_Manager {
 			return $result;
 		}
 
-		// Never enforce against WordPress's own internal REST calls (F-03).
-		if ( ! $this->is_external_rest_request() ) {
+		// Never enforce against dispatches made by PHP itself (F-03); see
+		// get_dispatch_context() for the rest.
+		$context = $this->get_dispatch_context( $request );
+		if ( 'internal' === $context ) {
 			return $result;
 		}
 
@@ -1422,11 +1544,16 @@ class Wpbyem_Endpoint_Manager {
 			}
 
 			if ( $matched ) {
-				$this->log_blocked_request( $current_route );
-				return new WP_Error(
-					'rest_forbidden',
-					__( 'This REST API endpoint has been disabled.', 'wpbuoy-endpoint-manager' ),
-					array( 'status' => 403 )
+				if ( 'embed' !== $context ) {
+					$this->log_blocked_request( $current_route );
+				}
+				return $this->refuse(
+					new WP_Error(
+						'rest_forbidden',
+						__( 'This REST API endpoint has been disabled.', 'wpbuoy-endpoint-manager' ),
+						array( 'status' => 403 )
+					),
+					$context
 				);
 			}
 		}
