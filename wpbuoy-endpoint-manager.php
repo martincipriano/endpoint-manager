@@ -838,8 +838,14 @@ class Wpbyem_Endpoint_Manager {
 	/**
 	 * Check whether the current user holds any of the given excluded roles.
 	 *
-	 * wp_validate_auth_cookie() reads the cookie directly so browser-based REST
-	 * requests without a nonce are still recognised as the logged-in user.
+	 * Core only authenticates a cookie-based REST request that carries a
+	 * wp_rest nonce. Without one, the logged-in cookie is read directly, so an
+	 * admin opening an endpoint in the browser (or the preview modal's
+	 * nonce-less fetch) is still recognised — but only when the request
+	 * didn't come from another site. The browser attaches that cookie to
+	 * cross-site requests too, which let any page an admin visited fetch
+	 * blocked endpoints through the admin's bypass and, with WordPress's
+	 * credentialed CORS headers, read the response.
 	 *
 	 * @param array $excluded_roles Role slugs excluded from the rule being checked.
 	 * @return bool
@@ -848,7 +854,10 @@ class Wpbyem_Endpoint_Manager {
 		if ( empty( $excluded_roles ) ) {
 			return false;
 		}
-		$user_id = wp_validate_auth_cookie( '', 'logged_in' ) ?: get_current_user_id();
+		$user_id = get_current_user_id();
+		if ( ! $user_id && $this->is_same_site_browser_request() ) {
+			$user_id = (int) wp_validate_auth_cookie( '', 'logged_in' );
+		}
 		if ( ! $user_id ) {
 			return false;
 		}
@@ -857,6 +866,40 @@ class Wpbyem_Endpoint_Manager {
 			return false;
 		}
 		return (bool) array_intersect( $excluded_roles, (array) $user->roles );
+	}
+
+	/**
+	 * Whether the current request can't have been triggered by another site.
+	 *
+	 * Uses the browser's Sec-Fetch-Site header where sent ('same-origin', or
+	 * 'none' for an address-bar visit); otherwise falls back to the Origin
+	 * header, which browsers add to cross-origin requests. A request with
+	 * neither isn't a cross-site browser request.
+	 *
+	 * @return bool
+	 */
+	private function is_same_site_browser_request() {
+		if ( isset( $_SERVER['HTTP_SEC_FETCH_SITE'] ) ) {
+			$fetch_site = strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_SEC_FETCH_SITE'] ) ) );
+			return in_array( $fetch_site, array( 'same-origin', 'none' ), true );
+		}
+
+		if ( isset( $_SERVER['HTTP_ORIGIN'] ) ) {
+			$origin = strtolower( untrailingslashit( esc_url_raw( wp_unslash( $_SERVER['HTTP_ORIGIN'] ) ) ) );
+			foreach ( array( home_url(), site_url() ) as $url ) {
+				$parts = wp_parse_url( $url );
+				if ( empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+					continue;
+				}
+				$own = strtolower( $parts['scheme'] . '://' . $parts['host'] . ( isset( $parts['port'] ) ? ':' . $parts['port'] : '' ) );
+				if ( $origin === $own ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
