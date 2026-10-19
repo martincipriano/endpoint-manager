@@ -4,7 +4,7 @@ Tags: rest api, rest api security, disable rest api, endpoint manager, api secur
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.4.2
+Stable tag: 2.4.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,18 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 7. Built-in contextual help with links to the knowledge base, FAQs, and support.
 
 == Changelog ==
+
+= 2.4.3 =
+* Security: searching the Logs could run script code carried in a logged request URL or User-Agent — search highlights no longer pass log data through HTML
+* Security: a page on another site could make a logged-in administrator's browser reach blocked endpoints through the admin bypass — the bypass now only trusts the login cookie on same-site requests
+* Fixed: blocks on routes with nested patterns (such as the plugins, themes and templates endpoints) never took effect — routes are now matched exactly the way WordPress matches them
+* Fixed: WordPress's own internal REST calls, and those of other plugins, made while handling a request were blocked and logged — they're now left alone; embedded (_embed) requests to blocked routes are still blocked but no longer logged separately
+* Fixed: a /batch/v1 request touching a blocked route could crash the whole batch on WordPress 7.x, and an _embed touching one crashed the request on WordPress before 6.2
+* Fixed: saving Manage Endpoints dropped blocks on routes from deactivated plugins — they're now kept, and the page lists them in a notice
+* Fixed: on a translated admin, the Logs and Settings scripts didn't load and default hidden columns didn't apply
+* Fixed: Manage Endpoints no longer fails when another plugin registers a route with an invokable-object permission callback
+* Changed: deleting the free plugin while Pro is installed now leaves the shared block list, settings and logs in place
+* Changed: requires WordPress 5.9 or later
 
 = 2.4.2 =
 * Fixed: the Manage Endpoints page was very heavy to load (several MB of HTML on larger sites) because every route repeated the same inline icons — icons are now shared, making the page much lighter
@@ -221,6 +233,9 @@ No. Viewing, searching, filtering, previewing endpoints, and reviewing security 
 * Organized by namespace
 
 == Upgrade Notice ==
+
+= 2.4.3 =
+Security fixes for the Logs search and the admin bypass, and blocks on nested routes now take effect. Requires WordPress 5.9 or later.
 
 = 2.0.0 =
 Major update — new security logs, help tab, HTTP method badges, and refreshed WP.org listing with Pro upsell screenshots.

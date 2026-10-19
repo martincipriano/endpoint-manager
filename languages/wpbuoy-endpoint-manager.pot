@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPBuoy Endpoint Manager 2.4.2\n"
+"Project-Id-Version: WPBuoy Endpoint Manager 2.4.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpbuoy-endpoint-manager\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-12T07:42:20+00:00\n"
+"POT-Creation-Date: 2026-10-19T08:44:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpbuoy-endpoint-manager\n"
@@ -56,7 +56,7 @@ msgid "Clear search"
 msgstr ""
 
 #: partials/admin/form-endpoints.php:42
-#: wpbuoy-endpoint-manager.php:1837
+#: wpbuoy-endpoint-manager.php:2160
 msgid "Status"
 msgstr ""
 
@@ -73,7 +73,7 @@ msgid "Disabled Only"
 msgstr ""
 
 #: partials/admin/form-endpoints.php:51
-#: wpbuoy-endpoint-manager.php:1838
+#: wpbuoy-endpoint-manager.php:2161
 msgid "Type"
 msgstr ""
 
@@ -90,7 +90,7 @@ msgid "Dynamic"
 msgstr ""
 
 #: partials/admin/form-endpoints.php:60
-#: wpbuoy-endpoint-manager.php:1839
+#: wpbuoy-endpoint-manager.php:2162
 msgid "Method"
 msgstr ""
 
@@ -99,7 +99,7 @@ msgid "All Methods"
 msgstr ""
 
 #: partials/admin/form-endpoints.php:70
-#: wpbuoy-endpoint-manager.php:1840
+#: wpbuoy-endpoint-manager.php:2163
 msgid "Namespace"
 msgstr ""
 
@@ -109,7 +109,7 @@ msgstr ""
 
 #: partials/admin/form-endpoints.php:80
 #: partials/admin/form-endpoints.php:161
-#: wpbuoy-endpoint-manager.php:1841
+#: wpbuoy-endpoint-manager.php:2164
 msgid "Restricted"
 msgstr ""
 
@@ -228,8 +228,8 @@ msgstr ""
 
 #: partials/admin/page-logs.php:46
 #: partials/admin/page-logs.php:97
-#: wpbuoy-endpoint-manager.php:1565
-#: wpbuoy-endpoint-manager.php:1647
+#: wpbuoy-endpoint-manager.php:1892
+#: wpbuoy-endpoint-manager.php:1970
 msgid "IP Address"
 msgstr ""
 
@@ -239,8 +239,8 @@ msgstr ""
 
 #: partials/admin/page-logs.php:56
 #: partials/admin/page-logs.php:98
-#: wpbuoy-endpoint-manager.php:1566
-#: wpbuoy-endpoint-manager.php:1648
+#: wpbuoy-endpoint-manager.php:1893
+#: wpbuoy-endpoint-manager.php:1971
 msgid "Endpoint"
 msgstr ""
 
@@ -253,17 +253,17 @@ msgid "To"
 msgstr ""
 
 #: partials/admin/page-logs.php:96
-#: wpbuoy-endpoint-manager.php:1564
+#: wpbuoy-endpoint-manager.php:1891
 msgid "Time"
 msgstr ""
 
 #: partials/admin/page-logs.php:99
-#: wpbuoy-endpoint-manager.php:1567
+#: wpbuoy-endpoint-manager.php:1894
 msgid "Response Code"
 msgstr ""
 
 #: partials/admin/page-logs.php:100
-#: wpbuoy-endpoint-manager.php:1568
+#: wpbuoy-endpoint-manager.php:1895
 msgid "User Agent"
 msgstr ""
 
@@ -379,272 +379,279 @@ msgid "Upgrade to Pro"
 msgstr ""
 
 #: partials/admin/page-settings.php:122
-#: wpbuoy-endpoint-manager.php:1322
+#: wpbuoy-endpoint-manager.php:1649
 msgid "Block any REST API endpoint with a configurable response code and message"
 msgstr ""
 
 #: partials/admin/page-settings.php:123
-#: wpbuoy-endpoint-manager.php:1323
+#: wpbuoy-endpoint-manager.php:1650
 msgid "Rate limiting — global and per-endpoint request thresholds"
 msgstr ""
 
 #: partials/admin/page-settings.php:124
-#: wpbuoy-endpoint-manager.php:1324
+#: wpbuoy-endpoint-manager.php:1651
 msgid "IP Block List — manual blocks, auto-block, and allowlist"
 msgstr ""
 
 #: partials/admin/page-settings.php:125
-#: wpbuoy-endpoint-manager.php:1325
+#: wpbuoy-endpoint-manager.php:1652
 msgid "Endpoint preview — inspect live API responses in an inline modal"
 msgstr ""
 
 #: partials/admin/page-settings.php:126
-#: wpbuoy-endpoint-manager.php:1326
+#: wpbuoy-endpoint-manager.php:1653
 msgid "Intuitive admin UI — namespace accordion, live search, and multi-criteria filters"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:356
-msgid "Endpoint Manager"
-msgstr ""
-
-#: wpbuoy-endpoint-manager.php:357
+#: wpbuoy-endpoint-manager.php:387
+#: wpbuoy-endpoint-manager.php:396
 msgid "Endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:370
-#: wpbuoy-endpoint-manager.php:371
+#: wpbuoy-endpoint-manager.php:395
+msgid "Endpoint Manager"
+msgstr ""
+
+#: wpbuoy-endpoint-manager.php:409
+#: wpbuoy-endpoint-manager.php:410
 msgid "Block List"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:381
+#: wpbuoy-endpoint-manager.php:420
 msgid "Security Logs"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:382
+#: wpbuoy-endpoint-manager.php:421
 msgid "Logs"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:394
-#: wpbuoy-endpoint-manager.php:395
+#: wpbuoy-endpoint-manager.php:433
+#: wpbuoy-endpoint-manager.php:434
 msgid "Settings"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:413
-#: wpbuoy-endpoint-manager.php:415
+#: wpbuoy-endpoint-manager.php:452
+#: wpbuoy-endpoint-manager.php:454
 msgid "Getting Started"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:417
+#: wpbuoy-endpoint-manager.php:456
 msgid "What is a REST API endpoint?"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:418
+#: wpbuoy-endpoint-manager.php:457
 msgid "Free vs Pro"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:419
+#: wpbuoy-endpoint-manager.php:458
 msgid "Static vs dynamic endpoints"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:420
+#: wpbuoy-endpoint-manager.php:459
 msgid "Minimum requirements"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:421
+#: wpbuoy-endpoint-manager.php:460
 msgid "Initial configuration"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:422
+#: wpbuoy-endpoint-manager.php:461
 msgid "Will this break my site?"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:423
+#: wpbuoy-endpoint-manager.php:462
 msgid "Privacy and data collection"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:429
-#: wpbuoy-endpoint-manager.php:431
+#: wpbuoy-endpoint-manager.php:468
+#: wpbuoy-endpoint-manager.php:470
 msgid "Features & Usage"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:433
+#: wpbuoy-endpoint-manager.php:472
 msgid "Which endpoints are safe to disable?"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:434
+#: wpbuoy-endpoint-manager.php:473
 msgid "Endpoint preview"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:435
+#: wpbuoy-endpoint-manager.php:474
 msgid "Search and filters"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:436
+#: wpbuoy-endpoint-manager.php:475
 msgid "Security logging"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:437
+#: wpbuoy-endpoint-manager.php:476
 msgid "Log filters"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:438
+#: wpbuoy-endpoint-manager.php:477
 msgid "Rate limiting"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:439
+#: wpbuoy-endpoint-manager.php:478
 msgid "IP Block List"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:440
+#: wpbuoy-endpoint-manager.php:479
 msgid "Shared IPs and auto-block"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:441
+#: wpbuoy-endpoint-manager.php:480
 msgid "CSV export"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:442
+#: wpbuoy-endpoint-manager.php:481
 msgid "Compatibility"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:448
-#: wpbuoy-endpoint-manager.php:450
+#: wpbuoy-endpoint-manager.php:487
+#: wpbuoy-endpoint-manager.php:489
 msgid "Licensing & Billing"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:452
+#: wpbuoy-endpoint-manager.php:491
 msgid "How to activate your license"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:453
+#: wpbuoy-endpoint-manager.php:492
 msgid "Using one license on multiple sites"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:454
+#: wpbuoy-endpoint-manager.php:493
 msgid "What happens when your license expires"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:455
+#: wpbuoy-endpoint-manager.php:494
 msgid "What does \"Pro Features Paused\" mean?"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:456
+#: wpbuoy-endpoint-manager.php:495
 msgid "Refunds"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:462
-#: wpbuoy-endpoint-manager.php:464
+#: wpbuoy-endpoint-manager.php:501
+#: wpbuoy-endpoint-manager.php:503
 msgid "Troubleshooting"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:466
+#: wpbuoy-endpoint-manager.php:505
 msgid "I disabled an endpoint and now my site isn't working"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:467
+#: wpbuoy-endpoint-manager.php:506
 msgid "I can't activate my license"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:468
+#: wpbuoy-endpoint-manager.php:507
 msgid "Security logs aren't showing any data"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:469
+#: wpbuoy-endpoint-manager.php:508
 msgid "How to get support"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:474
+#: wpbuoy-endpoint-manager.php:513
 msgid "For more information:"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:475
+#: wpbuoy-endpoint-manager.php:514
 msgid "Knowledge Base"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:476
+#: wpbuoy-endpoint-manager.php:515
 msgid "Support"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:520
-#: wpbuoy-endpoint-manager.php:569
+#. translators: 1: number of blocked routes, 2: comma-separated list of (up to five) routes
+#: wpbuoy-endpoint-manager.php:604
+#, php-format
+msgid "%1$d blocked route(s) are not registered on this site right now — for example, because their plugin is inactive — so they are not listed below: %2$s. They are kept, and apply again as soon as the route is registered."
+msgstr ""
+
+#: wpbuoy-endpoint-manager.php:622
+#: wpbuoy-endpoint-manager.php:671
 msgid "Security check failed."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:524
-#: wpbuoy-endpoint-manager.php:573
+#: wpbuoy-endpoint-manager.php:626
+#: wpbuoy-endpoint-manager.php:675
 msgid "You do not have permission to do this."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:579
+#: wpbuoy-endpoint-manager.php:681
 msgid "Import failed: no file was uploaded, or the upload failed."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:586
+#: wpbuoy-endpoint-manager.php:688
 msgid "Import failed: invalid or oversized upload."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:595
+#: wpbuoy-endpoint-manager.php:697
 msgid "Import failed: file is not a recognized WPBuoy Endpoint Manager export."
 msgstr ""
 
 #. translators: 1: number of endpoints imported, 2: number skipped
-#: wpbuoy-endpoint-manager.php:637
+#: wpbuoy-endpoint-manager.php:739
 #, php-format
 msgid "Import complete. %1$d blocked endpoint(s) imported, %2$d skipped (not found on this site)."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:700
+#: wpbuoy-endpoint-manager.php:802
 msgid "Manage Endpoints"
 msgstr ""
 
 #. translators: 1: number of rejected patterns, 2: comma-separated list of (up to five) patterns
-#: wpbuoy-endpoint-manager.php:864
+#: wpbuoy-endpoint-manager.php:1010
 #, php-format
 msgid "%1$d pattern(s) were not saved because they are not a valid route: %2$s. Use an exact route, or a route containing a named capture group such as (?P<id>[\\d]+). Catch-all patterns that would match every route are refused."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:885
-#: wpbuoy-endpoint-manager.php:1861
+#: wpbuoy-endpoint-manager.php:1031
+#: wpbuoy-endpoint-manager.php:2184
 msgid "Settings Saved"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1299
+#: wpbuoy-endpoint-manager.php:1624
 msgid "This REST API endpoint has been disabled."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1319
+#: wpbuoy-endpoint-manager.php:1646
 msgid "Keep your REST API protected with IP blocking"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1320
+#: wpbuoy-endpoint-manager.php:1647
 msgid "Block malicious IPs, auto-block repeat offenders, and maintain an allowlist for trusted sources — all from one place."
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1569
+#: wpbuoy-endpoint-manager.php:1896
 msgid "Actions"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1630
+#: wpbuoy-endpoint-manager.php:1953
 msgid "Columns & Filters"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1649
+#: wpbuoy-endpoint-manager.php:1972
 msgid "Date Range"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1670
-#: wpbuoy-endpoint-manager.php:1817
+#: wpbuoy-endpoint-manager.php:1993
+#: wpbuoy-endpoint-manager.php:2140
 msgid "Filters"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1703
+#: wpbuoy-endpoint-manager.php:2026
 msgid "Pagination"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1704
+#: wpbuoy-endpoint-manager.php:2027
 msgid "Logs per page"
 msgstr ""
 
-#: wpbuoy-endpoint-manager.php:1760
+#: wpbuoy-endpoint-manager.php:2083
 msgid "Unauthorized."
 msgstr ""
