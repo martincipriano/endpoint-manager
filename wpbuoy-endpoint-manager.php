@@ -1372,15 +1372,18 @@ class Wpbyem_Endpoint_Manager {
 	 * rest_pre_dispatch returned without converting a WP_Error first (core's
 	 * own errors there go through error_to_response()). Callbacks type-hinted
 	 * to WP_REST_Response — core's connectors settings filter among them —
-	 * then fatal, taking down the whole batch. A batch refusal is returned as
-	 * the equivalent WP_REST_Response instead: same status and body.
+	 * then fatal, taking down the whole batch. Embeds hit the same thing before
+	 * WP 6.2, whose dispatch() didn't convert a rest_pre_dispatch WP_Error:
+	 * core's own rest_send_allow_header() then fatals on it. Batch and embed
+	 * refusals are returned as the equivalent WP_REST_Response instead: same
+	 * status and body.
 	 *
 	 * @param WP_Error $error   The refusal.
 	 * @param string   $context Dispatch context, see get_dispatch_context().
 	 * @return WP_Error|WP_REST_Response
 	 */
 	private function refuse( $error, $context ) {
-		if ( 'batch' === $context && function_exists( 'rest_convert_error_to_response' ) ) {
+		if ( in_array( $context, array( 'batch', 'embed' ), true ) && function_exists( 'rest_convert_error_to_response' ) ) {
 			return rest_convert_error_to_response( $error );
 		}
 		return $error;
