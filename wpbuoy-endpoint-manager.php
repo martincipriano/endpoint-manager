@@ -309,7 +309,7 @@ class Wpbyem_Endpoint_Manager {
 		// The "Filters" visibility-toggle logic is shared between the
 		// Endpoints and Logs pages (see filter-visibility.js) — register it
 		// once as a dependency for whichever page-specific script needs it.
-		if ( in_array( $hook, array( 'toplevel_page_wpbyem', 'endpoints_page_wpbyem-logs' ), true ) ) {
+		if ( in_array( $hook, array( $this->get_screen_id( 'wpbyem' ), $this->get_screen_id( 'wpbyem-logs' ) ), true ) ) {
 			wp_enqueue_script(
 				'wpbyem-filter-visibility',
 				plugin_dir_url( __FILE__ ) . 'assets/js/filter-visibility.js',
@@ -322,7 +322,7 @@ class Wpbyem_Endpoint_Manager {
 		wp_enqueue_script(
 			'wpbyem-admin',
 			plugin_dir_url( __FILE__ ) . 'assets/js/admin.js',
-			'toplevel_page_wpbyem' === $hook ? array( 'wpbyem-filter-visibility' ) : array(),
+			$this->get_screen_id( 'wpbyem' ) === $hook ? array( 'wpbyem-filter-visibility' ) : array(),
 			WPBYEM_VERSION,
 			true
 		);
@@ -338,7 +338,7 @@ class Wpbyem_Endpoint_Manager {
 			)
 		);
 
-		if ( 'endpoints_page_wpbyem-settings' === $hook ) {
+		if ( $this->get_screen_id( 'wpbyem-settings' ) === $hook ) {
 			wp_enqueue_script(
 				'wpbyem-settings',
 				plugin_dir_url( __FILE__ ) . 'assets/js/settings.js',
@@ -348,7 +348,7 @@ class Wpbyem_Endpoint_Manager {
 			);
 		}
 
-		if ( 'endpoints_page_wpbyem-logs' === $hook ) {
+		if ( $this->get_screen_id( 'wpbyem-logs' ) === $hook ) {
 			wp_enqueue_script(
 				'wpbyem-logs',
 				plugin_dir_url( __FILE__ ) . 'assets/js/logs.js',
@@ -363,6 +363,28 @@ class Wpbyem_Endpoint_Manager {
 				'logsPageUrl' => admin_url( 'admin.php?page=wpbyem-logs' ),
 			) );
 		}
+	}
+
+	/**
+	 * Screen ID (admin page hook suffix) of one of the plugin's admin pages.
+	 *
+	 * A submenu page's screen ID starts with its top-level menu title as
+	 * sanitize_title() leaves it — after translation. "endpoints_page_…" is
+	 * only right in English; on a site where "Endpoints" is translated the
+	 * hardcoded IDs matched nothing, so the Logs/Settings scripts never loaded
+	 * and the Logs column defaults didn't apply. This mirrors
+	 * get_plugin_page_hookname() rather than reading the IDs back from
+	 * add_admin_menu(), because admin_menu never fires on admin-ajax.php (F-15).
+	 *
+	 * @param string $page Page slug: 'wpbyem', 'wpbyem-logs', 'wpbyem-settings', ….
+	 * @return string
+	 */
+	private function get_screen_id( $page ) {
+		if ( 'wpbyem' === $page ) {
+			return 'toplevel_page_wpbyem';
+		}
+		// Same string, same text domain, as the menu title in add_admin_menu().
+		return sanitize_title( __( 'Endpoints', 'wpbuoy-endpoint-manager' ) ) . '_page_' . $page;
 	}
 
 	/**
@@ -1665,7 +1687,7 @@ class Wpbyem_Endpoint_Manager {
 			// the AJAX handler too, where there's no "current screen" the
 			// normal admin-page way; get_hidden_columns() accepts a string
 			// and builds the WP_Screen itself either way.
-			'hidden_columns'   => get_hidden_columns( 'endpoints_page_wpbyem-logs' ),
+			'hidden_columns'   => get_hidden_columns( $this->get_screen_id( 'wpbyem-logs' ) ),
 			// Picks the empty-state copy in logs-table-rows.php ("No entries
 			// match your filters." vs. "No blocked requests logged yet.") —
 			// derived from $filters itself so callers can't drift on what
@@ -1857,16 +1879,12 @@ class Wpbyem_Endpoint_Manager {
 	 * @return string[]
 	 */
 	public function default_hidden_logs_columns( $hidden, $screen ) {
-		// Hardcoded rather than compared against $this->logs_hook (F-15): that
-		// property is only populated when add_admin_menu() actually runs,
-		// which admin_menu never does during an admin-ajax.php request — the
-		// exact request this filter also needs to fire correctly for. The
-		// literal is get_plugin_page_hookname( 'wpbyem-logs', 'wpbyem' )'s real
-		// output (verified by actually running add_admin_menu() and reading
-		// $this->logs_hook back — calling get_plugin_page_hookname() directly
-		// outside a real admin_menu firing returns the wrong value, since it
-		// depends on the global $admin_page_hooks that add_menu_page() populates).
-		if ( 'endpoints_page_wpbyem-logs' === $screen->id ) {
+		// Computed by get_screen_id() rather than compared against
+		// $this->logs_hook (F-15): that property is only populated when
+		// add_admin_menu() actually runs, which admin_menu never does during an
+		// admin-ajax.php request — the exact request this filter also needs to
+		// fire correctly for.
+		if ( $this->get_screen_id( 'wpbyem-logs' ) === $screen->id ) {
 			$hidden[] = 'user_agent';
 		}
 
