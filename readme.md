@@ -44,8 +44,8 @@ Disabling certain endpoints may affect WordPress functionality, plugins, or them
 
 ## Requirements
 
-- WordPress 5.0 or higher
-- PHP 7.2 or higher
+- WordPress 5.9 or higher
+- PHP 7.4 or higher
 
 ## License
 
